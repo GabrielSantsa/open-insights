@@ -74,6 +74,67 @@ function EmpresasPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const importXlsx = useMutation({
+    mutationFn: async (file: File) => {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf);
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+      if (!rows.length) throw new Error("Planilha vazia");
+
+      const sectorMap = new Map(
+        (sectors.data ?? []).map((s) => [s.name.toLowerCase().trim(), s.id]),
+      );
+
+      const get = (r: Record<string, unknown>, keys: string[]) => {
+        for (const k of Object.keys(r)) {
+          if (keys.includes(k.toLowerCase().trim())) return String(r[k] ?? "").trim();
+        }
+        return "";
+      };
+
+      const payload = rows
+        .map((r) => {
+          const razao = get(r, ["razao_social", "razão social", "razao social", "razão_social"]);
+          if (!razao) return null;
+          const setorNome = get(r, ["setor", "sector"]);
+          const statusRaw = get(r, ["status"]).toLowerCase();
+          const status = (STATUS_OPTIONS as readonly string[]).includes(statusRaw)
+            ? (statusRaw as (typeof STATUS_OPTIONS)[number])
+            : "ativo";
+          return {
+            razao_social: razao,
+            nome_fantasia: get(r, ["nome_fantasia", "nome fantasia", "fantasia"]) || null,
+            sector_id: setorNome ? sectorMap.get(setorNome.toLowerCase()) ?? null : null,
+            status,
+            observacoes: get(r, ["observacoes", "observações", "obs"]) || null,
+          };
+        })
+        .filter((x): x is NonNullable<typeof x> => x !== null);
+
+      if (!payload.length) throw new Error("Nenhuma linha com 'razao_social' encontrada");
+      const { error } = await supabase.from("companies").insert(payload);
+      if (error) throw error;
+      return payload.length;
+    },
+    onSuccess: (n) => {
+      toast.success(`${n} empresa(s) importada(s)`);
+      qc.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const downloadTemplate = () => {
+    const ws = XLSX.utils.json_to_sheet([
+      { razao_social: "Exemplo LTDA", nome_fantasia: "Exemplo", setor: "", status: "ativo", observacoes: "" },
+    ]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Empresas");
+    XLSX.writeFile(wb, "modelo-empresas.xlsx");
+  };
+
   return (
     <div className="space-y-6 max-w-7xl">
       <div className="flex items-end justify-between gap-4">
@@ -82,10 +143,28 @@ function EmpresasPage() {
           <p className="text-sm text-muted-foreground">Cadastro consolidado dos clientes.</p>
         </div>
         {canManage && (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button><Plus className="w-4 h-4" />Cadastrar empresa</Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) importXlsx.mutate(f);
+                e.target.value = "";
+              }}
+            />
+            <Button variant="outline" onClick={downloadTemplate}>
+              <Download className="w-4 h-4" />Modelo
+            </Button>
+            <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={importXlsx.isPending}>
+              <Upload className="w-4 h-4" />{importXlsx.isPending ? "Importando..." : "Importar Excel"}
+            </Button>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button><Plus className="w-4 h-4" />Cadastrar empresa</Button>
+              </DialogTrigger>
             <DialogContent className="max-w-xl">
               <DialogHeader><DialogTitle>Cadastrar empresa</DialogTitle></DialogHeader>
               <div className="space-y-3">
