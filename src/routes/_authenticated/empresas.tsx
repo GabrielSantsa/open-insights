@@ -34,6 +34,7 @@ function EmpresasPage() {
   const canManage = isApprover(roles);
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [detail, setDetail] = useState<any | null>(null);
   const [form, setForm] = useState({
     razao_social: "",
     nome_fantasia: "",
@@ -76,12 +77,22 @@ function EmpresasPage() {
 
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // dd/mm/yyyy or yyyy-mm-dd → ISO date or null
+  const parseDate = (v: string): string | null => {
+    if (!v) return null;
+    const br = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (br) return `${br[3]}-${br[2]}-${br[1]}`;
+    const iso = v.match(/^\d{4}-\d{2}-\d{2}/);
+    if (iso) return v.slice(0, 10);
+    return null;
+  };
+
   const importXlsx = useMutation({
     mutationFn: async (file: File) => {
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf);
       const sheet = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "", raw: false });
       if (!rows.length) throw new Error("Planilha vazia");
 
       const sectorMap = new Map(
@@ -104,12 +115,36 @@ function EmpresasPage() {
           const status = (STATUS_OPTIONS as readonly string[]).includes(statusRaw)
             ? (statusRaw as (typeof STATUS_OPTIONS)[number])
             : "ativo";
+          const capRaw = get(r, ["capital social", "capital_social"]).replace(/\./g, "").replace(",", ".");
+          const cap = capRaw ? Number(capRaw) : null;
           return {
             razao_social: razao,
             nome_fantasia: get(r, ["nome_fantasia", "nome fantasia", "fantasia"]) || null,
             sector_id: setorNome ? sectorMap.get(setorNome.toLowerCase()) ?? null : null,
             status,
             observacoes: get(r, ["observacoes", "observações", "obs"]) || null,
+            cnpj: get(r, ["cnpj"]) || null,
+            situacao: get(r, ["situação", "situacao"]) || null,
+            data_situacao: parseDate(get(r, ["data situação", "data situacao", "data_situacao"])),
+            inicio_atividades: parseDate(get(r, ["início atividades", "inicio atividades", "inicio_atividades"])),
+            natureza_juridica: get(r, ["natureza jurídica", "natureza juridica", "natureza_juridica"]) || null,
+            porte: get(r, ["porte"]) || null,
+            capital_social: cap && !isNaN(cap) ? cap : null,
+            simples_nacional: get(r, ["simples nacional", "simples_nacional"]) || null,
+            mei: get(r, ["mei"]) || null,
+            cnae_principal: get(r, ["cnae principal", "cnae_principal"]) || null,
+            cnaes_secundarios: get(r, ["cnaes secundários", "cnaes secundarios", "cnaes_secundarios"]) || null,
+            logradouro: get(r, ["logradouro"]) || null,
+            numero: get(r, ["número", "numero"]) || null,
+            complemento: get(r, ["complemento"]) || null,
+            bairro: get(r, ["bairro"]) || null,
+            municipio: get(r, ["município", "municipio"]) || null,
+            uf: get(r, ["uf"]) || null,
+            cep: get(r, ["cep"]) || null,
+            telefone1: get(r, ["telefone 1", "telefone1", "telefone"]) || null,
+            telefone2: get(r, ["telefone 2", "telefone2"]) || null,
+            email: get(r, ["e-mail", "email"]) || null,
+            socios: get(r, ["sócios", "socios"]) || null,
           };
         })
         .filter((x): x is NonNullable<typeof x> => x !== null);
@@ -128,7 +163,16 @@ function EmpresasPage() {
 
   const downloadTemplate = () => {
     const ws = XLSX.utils.json_to_sheet([
-      { razao_social: "Exemplo LTDA", nome_fantasia: "Exemplo", setor: "", status: "ativo", observacoes: "" },
+      {
+        razao_social: "Exemplo LTDA", nome_fantasia: "Exemplo", setor: "", status: "ativo",
+        cnpj: "", "Situação": "", "Data Situação": "", "Início Atividades": "",
+        "Natureza Jurídica": "", "Porte": "", "Capital Social": "",
+        "CNAE Principal": "", "CNAEs Secundários": "",
+        "Logradouro": "", "Número": "", "Complemento": "", "Bairro": "",
+        "Município": "", "UF": "", "CEP": "",
+        "Telefone 1": "", "Telefone 2": "", "E-mail": "", "Sócios": "",
+        observacoes: "",
+      },
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Empresas");
@@ -238,24 +282,85 @@ function EmpresasPage() {
         <CardContent className="p-0">
           <Table>
             <TableHeader><TableRow>
-              <TableHead>Razão social</TableHead><TableHead>Fantasia</TableHead><TableHead>Setor</TableHead><TableHead>Status</TableHead>
+              <TableHead>Razão social</TableHead>
+              <TableHead>CNPJ</TableHead>
+              <TableHead>Cidade/UF</TableHead>
+              <TableHead>Setor</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow></TableHeader>
             <TableBody>
               {(companies.data ?? []).map((c: any) => (
-                <TableRow key={c.id}>
-                  <TableCell className="font-medium">{c.razao_social}</TableCell>
-                  <TableCell>{c.nome_fantasia ?? "—"}</TableCell>
+                <TableRow
+                  key={c.id}
+                  className="cursor-pointer"
+                  onClick={() => setDetail(c)}
+                >
+                  <TableCell className="font-medium">
+                    {c.razao_social}
+                    {c.nome_fantasia && <div className="text-xs text-muted-foreground">{c.nome_fantasia}</div>}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">{c.cnpj ?? "—"}</TableCell>
+                  <TableCell>{c.municipio ? `${c.municipio}/${c.uf ?? ""}` : "—"}</TableCell>
                   <TableCell>{c.sectors?.name ?? "—"}</TableCell>
                   <TableCell><Badge variant="outline" className="capitalize">{c.status}</Badge></TableCell>
                 </TableRow>
               ))}
               {!companies.data?.length && (
-                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma empresa cadastrada ainda.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhuma empresa cadastrada ainda.</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{detail?.razao_social}</DialogTitle></DialogHeader>
+          {detail && (
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              {[
+                ["CNPJ", detail.cnpj],
+                ["Nome fantasia", detail.nome_fantasia],
+                ["Situação", detail.situacao],
+                ["Data situação", detail.data_situacao],
+                ["Início atividades", detail.inicio_atividades],
+                ["Natureza jurídica", detail.natureza_juridica],
+                ["Porte", detail.porte],
+                ["Capital social", detail.capital_social != null ? Number(detail.capital_social).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : null],
+                ["Simples Nacional", detail.simples_nacional],
+                ["MEI", detail.mei],
+                ["CNAE principal", detail.cnae_principal],
+                ["CNAEs secundários", detail.cnaes_secundarios],
+                ["Endereço", [detail.logradouro, detail.numero, detail.complemento].filter(Boolean).join(", ") || null],
+                ["Bairro", detail.bairro],
+                ["Cidade/UF", detail.municipio ? `${detail.municipio}/${detail.uf ?? ""}` : null],
+                ["CEP", detail.cep],
+                ["Telefone 1", detail.telefone1],
+                ["Telefone 2", detail.telefone2],
+                ["E-mail", detail.email],
+                ["Setor", detail.sectors?.name],
+              ].filter(([, v]) => v).map(([k, v]) => (
+                <div key={k as string} className="col-span-2 sm:col-span-1">
+                  <dt className="text-xs text-muted-foreground">{k}</dt>
+                  <dd className="font-medium break-words">{v as string}</dd>
+                </div>
+              ))}
+              {detail.socios && (
+                <div className="col-span-2">
+                  <dt className="text-xs text-muted-foreground">Sócios</dt>
+                  <dd className="font-medium whitespace-pre-wrap">{detail.socios.split(" | ").join("\n")}</dd>
+                </div>
+              )}
+              {detail.observacoes && (
+                <div className="col-span-2">
+                  <dt className="text-xs text-muted-foreground">Observações</dt>
+                  <dd className="whitespace-pre-wrap">{detail.observacoes}</dd>
+                </div>
+              )}
+            </dl>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

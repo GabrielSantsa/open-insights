@@ -192,34 +192,100 @@ export type Database = {
       }
       companies: {
         Row: {
+          bairro: string | null
+          capital_social: number | null
+          cep: string | null
+          cnae_principal: string | null
+          cnaes_secundarios: string | null
+          cnpj: string | null
+          complemento: string | null
           created_at: string
+          data_situacao: string | null
+          email: string | null
           id: string
+          inicio_atividades: string | null
+          logradouro: string | null
+          mei: string | null
+          municipio: string | null
+          natureza_juridica: string | null
           nome_fantasia: string | null
+          numero: string | null
           observacoes: string | null
+          porte: string | null
           razao_social: string
           responsavel_id: string | null
           sector_id: string | null
+          simples_nacional: string | null
+          situacao: string | null
+          socios: string | null
           status: Database["public"]["Enums"]["company_status"]
+          telefone1: string | null
+          telefone2: string | null
+          uf: string | null
         }
         Insert: {
+          bairro?: string | null
+          capital_social?: number | null
+          cep?: string | null
+          cnae_principal?: string | null
+          cnaes_secundarios?: string | null
+          cnpj?: string | null
+          complemento?: string | null
           created_at?: string
+          data_situacao?: string | null
+          email?: string | null
           id?: string
+          inicio_atividades?: string | null
+          logradouro?: string | null
+          mei?: string | null
+          municipio?: string | null
+          natureza_juridica?: string | null
           nome_fantasia?: string | null
+          numero?: string | null
           observacoes?: string | null
+          porte?: string | null
           razao_social: string
           responsavel_id?: string | null
           sector_id?: string | null
+          simples_nacional?: string | null
+          situacao?: string | null
+          socios?: string | null
           status?: Database["public"]["Enums"]["company_status"]
+          telefone1?: string | null
+          telefone2?: string | null
+          uf?: string | null
         }
         Update: {
+          bairro?: string | null
+          capital_social?: number | null
+          cep?: string | null
+          cnae_principal?: string | null
+          cnaes_secundarios?: string | null
+          cnpj?: string | null
+          complemento?: string | null
           created_at?: string
+          data_situacao?: string | null
+          email?: string | null
           id?: string
+          inicio_atividades?: string | null
+          logradouro?: string | null
+          mei?: string | null
+          municipio?: string | null
+          natureza_juridica?: string | null
           nome_fantasia?: string | null
+          numero?: string | null
           observacoes?: string | null
+          porte?: string | null
           razao_social?: string
           responsavel_id?: string | null
           sector_id?: string | null
+          simples_nacional?: string | null
+          situacao?: string | null
+          socios?: string | null
           status?: Database["public"]["Enums"]["company_status"]
+          telefone1?: string | null
+          telefone2?: string | null
+          uf?: string | null
         }
         Relationships: [
           {
