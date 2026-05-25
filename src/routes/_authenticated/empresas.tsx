@@ -362,6 +362,5 @@ function EmpresasPage() {
         </DialogContent>
       </Dialog>
     </div>
-    </div>
   );
 }
