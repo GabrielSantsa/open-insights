@@ -76,12 +76,22 @@ function EmpresasPage() {
 
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // dd/mm/yyyy or yyyy-mm-dd → ISO date or null
+  const parseDate = (v: string): string | null => {
+    if (!v) return null;
+    const br = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (br) return `${br[3]}-${br[2]}-${br[1]}`;
+    const iso = v.match(/^\d{4}-\d{2}-\d{2}/);
+    if (iso) return v.slice(0, 10);
+    return null;
+  };
+
   const importXlsx = useMutation({
     mutationFn: async (file: File) => {
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf);
       const sheet = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "", raw: false });
       if (!rows.length) throw new Error("Planilha vazia");
 
       const sectorMap = new Map(
@@ -104,12 +114,36 @@ function EmpresasPage() {
           const status = (STATUS_OPTIONS as readonly string[]).includes(statusRaw)
             ? (statusRaw as (typeof STATUS_OPTIONS)[number])
             : "ativo";
+          const capRaw = get(r, ["capital social", "capital_social"]).replace(/\./g, "").replace(",", ".");
+          const cap = capRaw ? Number(capRaw) : null;
           return {
             razao_social: razao,
             nome_fantasia: get(r, ["nome_fantasia", "nome fantasia", "fantasia"]) || null,
             sector_id: setorNome ? sectorMap.get(setorNome.toLowerCase()) ?? null : null,
             status,
             observacoes: get(r, ["observacoes", "observações", "obs"]) || null,
+            cnpj: get(r, ["cnpj"]) || null,
+            situacao: get(r, ["situação", "situacao"]) || null,
+            data_situacao: parseDate(get(r, ["data situação", "data situacao", "data_situacao"])),
+            inicio_atividades: parseDate(get(r, ["início atividades", "inicio atividades", "inicio_atividades"])),
+            natureza_juridica: get(r, ["natureza jurídica", "natureza juridica", "natureza_juridica"]) || null,
+            porte: get(r, ["porte"]) || null,
+            capital_social: cap && !isNaN(cap) ? cap : null,
+            simples_nacional: get(r, ["simples nacional", "simples_nacional"]) || null,
+            mei: get(r, ["mei"]) || null,
+            cnae_principal: get(r, ["cnae principal", "cnae_principal"]) || null,
+            cnaes_secundarios: get(r, ["cnaes secundários", "cnaes secundarios", "cnaes_secundarios"]) || null,
+            logradouro: get(r, ["logradouro"]) || null,
+            numero: get(r, ["número", "numero"]) || null,
+            complemento: get(r, ["complemento"]) || null,
+            bairro: get(r, ["bairro"]) || null,
+            municipio: get(r, ["município", "municipio"]) || null,
+            uf: get(r, ["uf"]) || null,
+            cep: get(r, ["cep"]) || null,
+            telefone1: get(r, ["telefone 1", "telefone1", "telefone"]) || null,
+            telefone2: get(r, ["telefone 2", "telefone2"]) || null,
+            email: get(r, ["e-mail", "email"]) || null,
+            socios: get(r, ["sócios", "socios"]) || null,
           };
         })
         .filter((x): x is NonNullable<typeof x> => x !== null);
@@ -128,7 +162,16 @@ function EmpresasPage() {
 
   const downloadTemplate = () => {
     const ws = XLSX.utils.json_to_sheet([
-      { razao_social: "Exemplo LTDA", nome_fantasia: "Exemplo", setor: "", status: "ativo", observacoes: "" },
+      {
+        razao_social: "Exemplo LTDA", nome_fantasia: "Exemplo", setor: "", status: "ativo",
+        cnpj: "", "Situação": "", "Data Situação": "", "Início Atividades": "",
+        "Natureza Jurídica": "", "Porte": "", "Capital Social": "",
+        "CNAE Principal": "", "CNAEs Secundários": "",
+        "Logradouro": "", "Número": "", "Complemento": "", "Bairro": "",
+        "Município": "", "UF": "", "CEP": "",
+        "Telefone 1": "", "Telefone 2": "", "E-mail": "", "Sócios": "",
+        observacoes: "",
+      },
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Empresas");
