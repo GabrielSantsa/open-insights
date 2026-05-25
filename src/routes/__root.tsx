@@ -86,9 +86,12 @@ function AuthInvalidator() {
   const router = useRouter();
   const queryClient = useQueryClient();
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      router.invalidate();
-      queryClient.invalidateQueries();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      // Only invalidate on real auth transitions, not token refreshes / focus events
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+        router.invalidate();
+        queryClient.invalidateQueries();
+      }
     });
     return () => subscription.unsubscribe();
   }, [router, queryClient]);

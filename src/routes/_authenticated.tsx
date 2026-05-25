@@ -7,10 +7,8 @@ import { Topbar } from "@/components/layout/Topbar";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated")({
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) throw redirect({ to: "/login" });
-  },
+  // Auth gating happens client-side via useAuth below — avoids a blocking
+  // supabase.auth.getSession() roundtrip on every navigation.
   component: AuthenticatedLayout,
 });
 
