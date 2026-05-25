@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedProcedimentosRouteImport } from './routes/_authenticated/procedimentos'
 import { Route as AuthenticatedDemandasRouteImport } from './routes/_authenticated/demandas'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedProcedimentosIdRouteImport } from './routes/_authenticated/procedimentos.$id'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -52,6 +53,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedProcedimentosIdRoute =
+  AuthenticatedProcedimentosIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedProcedimentosRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,7 +66,8 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demandas': typeof AuthenticatedDemandasRoute
-  '/procedimentos': typeof AuthenticatedProcedimentosRoute
+  '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
+  '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,7 +75,8 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demandas': typeof AuthenticatedDemandasRoute
-  '/procedimentos': typeof AuthenticatedProcedimentosRoute
+  '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
+  '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,7 +86,8 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/demandas': typeof AuthenticatedDemandasRoute
-  '/_authenticated/procedimentos': typeof AuthenticatedProcedimentosRoute
+  '/_authenticated/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
+  '/_authenticated/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/demandas'
     | '/procedimentos'
+    | '/procedimentos/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/demandas'
     | '/procedimentos'
+    | '/procedimentos/$id'
   id:
     | '__root__'
     | '/'
@@ -105,6 +117,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/demandas'
     | '/_authenticated/procedimentos'
+    | '/_authenticated/procedimentos/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -165,19 +178,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/procedimentos/$id': {
+      id: '/_authenticated/procedimentos/$id'
+      path: '/$id'
+      fullPath: '/procedimentos/$id'
+      preLoaderRoute: typeof AuthenticatedProcedimentosIdRouteImport
+      parentRoute: typeof AuthenticatedProcedimentosRoute
+    }
   }
 }
+
+interface AuthenticatedProcedimentosRouteChildren {
+  AuthenticatedProcedimentosIdRoute: typeof AuthenticatedProcedimentosIdRoute
+}
+
+const AuthenticatedProcedimentosRouteChildren: AuthenticatedProcedimentosRouteChildren =
+  {
+    AuthenticatedProcedimentosIdRoute: AuthenticatedProcedimentosIdRoute,
+  }
+
+const AuthenticatedProcedimentosRouteWithChildren =
+  AuthenticatedProcedimentosRoute._addFileChildren(
+    AuthenticatedProcedimentosRouteChildren,
+  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDemandasRoute: typeof AuthenticatedDemandasRoute
-  AuthenticatedProcedimentosRoute: typeof AuthenticatedProcedimentosRoute
+  AuthenticatedProcedimentosRoute: typeof AuthenticatedProcedimentosRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDemandasRoute: AuthenticatedDemandasRoute,
-  AuthenticatedProcedimentosRoute: AuthenticatedProcedimentosRoute,
+  AuthenticatedProcedimentosRoute: AuthenticatedProcedimentosRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
