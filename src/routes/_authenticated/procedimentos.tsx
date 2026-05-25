@@ -3,11 +3,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { isApprover } from "@/lib/permissions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Search } from "lucide-react";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
+} from "@/components/ui/dialog";
+import { Star, Search, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/procedimentos")({
   component: ProceduresPage,
@@ -15,9 +22,33 @@ export const Route = createFileRoute("/_authenticated/procedimentos")({
 });
 
 function ProceduresPage() {
-  const { user } = useAuth();
+  const { user, roles } = useAuth();
+  const canPublish = isApprover(roles);
   const qc = useQueryClient();
   const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ title: "", description: "", version: "1.0" });
+
+  const publish = useMutation({
+    mutationFn: async () => {
+      if (!form.title.trim()) throw new Error("Título é obrigatório");
+      const { error } = await supabase.from("procedures").insert({
+        title: form.title.trim(),
+        description: form.description.trim() || null,
+        version: form.version.trim() || "1.0",
+        status: "ativo",
+        responsible_id: user!.id,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Procedimento publicado");
+      setForm({ title: "", description: "", version: "1.0" });
+      setOpen(false);
+      qc.invalidateQueries({ queryKey: ["procs"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const procs = useQuery({
     queryKey: ["procs"],
@@ -61,9 +92,41 @@ function ProceduresPage() {
           <h1 className="text-2xl font-bold tracking-tight">Procedimentos</h1>
           <p className="text-sm text-muted-foreground">Base de conhecimento e checklists operacionais.</p>
         </div>
-        <div className="relative w-72">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Buscar procedimento..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+        <div className="flex items-center gap-2">
+          <div className="relative w-72">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input placeholder="Buscar procedimento..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+          </div>
+          {canPublish && (
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button><Plus className="w-4 h-4" />Publicar</Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-xl">
+                <DialogHeader><DialogTitle>Publicar procedimento</DialogTitle></DialogHeader>
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label>Título</Label>
+                    <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Descrição</Label>
+                    <Textarea rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Versão</Label>
+                    <Input value={form.version} onChange={(e) => setForm({ ...form, version: e.target.value })} />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+                  <Button onClick={() => publish.mutate()} disabled={publish.isPending}>
+                    {publish.isPending ? "Publicando..." : "Publicar"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
