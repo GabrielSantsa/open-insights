@@ -92,9 +92,41 @@ function ProceduresPage() {
           <h1 className="text-2xl font-bold tracking-tight">Procedimentos</h1>
           <p className="text-sm text-muted-foreground">Base de conhecimento e checklists operacionais.</p>
         </div>
-        <div className="relative w-72">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Buscar procedimento..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+        <div className="flex items-center gap-2">
+          <div className="relative w-72">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input placeholder="Buscar procedimento..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+          </div>
+          {canPublish && (
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button><Plus className="w-4 h-4" />Publicar</Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-xl">
+                <DialogHeader><DialogTitle>Publicar procedimento</DialogTitle></DialogHeader>
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label>Título</Label>
+                    <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Descrição</Label>
+                    <Textarea rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Versão</Label>
+                    <Input value={form.version} onChange={(e) => setForm({ ...form, version: e.target.value })} />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+                  <Button onClick={() => publish.mutate()} disabled={publish.isPending}>
+                    {publish.isPending ? "Publicando..." : "Publicar"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
