@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedProcedimentosRouteImport } from './routes/_authenticated/procedimentos'
 import { Route as AuthenticatedNoticiasRouteImport } from './routes/_authenticated/noticias'
+import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedDemandasRouteImport } from './routes/_authenticated/demandas'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -49,6 +50,11 @@ const AuthenticatedProcedimentosRoute =
 const AuthenticatedNoticiasRoute = AuthenticatedNoticiasRouteImport.update({
   id: '/noticias',
   path: '/noticias',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedEmpresasRoute = AuthenticatedEmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDocumentosRoute = AuthenticatedDocumentosRouteImport.update({
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demandas': typeof AuthenticatedDemandasRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
+  '/empresas': typeof AuthenticatedEmpresasRoute
   '/noticias': typeof AuthenticatedNoticiasRoute
   '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demandas': typeof AuthenticatedDemandasRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
+  '/empresas': typeof AuthenticatedEmpresasRoute
   '/noticias': typeof AuthenticatedNoticiasRoute
   '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/demandas': typeof AuthenticatedDemandasRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
+  '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
   '/_authenticated/noticias': typeof AuthenticatedNoticiasRoute
   '/_authenticated/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/_authenticated/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/demandas'
     | '/documentos'
+    | '/empresas'
     | '/noticias'
     | '/procedimentos'
     | '/procedimentos/$id'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/demandas'
     | '/documentos'
+    | '/empresas'
     | '/noticias'
     | '/procedimentos'
     | '/procedimentos/$id'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/demandas'
     | '/_authenticated/documentos'
+    | '/_authenticated/empresas'
     | '/_authenticated/noticias'
     | '/_authenticated/procedimentos'
     | '/_authenticated/procedimentos/$id'
@@ -205,6 +217,13 @@ declare module '@tanstack/react-router' {
       path: '/noticias'
       fullPath: '/noticias'
       preLoaderRoute: typeof AuthenticatedNoticiasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/empresas': {
+      id: '/_authenticated/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof AuthenticatedEmpresasRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/documentos': {
@@ -264,6 +283,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDemandasRoute: typeof AuthenticatedDemandasRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
+  AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
   AuthenticatedNoticiasRoute: typeof AuthenticatedNoticiasRoute
   AuthenticatedProcedimentosRoute: typeof AuthenticatedProcedimentosRouteWithChildren
 }
@@ -273,6 +293,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDemandasRoute: AuthenticatedDemandasRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
+  AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
   AuthenticatedNoticiasRoute: AuthenticatedNoticiasRoute,
   AuthenticatedProcedimentosRoute: AuthenticatedProcedimentosRouteWithChildren,
 }
