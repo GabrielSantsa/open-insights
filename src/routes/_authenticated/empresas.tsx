@@ -281,24 +281,86 @@ function EmpresasPage() {
         <CardContent className="p-0">
           <Table>
             <TableHeader><TableRow>
-              <TableHead>Razão social</TableHead><TableHead>Fantasia</TableHead><TableHead>Setor</TableHead><TableHead>Status</TableHead>
+              <TableHead>Razão social</TableHead>
+              <TableHead>CNPJ</TableHead>
+              <TableHead>Cidade/UF</TableHead>
+              <TableHead>Setor</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow></TableHeader>
             <TableBody>
               {(companies.data ?? []).map((c: any) => (
-                <TableRow key={c.id}>
-                  <TableCell className="font-medium">{c.razao_social}</TableCell>
-                  <TableCell>{c.nome_fantasia ?? "—"}</TableCell>
+                <TableRow
+                  key={c.id}
+                  className="cursor-pointer"
+                  onClick={() => setDetail(c)}
+                >
+                  <TableCell className="font-medium">
+                    {c.razao_social}
+                    {c.nome_fantasia && <div className="text-xs text-muted-foreground">{c.nome_fantasia}</div>}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">{c.cnpj ?? "—"}</TableCell>
+                  <TableCell>{c.municipio ? `${c.municipio}/${c.uf ?? ""}` : "—"}</TableCell>
                   <TableCell>{c.sectors?.name ?? "—"}</TableCell>
                   <TableCell><Badge variant="outline" className="capitalize">{c.status}</Badge></TableCell>
                 </TableRow>
               ))}
               {!companies.data?.length && (
-                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma empresa cadastrada ainda.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhuma empresa cadastrada ainda.</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{detail?.razao_social}</DialogTitle></DialogHeader>
+          {detail && (
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              {[
+                ["CNPJ", detail.cnpj],
+                ["Nome fantasia", detail.nome_fantasia],
+                ["Situação", detail.situacao],
+                ["Data situação", detail.data_situacao],
+                ["Início atividades", detail.inicio_atividades],
+                ["Natureza jurídica", detail.natureza_juridica],
+                ["Porte", detail.porte],
+                ["Capital social", detail.capital_social != null ? Number(detail.capital_social).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : null],
+                ["Simples Nacional", detail.simples_nacional],
+                ["MEI", detail.mei],
+                ["CNAE principal", detail.cnae_principal],
+                ["CNAEs secundários", detail.cnaes_secundarios],
+                ["Endereço", [detail.logradouro, detail.numero, detail.complemento].filter(Boolean).join(", ") || null],
+                ["Bairro", detail.bairro],
+                ["Cidade/UF", detail.municipio ? `${detail.municipio}/${detail.uf ?? ""}` : null],
+                ["CEP", detail.cep],
+                ["Telefone 1", detail.telefone1],
+                ["Telefone 2", detail.telefone2],
+                ["E-mail", detail.email],
+                ["Setor", detail.sectors?.name],
+              ].filter(([, v]) => v).map(([k, v]) => (
+                <div key={k as string} className="col-span-2 sm:col-span-1">
+                  <dt className="text-xs text-muted-foreground">{k}</dt>
+                  <dd className="font-medium break-words">{v as string}</dd>
+                </div>
+              ))}
+              {detail.socios && (
+                <div className="col-span-2">
+                  <dt className="text-xs text-muted-foreground">Sócios</dt>
+                  <dd className="font-medium whitespace-pre-wrap">{detail.socios.split(" | ").join("\n")}</dd>
+                </div>
+              )}
+              {detail.observacoes && (
+                <div className="col-span-2">
+                  <dt className="text-xs text-muted-foreground">Observações</dt>
+                  <dd className="whitespace-pre-wrap">{detail.observacoes}</dd>
+                </div>
+              )}
+            </dl>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
     </div>
   );
 }
