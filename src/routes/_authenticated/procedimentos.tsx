@@ -22,9 +22,33 @@ export const Route = createFileRoute("/_authenticated/procedimentos")({
 });
 
 function ProceduresPage() {
-  const { user } = useAuth();
+  const { user, roles } = useAuth();
+  const canPublish = isApprover(roles);
   const qc = useQueryClient();
   const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ title: "", description: "", version: "1.0" });
+
+  const publish = useMutation({
+    mutationFn: async () => {
+      if (!form.title.trim()) throw new Error("Título é obrigatório");
+      const { error } = await supabase.from("procedures").insert({
+        title: form.title.trim(),
+        description: form.description.trim() || null,
+        version: form.version.trim() || "1.0",
+        status: "ativo",
+        responsible_id: user!.id,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Procedimento publicado");
+      setForm({ title: "", description: "", version: "1.0" });
+      setOpen(false);
+      qc.invalidateQueries({ queryKey: ["procs"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const procs = useQuery({
     queryKey: ["procs"],
