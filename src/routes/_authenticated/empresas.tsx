@@ -34,6 +34,7 @@ function EmpresasPage() {
   const canManage = isApprover(roles);
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [detail, setDetail] = useState<any | null>(null);
   const [form, setForm] = useState({
     razao_social: "",
     nome_fantasia: "",
