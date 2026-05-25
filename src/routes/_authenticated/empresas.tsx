@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/empresas")({
   head: () => ({ meta: [{ title: "Empresas — União Contadores" }] }),
 });
 
-const STATUS_OPTIONS = ["ativo", "inativo", "suspenso"] as const;
+const STATUS_OPTIONS = ["ativo", "inativo", "prospecto"] as const;
 
 function EmpresasPage() {
   const { roles } = useAuth();
