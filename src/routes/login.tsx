@@ -1,11 +1,10 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Building2 } from "lucide-react";
 
@@ -18,7 +17,6 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -34,22 +32,6 @@ function LoginPage() {
     if (error) return toast.error(error.message);
     toast.success("Bem-vindo!");
     navigate({ to: "/dashboard" });
-  };
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-        data: { full_name: fullName },
-      },
-    });
-    setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Cadastro realizado! Verifique seu e-mail.");
   };
 
   const handleForgot = async () => {
@@ -78,56 +60,27 @@ function LoginPage() {
             <CardDescription>Use sua conta corporativa para entrar.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="login">
-              <TabsList className="grid grid-cols-2 w-full">
-                <TabsTrigger value="login">Entrar</TabsTrigger>
-                <TabsTrigger value="signup">Cadastrar</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">E-mail</Label>
-                    <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Senha</Label>
-                    <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Entrando..." : "Entrar"}
-                  </Button>
-                  <button type="button" onClick={handleForgot} className="text-sm text-muted-foreground hover:text-foreground w-full text-center">
-                    Esqueci minha senha
-                  </button>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="signup">
-                <form onSubmit={handleSignup} className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nome completo</Label>
-                    <Input id="name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email2">E-mail</Label>
-                    <Input id="email2" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password2">Senha</Label>
-                    <Input id="password2" type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} required />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Cadastrando..." : "Cadastrar"}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">E-mail</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Entrando..." : "Entrar"}
+              </Button>
+              <button type="button" onClick={handleForgot} className="text-sm text-muted-foreground hover:text-foreground w-full text-center">
+                Esqueci minha senha
+              </button>
+            </form>
           </CardContent>
         </Card>
 
         <p className="text-xs text-muted-foreground text-center mt-6">
-          Problemas para entrar? Contate o <Link to="/login" className="underline">administrador</Link>.
+          Novos acessos são criados pelo administrador da intranet.
         </p>
       </div>
     </div>

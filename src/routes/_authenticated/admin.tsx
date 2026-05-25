@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { UserPlus } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,9 +26,14 @@ function AdminPage() {
   }
   return (
     <div className="space-y-6 max-w-7xl">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Painel administrativo</h1>
-        <p className="text-sm text-muted-foreground">Gerencie usuários, perfis e auditoria.</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Painel administrativo</h1>
+          <p className="text-sm text-muted-foreground">Gerencie usuários, perfis e auditoria.</p>
+        </div>
+        <Button asChild>
+          <Link to="/admin/usuarios/novo"><UserPlus className="w-4 h-4 mr-2" /> Novo usuário</Link>
+        </Button>
       </div>
       <Tabs defaultValue="users">
         <TabsList>

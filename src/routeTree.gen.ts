@@ -23,6 +23,7 @@ import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppsRouteImport } from './routes/_authenticated/apps'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedProcedimentosIdRouteImport } from './routes/_authenticated/procedimentos.$id'
+import { Route as AuthenticatedAdminUsuariosNovoRouteImport } from './routes/_authenticated/admin.usuarios.novo'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -95,12 +96,18 @@ const AuthenticatedProcedimentosIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedProcedimentosRoute,
   } as any)
+const AuthenticatedAdminUsuariosNovoRoute =
+  AuthenticatedAdminUsuariosNovoRouteImport.update({
+    id: '/usuarios/novo',
+    path: '/usuarios/novo',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/apps': typeof AuthenticatedAppsRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -110,12 +117,13 @@ export interface FileRoutesByFullPath {
   '/noticias': typeof AuthenticatedNoticiasRoute
   '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
+  '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/apps': typeof AuthenticatedAppsRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -125,6 +133,7 @@ export interface FileRoutesByTo {
   '/noticias': typeof AuthenticatedNoticiasRoute
   '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
+  '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -132,7 +141,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/apps': typeof AuthenticatedAppsRoute
   '/_authenticated/calendario': typeof AuthenticatedCalendarioRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -142,6 +151,7 @@ export interface FileRoutesById {
   '/_authenticated/noticias': typeof AuthenticatedNoticiasRoute
   '/_authenticated/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/_authenticated/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
+  '/_authenticated/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/noticias'
     | '/procedimentos'
     | '/procedimentos/$id'
+    | '/admin/usuarios/novo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/noticias'
     | '/procedimentos'
     | '/procedimentos/$id'
+    | '/admin/usuarios/novo'
   id:
     | '__root__'
     | '/'
@@ -190,6 +202,7 @@ export interface FileRouteTypes {
     | '/_authenticated/noticias'
     | '/_authenticated/procedimentos'
     | '/_authenticated/procedimentos/$id'
+    | '/_authenticated/admin/usuarios/novo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -299,8 +312,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProcedimentosIdRouteImport
       parentRoute: typeof AuthenticatedProcedimentosRoute
     }
+    '/_authenticated/admin/usuarios/novo': {
+      id: '/_authenticated/admin/usuarios/novo'
+      path: '/usuarios/novo'
+      fullPath: '/admin/usuarios/novo'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosNovoRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
+
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminUsuariosNovoRoute: typeof AuthenticatedAdminUsuariosNovoRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminUsuariosNovoRoute: AuthenticatedAdminUsuariosNovoRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedProcedimentosRouteChildren {
   AuthenticatedProcedimentosIdRoute: typeof AuthenticatedProcedimentosIdRoute
@@ -317,7 +348,7 @@ const AuthenticatedProcedimentosRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAppsRoute: typeof AuthenticatedAppsRoute
   AuthenticatedCalendarioRoute: typeof AuthenticatedCalendarioRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -329,7 +360,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAppsRoute: AuthenticatedAppsRoute,
   AuthenticatedCalendarioRoute: AuthenticatedCalendarioRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
