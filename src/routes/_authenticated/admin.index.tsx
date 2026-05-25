@@ -14,7 +14,7 @@ import type { AppRole } from "@/lib/permissions";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminPage,
   head: () => ({ meta: [{ title: "Administração — União Contadores" }] }),
 });
