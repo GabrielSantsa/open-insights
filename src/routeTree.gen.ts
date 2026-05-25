@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedProcedimentosRouteImport } from './routes/_authenticated/procedimentos'
 import { Route as AuthenticatedNoticiasRouteImport } from './routes/_authenticated/noticias'
+import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedDemandasRouteImport } from './routes/_authenticated/demandas'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAppsRouteImport } from './routes/_authenticated/apps'
@@ -50,6 +51,11 @@ const AuthenticatedNoticiasRoute = AuthenticatedNoticiasRouteImport.update({
   path: '/noticias',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDocumentosRoute = AuthenticatedDocumentosRouteImport.update({
+  id: '/documentos',
+  path: '/documentos',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDemandasRoute = AuthenticatedDemandasRouteImport.update({
   id: '/demandas',
   path: '/demandas',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/apps': typeof AuthenticatedAppsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demandas': typeof AuthenticatedDemandasRoute
+  '/documentos': typeof AuthenticatedDocumentosRoute
   '/noticias': typeof AuthenticatedNoticiasRoute
   '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/apps': typeof AuthenticatedAppsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demandas': typeof AuthenticatedDemandasRoute
+  '/documentos': typeof AuthenticatedDocumentosRoute
   '/noticias': typeof AuthenticatedNoticiasRoute
   '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/_authenticated/apps': typeof AuthenticatedAppsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/demandas': typeof AuthenticatedDemandasRoute
+  '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/noticias': typeof AuthenticatedNoticiasRoute
   '/_authenticated/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/_authenticated/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/dashboard'
     | '/demandas'
+    | '/documentos'
     | '/noticias'
     | '/procedimentos'
     | '/procedimentos/$id'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/dashboard'
     | '/demandas'
+    | '/documentos'
     | '/noticias'
     | '/procedimentos'
     | '/procedimentos/$id'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/_authenticated/apps'
     | '/_authenticated/dashboard'
     | '/_authenticated/demandas'
+    | '/_authenticated/documentos'
     | '/_authenticated/noticias'
     | '/_authenticated/procedimentos'
     | '/_authenticated/procedimentos/$id'
@@ -195,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNoticiasRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/documentos': {
+      id: '/_authenticated/documentos'
+      path: '/documentos'
+      fullPath: '/documentos'
+      preLoaderRoute: typeof AuthenticatedDocumentosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/demandas': {
       id: '/_authenticated/demandas'
       path: '/demandas'
@@ -244,6 +263,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAppsRoute: typeof AuthenticatedAppsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDemandasRoute: typeof AuthenticatedDemandasRoute
+  AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedNoticiasRoute: typeof AuthenticatedNoticiasRoute
   AuthenticatedProcedimentosRoute: typeof AuthenticatedProcedimentosRouteWithChildren
 }
@@ -252,6 +272,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppsRoute: AuthenticatedAppsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDemandasRoute: AuthenticatedDemandasRoute,
+  AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedNoticiasRoute: AuthenticatedNoticiasRoute,
   AuthenticatedProcedimentosRoute: AuthenticatedProcedimentosRouteWithChildren,
 }
