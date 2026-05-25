@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedProcedimentosRouteImport } from './routes/_authenticated/procedimentos'
+import { Route as AuthenticatedNoticiasRouteImport } from './routes/_authenticated/noticias'
 import { Route as AuthenticatedDemandasRouteImport } from './routes/_authenticated/demandas'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAppsRouteImport } from './routes/_authenticated/apps'
@@ -44,6 +45,11 @@ const AuthenticatedProcedimentosRoute =
     path: '/procedimentos',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedNoticiasRoute = AuthenticatedNoticiasRouteImport.update({
+  id: '/noticias',
+  path: '/noticias',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDemandasRoute = AuthenticatedDemandasRouteImport.update({
   id: '/demandas',
   path: '/demandas',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/apps': typeof AuthenticatedAppsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demandas': typeof AuthenticatedDemandasRoute
+  '/noticias': typeof AuthenticatedNoticiasRoute
   '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
 }
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/apps': typeof AuthenticatedAppsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demandas': typeof AuthenticatedDemandasRoute
+  '/noticias': typeof AuthenticatedNoticiasRoute
   '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
 }
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/_authenticated/apps': typeof AuthenticatedAppsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/demandas': typeof AuthenticatedDemandasRoute
+  '/_authenticated/noticias': typeof AuthenticatedNoticiasRoute
   '/_authenticated/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/_authenticated/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
 }
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/dashboard'
     | '/demandas'
+    | '/noticias'
     | '/procedimentos'
     | '/procedimentos/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/dashboard'
     | '/demandas'
+    | '/noticias'
     | '/procedimentos'
     | '/procedimentos/$id'
   id:
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/_authenticated/apps'
     | '/_authenticated/dashboard'
     | '/_authenticated/demandas'
+    | '/_authenticated/noticias'
     | '/_authenticated/procedimentos'
     | '/_authenticated/procedimentos/$id'
   fileRoutesById: FileRoutesById
@@ -174,6 +186,13 @@ declare module '@tanstack/react-router' {
       path: '/procedimentos'
       fullPath: '/procedimentos'
       preLoaderRoute: typeof AuthenticatedProcedimentosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/noticias': {
+      id: '/_authenticated/noticias'
+      path: '/noticias'
+      fullPath: '/noticias'
+      preLoaderRoute: typeof AuthenticatedNoticiasRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/demandas': {
@@ -225,6 +244,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAppsRoute: typeof AuthenticatedAppsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDemandasRoute: typeof AuthenticatedDemandasRoute
+  AuthenticatedNoticiasRoute: typeof AuthenticatedNoticiasRoute
   AuthenticatedProcedimentosRoute: typeof AuthenticatedProcedimentosRouteWithChildren
 }
 
@@ -232,6 +252,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppsRoute: AuthenticatedAppsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDemandasRoute: AuthenticatedDemandasRoute,
+  AuthenticatedNoticiasRoute: AuthenticatedNoticiasRoute,
   AuthenticatedProcedimentosRoute: AuthenticatedProcedimentosRouteWithChildren,
 }
 
