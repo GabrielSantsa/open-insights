@@ -480,10 +480,10 @@ function EmpresasPage() {
                   className="cursor-pointer"
                   onClick={() => setDetail(c)}
                 >
-                  <TableCell className="font-mono text-xs">
+                  <TableCell className="font-bold text-primary text-base">
                     {isEditingNumbers ? (
                       <Input 
-                        className="h-8 w-24 text-xs" 
+                        className="h-8 w-24 text-sm font-bold border-primary/30" 
                         value={tempNumbers[c.id] ?? c.company_number ?? ""} 
                         onChange={(e) => setTempNumbers({ ...tempNumbers, [c.id]: e.target.value })}
                         onClick={(e) => e.stopPropagation()}
