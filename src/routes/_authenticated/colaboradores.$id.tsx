@@ -363,9 +363,10 @@ function ColaboradorDetail() {
                         </Button>
                       </div>
                     ) : (
-                      <div className="p-8 border border-dashed rounded-xl text-center text-sm text-muted-foreground bg-muted/20 italic">
-                        Sem gestor direto vinculado.
-                      </div>
+                      <ModuleEmptyState 
+                        title="Sem gestão"
+                        description="Este colaborador não possui um gestor direto vinculado."
+                      />
                     )}
                   </div>
 
