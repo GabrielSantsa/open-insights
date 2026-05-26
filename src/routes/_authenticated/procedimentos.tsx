@@ -15,6 +15,24 @@ import {
 } from "@/components/ui/dialog";
 import { Star, Search, Plus } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+
+const CATEGORIES = ["Fiscal", "Departamento Pessoal", "RH", "Comercial", "Financeiro", "Administrativo"];
+
+const WORKFLOW_LABEL: Record<string, string> = {
+  rascunho: "Rascunho",
+  em_revisao: "Em revisão",
+  publicado: "Publicado",
+  arquivado: "Arquivado",
+};
+const WORKFLOW_VARIANT: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
+  rascunho: "outline",
+  em_revisao: "secondary",
+  publicado: "default",
+  arquivado: "destructive",
+};
 
 export const Route = createFileRoute("/_authenticated/procedimentos")({
   component: ProceduresPage,
@@ -27,7 +45,8 @@ function ProceduresPage() {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ title: "", description: "", version: "1.0" });
+  const [form, setForm] = useState({ title: "", description: "", version: "1.0", category: "Fiscal" });
+
 
   const publish = useMutation({
     mutationFn: async () => {
