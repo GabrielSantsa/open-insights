@@ -552,7 +552,7 @@ function ColaboradorDetail() {
                   <CardTitle className="text-sm font-semibold">Competências & Responsabilidades</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <EmployeeSkills employeeId={id} />
+                  <EmployeeSkills employeeId={id} employeeData={employee} />
                 </CardContent>
               </Card>
             </TabsContent>
