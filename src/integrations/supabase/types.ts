@@ -578,6 +578,7 @@ export type Database = {
       }
       procedures: {
         Row: {
+          content: string | null
           created_at: string
           description: string | null
           id: string
@@ -590,6 +591,7 @@ export type Database = {
           version: string
         }
         Insert: {
+          content?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -602,6 +604,7 @@ export type Database = {
           version?: string
         }
         Update: {
+          content?: string | null
           created_at?: string
           description?: string | null
           id?: string
