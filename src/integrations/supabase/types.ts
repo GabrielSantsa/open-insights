@@ -198,6 +198,7 @@ export type Database = {
           cnae_principal: string | null
           cnaes_secundarios: string | null
           cnpj: string | null
+          company_number: string | null
           complemento: string | null
           created_at: string
           data_situacao: string | null
@@ -230,6 +231,7 @@ export type Database = {
           cnae_principal?: string | null
           cnaes_secundarios?: string | null
           cnpj?: string | null
+          company_number?: string | null
           complemento?: string | null
           created_at?: string
           data_situacao?: string | null
@@ -262,6 +264,7 @@ export type Database = {
           cnae_principal?: string | null
           cnaes_secundarios?: string | null
           cnpj?: string | null
+          company_number?: string | null
           complemento?: string | null
           created_at?: string
           data_situacao?: string | null
