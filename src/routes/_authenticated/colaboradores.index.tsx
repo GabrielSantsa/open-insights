@@ -134,22 +134,22 @@ export function ColaboradoresPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Colaboradores</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Colaboradores</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Encontre rapidamente contatos internos e estrutura da equipe.
           </p>
         </div>
         {isUserAdmin && (
           <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
             <SheetTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90">
+              <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
                 <UserPlus className="w-4 h-4 mr-2" />
                 Novo colaborador
               </Button>
             </SheetTrigger>
-            <SheetContent className="sm:max-w-md md:max-w-lg p-0 flex flex-col h-full">
+            <SheetContent className="w-full sm:max-w-md md:max-w-lg p-0 flex flex-col h-full overflow-hidden">
               <SheetHeader className="p-6 border-b bg-background/50 backdrop-blur-sm sticky top-0 z-10">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
@@ -185,8 +185,8 @@ export function ColaboradoresPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="md:col-span-2 relative">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="sm:col-span-2 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
             placeholder="Buscar por nome, e-mail, cargo ou setor..." 
@@ -276,7 +276,7 @@ export function ColaboradoresPage() {
           onAction={clearFilters}
         />
       ) : view === "cards" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredEmployees.map((emp) => (
             <Link key={emp.id} to="/colaboradores/$id" params={{ id: emp.id }}>
 
@@ -335,11 +335,11 @@ export function ColaboradoresPage() {
           ))}
         </div>
       ) : (
-        <div className="rounded-xl border border-border/40 bg-card overflow-hidden shadow-sm animate-in fade-in duration-500">
+        <div className="rounded-xl border border-border/40 bg-card overflow-x-auto shadow-sm animate-in fade-in duration-500">
           <Table>
             <TableHeader className="bg-muted/30">
               <TableRow className="hover:bg-transparent border-b border-border/40">
-                <TableHead className="w-[300px] text-[10px] font-bold uppercase tracking-widest py-4">Colaborador</TableHead>
+                <TableHead className="min-w-[200px] text-[10px] font-bold uppercase tracking-widest py-4">Colaborador</TableHead>
                 <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">Setor</TableHead>
                 <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">E-mail</TableHead>
                 <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">Ramal</TableHead>
