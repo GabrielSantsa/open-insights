@@ -306,23 +306,41 @@ function ColaboradorDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {employee.gestor ? (
-                <div className="flex items-center gap-3 p-2 rounded-lg border border-transparent hover:border-border/60 hover:bg-muted/30 transition-all cursor-pointer">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={employee.gestor.foto_url || ""} />
-                    <AvatarFallback className="text-xs">
-                      {employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground font-medium">Gestor Direto</p>
-                    <p className="text-sm font-semibold truncate">{employee.gestor.nome_completo}</p>
-                    <p className="text-[11px] text-muted-foreground truncate">{employee.gestor.cargo}</p>
+               <div className="space-y-3">
+                {employee.gestor && (
+                  <div className="flex items-center gap-3 p-2 rounded-lg border border-transparent hover:border-border/60 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => navigate({ to: "/colaboradores/$id", params: { id: employee.gestor.id } })}>
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={employee.gestor.foto_url || ""} />
+                      <AvatarFallback className="text-xs">
+                        {employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground font-medium">Gestor Direto</p>
+                      <p className="text-sm font-semibold truncate">{employee.gestor.nome_completo}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">{employee.gestor.cargo}</p>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground">Nenhum gestor atribuído.</p>
-              )}
+                )}
+                {employee.coordenador && (
+                  <div className="flex items-center gap-3 p-2 rounded-lg border border-transparent hover:border-border/60 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => navigate({ to: "/colaboradores/$id", params: { id: employee.coordenador.id } })}>
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={employee.coordenador.foto_url || ""} />
+                      <AvatarFallback className="text-xs">
+                        {employee.coordenador.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground font-medium">Coordenador</p>
+                      <p className="text-sm font-semibold truncate">{employee.coordenador.nome_completo}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">{employee.coordenador.cargo}</p>
+                    </div>
+                  </div>
+                )}
+                {!employee.gestor && !employee.coordenador && (
+                  <p className="text-xs text-muted-foreground">Nenhuma estrutura de reporte atribuída.</p>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
