@@ -238,8 +238,8 @@ function ColaboradorDetail() {
       </div>
 
 
-      <div className="flex flex-col lg:flex-row gap-8 items-stretch">
-        <div className="lg:w-1/3 flex flex-col gap-6">
+      <div className="flex flex-col gap-6">
+        <div className="w-full flex flex-col gap-6">
           <Card className="border-border/40 overflow-hidden shadow-sm flex-1">
             <div className="h-24 bg-gradient-to-r from-primary/10 to-primary/5" />
             <CardContent className="pt-0 -mt-12 text-center">
