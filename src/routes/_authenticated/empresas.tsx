@@ -34,6 +34,8 @@ function EmpresasPage() {
   const canManage = isApprover(roles);
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [isEditingNumbers, setIsEditingNumbers] = useState(false);
+  const [tempNumbers, setTempNumbers] = useState<Record<string, string>>({});
   const [detail, setDetail] = useState<any | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [form, setForm] = useState({
@@ -254,6 +256,28 @@ function EmpresasPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const saveBulkNumbers = useMutation({
+    mutationFn: async () => {
+      const entries = Object.entries(tempNumbers);
+      if (entries.length === 0) return;
+      
+      const promises = entries.map(([id, number]) => 
+        supabase.from("companies").update({ company_number: number }).eq("id", id)
+      );
+      
+      const results = await Promise.all(promises);
+      const errors = results.filter(r => r.error);
+      if (errors.length > 0) throw new Error("Erro ao salvar alguns números");
+    },
+    onSuccess: () => {
+      toast.success("Números salvos");
+      setIsEditingNumbers(false);
+      setTempNumbers({});
+      qc.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const deleteCompany = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("companies").delete().eq("id", id);
@@ -332,6 +356,24 @@ function EmpresasPage() {
             <Button variant="outline" onClick={() => updateNumbersFileRef.current?.click()} disabled={updateNumbersXlsx.isPending}>
               <Upload className="w-4 h-4" />{updateNumbersXlsx.isPending ? "Processando..." : "Vincular Números"}
             </Button>
+            <Button 
+              variant={isEditingNumbers ? "default" : "outline"} 
+              onClick={() => {
+                if (isEditingNumbers) {
+                  saveBulkNumbers.mutate();
+                } else {
+                  setIsEditingNumbers(true);
+                }
+              }}
+              disabled={saveBulkNumbers.isPending}
+            >
+              {isEditingNumbers ? (saveBulkNumbers.isPending ? "Salvando..." : "Salvar Números") : "Editar Números"}
+            </Button>
+            {isEditingNumbers && (
+              <Button variant="ghost" onClick={() => { setIsEditingNumbers(false); setTempNumbers({}); }}>
+                Cancelar
+              </Button>
+            )}
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button><Plus className="w-4 h-4" />Cadastrar empresa</Button>
@@ -455,7 +497,18 @@ function EmpresasPage() {
                   className="cursor-pointer"
                   onClick={() => setDetail(c)}
                 >
-                  <TableCell className="font-mono text-xs">{c.company_number ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-xs">
+                    {isEditingNumbers ? (
+                      <Input 
+                        className="h-8 w-24 text-xs" 
+                        value={tempNumbers[c.id] ?? c.company_number ?? ""} 
+                        onChange={(e) => setTempNumbers({ ...tempNumbers, [c.id]: e.target.value })}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      c.company_number ?? "—"
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium">
                     {c.razao_social}
                     {c.nome_fantasia && <div className="text-xs text-muted-foreground">{c.nome_fantasia}</div>}
