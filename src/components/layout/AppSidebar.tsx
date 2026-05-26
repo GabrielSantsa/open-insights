@@ -35,6 +35,7 @@ const mainItems = [
   { title: "Empresas", url: "/empresas", icon: Building },
   { title: "Calendário", url: "/calendario", icon: Calendar },
   { title: "Notícias", url: "/noticias", icon: Newspaper },
+  { title: "Colaboradores", url: "/colaboradores", icon: UserIcon },
 ] as const;
 
 export function AppSidebar() {
