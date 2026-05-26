@@ -34,7 +34,7 @@ const WORKFLOW_VARIANT: Record<string, "default" | "secondary" | "outline" | "de
   arquivado: "destructive",
 };
 
-export const Route = createFileRoute("/_authenticated/procedimentos")({
+export const Route = createFileRoute("/_authenticated/procedimentos/")({
   component: ProceduresPage,
   head: () => ({ meta: [{ title: "Procedimentos — União Contadores" }] }),
 });
