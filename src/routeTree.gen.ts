@@ -24,6 +24,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedProcedimentosIndexRouteImport } from './routes/_authenticated/procedimentos.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedProcedimentosIdRouteImport } from './routes/_authenticated/procedimentos.$id'
+import { Route as AuthenticatedNoticiasIdRouteImport } from './routes/_authenticated/noticias.$id'
 import { Route as AuthenticatedAdminUsuariosNovoRouteImport } from './routes/_authenticated/admin.usuarios.novo'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -102,6 +103,11 @@ const AuthenticatedProcedimentosIdRoute =
     path: '/procedimentos/$id',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedNoticiasIdRoute = AuthenticatedNoticiasIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedNoticiasRoute,
+} as any)
 const AuthenticatedAdminUsuariosNovoRoute =
   AuthenticatedAdminUsuariosNovoRouteImport.update({
     id: '/usuarios/novo',
@@ -120,7 +126,8 @@ export interface FileRoutesByFullPath {
   '/demandas': typeof AuthenticatedDemandasRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
-  '/noticias': typeof AuthenticatedNoticiasRoute
+  '/noticias': typeof AuthenticatedNoticiasRouteWithChildren
+  '/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/procedimentos/': typeof AuthenticatedProcedimentosIndexRoute
@@ -136,7 +143,8 @@ export interface FileRoutesByTo {
   '/demandas': typeof AuthenticatedDemandasRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
-  '/noticias': typeof AuthenticatedNoticiasRoute
+  '/noticias': typeof AuthenticatedNoticiasRouteWithChildren
+  '/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/procedimentos': typeof AuthenticatedProcedimentosIndexRoute
@@ -155,7 +163,8 @@ export interface FileRoutesById {
   '/_authenticated/demandas': typeof AuthenticatedDemandasRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
-  '/_authenticated/noticias': typeof AuthenticatedNoticiasRoute
+  '/_authenticated/noticias': typeof AuthenticatedNoticiasRouteWithChildren
+  '/_authenticated/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/_authenticated/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/procedimentos/': typeof AuthenticatedProcedimentosIndexRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/documentos'
     | '/empresas'
     | '/noticias'
+    | '/noticias/$id'
     | '/procedimentos/$id'
     | '/admin/'
     | '/procedimentos/'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/documentos'
     | '/empresas'
     | '/noticias'
+    | '/noticias/$id'
     | '/procedimentos/$id'
     | '/admin'
     | '/procedimentos'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/_authenticated/documentos'
     | '/_authenticated/empresas'
     | '/_authenticated/noticias'
+    | '/_authenticated/noticias/$id'
     | '/_authenticated/procedimentos/$id'
     | '/_authenticated/admin/'
     | '/_authenticated/procedimentos/'
@@ -329,6 +341,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProcedimentosIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/noticias/$id': {
+      id: '/_authenticated/noticias/$id'
+      path: '/$id'
+      fullPath: '/noticias/$id'
+      preLoaderRoute: typeof AuthenticatedNoticiasIdRouteImport
+      parentRoute: typeof AuthenticatedNoticiasRoute
+    }
     '/_authenticated/admin/usuarios/novo': {
       id: '/_authenticated/admin/usuarios/novo'
       path: '/usuarios/novo'
@@ -352,6 +371,19 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedNoticiasRouteChildren {
+  AuthenticatedNoticiasIdRoute: typeof AuthenticatedNoticiasIdRoute
+}
+
+const AuthenticatedNoticiasRouteChildren: AuthenticatedNoticiasRouteChildren = {
+  AuthenticatedNoticiasIdRoute: AuthenticatedNoticiasIdRoute,
+}
+
+const AuthenticatedNoticiasRouteWithChildren =
+  AuthenticatedNoticiasRoute._addFileChildren(
+    AuthenticatedNoticiasRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAppsRoute: typeof AuthenticatedAppsRoute
@@ -360,7 +392,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDemandasRoute: typeof AuthenticatedDemandasRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
-  AuthenticatedNoticiasRoute: typeof AuthenticatedNoticiasRoute
+  AuthenticatedNoticiasRoute: typeof AuthenticatedNoticiasRouteWithChildren
   AuthenticatedProcedimentosIdRoute: typeof AuthenticatedProcedimentosIdRoute
   AuthenticatedProcedimentosIndexRoute: typeof AuthenticatedProcedimentosIndexRoute
 }
@@ -373,7 +405,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDemandasRoute: AuthenticatedDemandasRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
-  AuthenticatedNoticiasRoute: AuthenticatedNoticiasRoute,
+  AuthenticatedNoticiasRoute: AuthenticatedNoticiasRouteWithChildren,
   AuthenticatedProcedimentosIdRoute: AuthenticatedProcedimentosIdRoute,
   AuthenticatedProcedimentosIndexRoute: AuthenticatedProcedimentosIndexRoute,
 }
