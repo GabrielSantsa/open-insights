@@ -444,6 +444,7 @@ export function ColaboradoresPage() {
             <TableBody>
               {filteredEmployees.map((emp) => (
                 <TableRow key={emp.id} className="cursor-pointer group hover:bg-muted/30" onClick={() => window.location.href=`/colaboradores/${emp.id}`}>
+
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 ring-1 ring-border/10">
