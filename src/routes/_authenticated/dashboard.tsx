@@ -155,11 +155,15 @@ function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {(apps.data ?? []).map((a) => (
-                <a key={a.id} href={a.url} target="_blank" rel="noreferrer" className="px-3 py-2 rounded-md border bg-card hover:bg-accent/20 text-sm truncate transition-colors">
-                  {a.name}
-                </a>
-              ))}
+              {(apps.data ?? []).length > 0 ? (
+                (apps.data ?? []).map((a) => (
+                  <a key={a.id} href={a.url} target="_blank" rel="noreferrer" className="px-3 py-2 rounded-md border bg-card hover:bg-accent/20 text-sm truncate transition-colors flex items-center gap-2">
+                    {a.name}
+                  </a>
+                ))
+              ) : (
+                <p className="text-xs text-muted-foreground col-span-full">Nenhum app disponível.</p>
+              )}
             </div>
           </CardContent>
         </Card>
