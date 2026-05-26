@@ -87,6 +87,7 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
   });
 
   const managers = allEmployees?.filter(e => 
+    e.cargo?.toLowerCase().includes("gerencia") || 
     e.cargo?.toLowerCase().includes("gerente") || 
     e.cargo?.toLowerCase().includes("gestor") ||
     e.cargo?.toLowerCase().includes("diretor")
