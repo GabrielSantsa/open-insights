@@ -369,17 +369,13 @@ function ProcedureDetail() {
             <Button variant="outline" size="icon" onClick={() => setFontSize((s) => Math.min(24, s + 1))} title="Aumentar fonte">
               <AArrowUp className="w-4 h-4" />
             </Button>
-            {canEdit && (
-              <>
-                <Button variant="outline" size="sm" className="ml-2" onClick={() => setVersionDialog(true)}>
-                  <GitBranch className="w-4 h-4 mr-1" />Nova versão
-                </Button>
-                {!editing && (
-                  <Button variant="outline" size="sm" onClick={() => { setDraft(content); setEditing(true); }}>
-                    <Pencil className="w-4 h-4 mr-1" />Editar
-                  </Button>
-                )}
-              </>
+            <Button variant="outline" size="sm" className="ml-2" onClick={() => setVersionDialog(true)}>
+              <GitBranch className="w-4 h-4 mr-1" />Nova versão
+            </Button>
+            {!editing && (
+              <Button variant="outline" size="sm" onClick={() => { setDraft(content); setEditing(true); }}>
+                <Pencil className="w-4 h-4 mr-1" />Editar
+              </Button>
             )}
           </div>
         </div>
