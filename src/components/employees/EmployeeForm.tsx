@@ -215,7 +215,7 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Nenhum</SelectItem>
-                    {managers?.filter(m => m.id !== initialData?.id).map((manager) => (
+                    {managers.filter(m => m.id !== initialData?.id).map((manager) => (
                       <SelectItem key={manager.id} value={manager.id}>
                         {manager.nome_completo}
                       </SelectItem>
