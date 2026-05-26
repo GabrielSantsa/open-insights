@@ -379,6 +379,27 @@ export type Database = {
           },
         ]
       }
+      internal_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       news_posts: {
         Row: {
           approved_by: string | null
