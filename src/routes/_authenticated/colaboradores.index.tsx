@@ -370,11 +370,13 @@ export function ColaboradoresPage() {
             <div 
               key={emp.id} 
               className="cursor-pointer"
-              onClick={() => navigate({ to: "/colaboradores/$id", params: { id: emp.id } })}
+              onClick={(e) => {
+                if ((e.target as HTMLElement).closest('button')) return;
+                navigate({ to: "/colaboradores/$id", params: { id: emp.id } });
+              }}
             >
-
               <Card className={cn(
-                "hover:shadow-lg hover:border-primary/20 transition-all group cursor-pointer border-border/60 bg-card overflow-hidden h-full flex flex-col",
+                "hover:shadow-lg hover:border-primary/20 transition-all group border-border/60 bg-card overflow-hidden h-full flex flex-col",
                 emp.status === "desligado" && "opacity-60 grayscale-[0.5]"
               )}>
                 <CardHeader className="flex-row items-center gap-4 space-y-0 pb-4">
@@ -525,14 +527,20 @@ export function ColaboradoresPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={(e) => handleEditClick(emp, e)}>
+                          <DropdownMenuItem onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditClick(emp, e);
+                          }}>
                             <Edit className="mr-2 h-4 w-4" />
                             Editar
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem 
                             className="text-destructive"
-                            onClick={(e) => handleDeleteClick(emp, e)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteClick(emp, e);
+                            }}
                           >
                             <Trash className="mr-2 h-4 w-4" />
                             Excluir
