@@ -336,25 +336,8 @@ function EmpresasPage() {
                 e.target.value = "";
               }}
             />
-            <Button variant="outline" onClick={downloadTemplate}>
-              <Download className="w-4 h-4" />Modelo
-            </Button>
             <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={importXlsx.isPending}>
               <Upload className="w-4 h-4" />{importXlsx.isPending ? "Importando..." : "Importar Excel"}
-            </Button>
-            <input
-              ref={updateNumbersFileRef}
-              type="file"
-              accept=".xlsx,.xls,.csv"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) updateNumbersXlsx.mutate(f);
-                e.target.value = "";
-              }}
-            />
-            <Button variant="outline" onClick={() => updateNumbersFileRef.current?.click()} disabled={updateNumbersXlsx.isPending}>
-              <Upload className="w-4 h-4" />{updateNumbersXlsx.isPending ? "Processando..." : "Vincular Números"}
             </Button>
             <Button 
               variant={isEditingNumbers ? "default" : "outline"} 
