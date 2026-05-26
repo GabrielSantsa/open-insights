@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Bell, Search, LogOut, User as UserIcon } from "lucide-react";
+import { Bell, Search, LogOut, User as UserIcon, LayoutDashboard, Settings } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -148,7 +148,16 @@ export function Topbar() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to="/dashboard"><UserIcon className="w-4 h-4 mr-2" />Meu perfil</Link>
+              <Link to="/meu-perfil/painel">
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                Meu Painel
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/meu-perfil/conta">
+                <Settings className="w-4 h-4 mr-2" />
+                Minha Conta
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
