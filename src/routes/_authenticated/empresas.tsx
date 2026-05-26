@@ -110,7 +110,10 @@ function EmpresasPage() {
 
       const get = (r: Record<string, unknown>, keys: string[]) => {
         for (const k of Object.keys(r)) {
-          if (keys.includes(k.toLowerCase().trim())) return String(r[k] ?? "").trim();
+          const normalizedK = k.toLowerCase().trim();
+          if (keys.some(key => normalizedK === key.toLowerCase().trim() || normalizedK.includes(key.toLowerCase().trim()))) {
+            return String(r[k] ?? "").trim();
+          }
         }
         return "";
       };
@@ -142,8 +145,8 @@ function EmpresasPage() {
             capital_social: cap && !isNaN(cap) ? cap : null,
             simples_nacional: get(r, ["simples nacional", "simples_nacional"]) || null,
             mei: get(r, ["mei"]) || null,
-            cnae_principal: get(r, ["cnae principal", "cnae_principal"]) || null,
-            cnaes_secundarios: get(r, ["cnaes secundários", "cnaes secundarios", "cnaes_secundarios"]) || null,
+            cnae_principal: get(r, ["cnae principal", "cnae_principal", "atividade economica", "atividade econômica", "cnae"]) || null,
+            cnaes_secundarios: get(r, ["cnaes secundários", "cnaes secundarios", "cnaes_secundarios", "atividades secundarias"]) || null,
             logradouro: get(r, ["logradouro"]) || null,
             numero: get(r, ["número", "numero"]) || null,
             complemento: get(r, ["complemento"]) || null,
@@ -154,7 +157,7 @@ function EmpresasPage() {
             telefone1: get(r, ["telefone 1", "telefone1", "telefone"]) || null,
             telefone2: get(r, ["telefone 2", "telefone2"]) || null,
             email: get(r, ["e-mail", "email"]) || null,
-            socios: get(r, ["sócios", "socios"]) || null,
+            socios: get(r, ["sócios", "socios", "quadro societário", "quadro societario", "administradores"]) || null,
           };
         })
         .filter((x): x is NonNullable<typeof x> => x !== null);
@@ -220,7 +223,7 @@ function EmpresasPage() {
         "CNAE Principal": "", "CNAEs Secundários": "",
         "Logradouro": "", "Número": "", "Complemento": "", "Bairro": "",
         "Município": "", "UF": "", "CEP": "",
-        "Telefone 1": "", "Telefone 2": "", "E-mail": "", "Sócios": "",
+        "Telefone 1": "", "Telefone 2": "", "E-mail": "", "Sócios": "Sócio 1, Sócio 2",
         observacoes: "",
       },
     ]);
