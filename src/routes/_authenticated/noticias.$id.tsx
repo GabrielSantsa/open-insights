@@ -99,15 +99,11 @@ function NewsDetail() {
         {n.summary && <p className="text-lg text-muted-foreground">{n.summary}</p>}
       </header>
 
-      <div className="aspect-[16/8] rounded-xl overflow-hidden border bg-muted">
-        {n.cover_image_url ? (
+      {n.cover_image_url && (
+        <div className="aspect-[16/8] rounded-xl overflow-hidden border bg-muted">
           <img src={n.cover_image_url} alt={n.title} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-            <ImageIcon className="w-12 h-12" />
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="prose prose-neutral dark:prose-invert max-w-none">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
