@@ -272,21 +272,9 @@ function ColaboradorDetail() {
                 <Briefcase className="w-4 h-4 mr-2" />
                 Demandas
               </TabsTrigger>
-              <TabsTrigger value="procedimentos" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <GraduationCap className="w-4 h-4 mr-2" />
-                Procedimentos
-              </TabsTrigger>
-              <TabsTrigger value="atividades" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <History className="w-4 h-4 mr-2" />
-                Atividades
-              </TabsTrigger>
               <TabsTrigger value="competencias" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <CheckCircle2 className="w-4 h-4 mr-2" />
                 Competências
-              </TabsTrigger>
-              <TabsTrigger value="assinatura" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <Edit2 className="w-4 h-4 mr-2" />
-                Assinatura
               </TabsTrigger>
               </TabsList>
             </div>
@@ -443,51 +431,6 @@ function ColaboradorDetail() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="procedimentos" className="mt-6 space-y-6">
-               <Card className="border-border/40 shadow-sm overflow-hidden">
-                <Tabs defaultValue="favoritos" className="w-full">
-                  <div className="px-4 border-b bg-muted/10">
-                    <TabsList className="h-10 bg-transparent gap-4">
-                      <TabsTrigger value="favoritos" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 text-xs font-bold uppercase tracking-tighter">Favoritos</TabsTrigger>
-                      <TabsTrigger value="acessados" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 text-xs font-bold uppercase tracking-tighter">Mais Acessados</TabsTrigger>
-                      <TabsTrigger value="recentes" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 text-xs font-bold uppercase tracking-tighter">Últimos Visualizados</TabsTrigger>
-                    </TabsList>
-                  </div>
-                  <TabsContent value="favoritos" className="p-0 m-0">
-                    <ModuleEmptyState 
-                      icon={ShieldCheck}
-                      title="Sem favoritos"
-                      description="Nenhum procedimento favoritado por este colaborador ainda."
-                    />
-                  </TabsContent>
-                  <TabsContent value="acessados" className="p-0 m-0">
-                    <ModuleEmptyState 
-                      icon={GraduationCap}
-                      title="Sem dados de acesso"
-                      description="Ainda não há registros de acesso a procedimentos para este perfil."
-                    />
-                  </TabsContent>
-                  <TabsContent value="recentes" className="p-0 m-0">
-                    <ModuleEmptyState 
-                      icon={History}
-                      title="Sem histórico"
-                      description="Nenhum procedimento visualizado recentemente por este colaborador."
-                    />
-                  </TabsContent>
-                </Tabs>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="atividades" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
-              <Card className="border-border/40 shadow-sm">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-sm font-semibold">Histórico de Atividades</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <EmployeeActivity employeeId={id} />
-                </CardContent>
-              </Card>
-            </TabsContent>
 
             <TabsContent value="competencias" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
               <Card className="border-border/40 shadow-sm">
@@ -496,17 +439,6 @@ function ColaboradorDetail() {
                 </CardHeader>
                 <CardContent>
                   <EmployeeSkills employeeId={id} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="assinatura" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
-              <Card className="border-border/40 shadow-sm">
-                <CardHeader className="pb-6">
-                  <CardTitle className="text-sm font-semibold">Assinatura Corporativa</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <EmployeeSignature employee={employee} />
                 </CardContent>
               </Card>
             </TabsContent>
