@@ -90,7 +90,7 @@ function ColaboradorDetail() {
               <Avatar className="h-24 w-24 mx-auto border-4 border-background shadow-md">
                 <AvatarImage src={employee.foto_url || ""} />
                 <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                  {employee.nome_completo.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase()}
+                  {employee.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <h1 className="mt-4 text-xl font-bold">{employee.nome_completo}</h1>
@@ -159,7 +159,7 @@ function ColaboradorDetail() {
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={employee.gestor.foto_url || ""} />
                     <AvatarFallback className="text-xs">
-                      {employee.gestor.nome_completo.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase()}
+                      {employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
@@ -249,7 +249,7 @@ function ColaboradorDetail() {
                           <Avatar className="h-9 w-9">
                             <AvatarImage src={sub.foto_url || ""} />
                             <AvatarFallback className="text-xs">
-                              {sub.nome_completo.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase()}
+                              {sub.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
