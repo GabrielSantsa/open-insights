@@ -306,7 +306,32 @@ function EmpresasPage() {
         )}
       </div>
 
+      {(() => {
+        const list = companies.data ?? [];
+        const total = list.length;
+        const by = (s: string) => list.filter((c: any) => c.status === s).length;
+        const stats = [
+          { label: "Total", value: total },
+          { label: "Ativas", value: by("ativo") },
+          { label: "Inativas", value: by("inativo") },
+          { label: "Prospectos", value: by("prospecto") },
+        ];
+        return (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {stats.map((s) => (
+              <Card key={s.label}>
+                <CardContent className="p-4">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">{s.label}</p>
+                  <p className="text-2xl font-bold mt-1">{s.value}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        );
+      })()}
+
       <Card>
+
         <CardContent className="p-0">
           <Table>
             <TableHeader><TableRow>
