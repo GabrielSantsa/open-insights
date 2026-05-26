@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -18,7 +18,8 @@ import {
   Edit2,
   Save,
   Copy,
-  CheckCircle2
+  CheckCircle2,
+  Trash2
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,17 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { EmployeeForm } from "@/components/employees/EmployeeForm";
 import { EmployeeActivity } from "@/components/employees/EmployeeActivity";
 import { EmployeeSkills } from "@/components/employees/EmployeeSkills";
@@ -54,7 +66,9 @@ function ColaboradorDetail() {
   const { id } = Route.useParams();
   const { roles } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const isUserAdmin = isAdmin(roles);
 
 
@@ -110,8 +124,30 @@ function ColaboradorDetail() {
     },
   });
 
+  const deleteEmployeeMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("employee_profiles")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      toast.success("Colaborador removido com sucesso!");
+      navigate({ to: "/colaboradores" });
+    },
+    onError: (err: any) => {
+      toast.error(`Erro ao remover colaborador: ${err.message}`);
+    },
+  });
+
   const handleUpdate = (data: any) => {
     updateEmployeeMutation.mutate(data);
+  };
+
+  const handleDelete = () => {
+    deleteEmployeeMutation.mutate();
   };
 
 
@@ -157,10 +193,38 @@ function ColaboradorDetail() {
           </Button>
           
           {isUserAdmin && (
-            <Button onClick={() => setIsEditDrawerOpen(true)} variant="outline" className="gap-2 h-9 border-primary/20 text-primary hover:bg-primary/5 flex-1 sm:flex-none">
-              <Edit2 className="w-4 h-4" />
-              Editar Perfil
-            </Button>
+            <div className="flex items-center gap-2 flex-1 sm:flex-none">
+              <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" className="gap-2 h-9 border-destructive/20 text-destructive hover:bg-destructive/5 flex-1 sm:flex-none">
+                    <Trash2 className="w-4 h-4" />
+                    Excluir
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta ação não pode ser desfeita. Isso excluirá permanentemente o perfil de <strong>{employee.nome_completo}</strong> e removerá seus dados de nossos servidores.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleDelete}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Excluir Colaborador
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              <Button onClick={() => setIsEditDrawerOpen(true)} variant="outline" className="gap-2 h-9 border-primary/20 text-primary hover:bg-primary/5 flex-1 sm:flex-none">
+                <Edit2 className="w-4 h-4" />
+                Editar Perfil
+              </Button>
+            </div>
           )}
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, UserPlus, LayoutGrid, List, FilterX, Building2, MapPin, Mail, Phone, ExternalLink, Users, Save, X } from "lucide-react";
+import { Search, UserPlus, LayoutGrid, List, FilterX, Building2, MapPin, Mail, Phone, ExternalLink, Users, Save, X, MoreHorizontal, Edit, Trash, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,25 @@ import {
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmployeeForm } from "@/components/employees/EmployeeForm";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 
 export function ColaboradoresPage() {
@@ -53,6 +72,9 @@ export function ColaboradoresPage() {
   const [setorFilter, setSetorFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<any>(null);
+  const [deletingEmployee, setDeletingEmployee] = useState<any>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const isUserAdmin = isAdmin(roles);
 
@@ -90,6 +112,44 @@ export function ColaboradoresPage() {
     },
   });
 
+  const updateEmployeeMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const { error } = await supabase
+        .from("employee_profiles")
+        .update(data)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      toast.success("Colaborador atualizado com sucesso!");
+      setIsDrawerOpen(false);
+      setEditingEmployee(null);
+    },
+    onError: (err: any) => {
+      toast.error(`Erro ao atualizar colaborador: ${err.message}`);
+    },
+  });
+
+  const deleteEmployeeMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("employee_profiles")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      toast.success("Colaborador removido com sucesso!");
+      setIsDeleteDialogOpen(false);
+      setDeletingEmployee(null);
+    },
+    onError: (err: any) => {
+      toast.error(`Erro ao remover colaborador: ${err.message}`);
+    },
+  });
+
 
   const filteredEmployees = useMemo(() => {
     if (!employees) return [];
@@ -119,7 +179,23 @@ export function ColaboradoresPage() {
   };
 
   const handleSave = (data: any) => {
-    createEmployeeMutation.mutate(data);
+    if (editingEmployee) {
+      updateEmployeeMutation.mutate({ id: editingEmployee.id, data });
+    } else {
+      createEmployeeMutation.mutate(data);
+    }
+  };
+
+  const handleEditClick = (emp: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingEmployee(emp);
+    setIsDrawerOpen(true);
+  };
+
+  const handleDeleteClick = (emp: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeletingEmployee(emp);
+    setIsDeleteDialogOpen(true);
   };
 
 
@@ -142,9 +218,12 @@ export function ColaboradoresPage() {
           </p>
         </div>
         {isUserAdmin && (
-          <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <Sheet open={isDrawerOpen} onOpenChange={(open) => {
+            setIsDrawerOpen(open);
+            if (!open) setEditingEmployee(null);
+          }}>
             <SheetTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
+              <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto" onClick={() => setEditingEmployee(null)}>
                 <UserPlus className="w-4 h-4 mr-2" />
                 Novo colaborador
               </Button>
@@ -153,19 +232,23 @@ export function ColaboradoresPage() {
               <SheetHeader className="p-6 border-b bg-background/50 backdrop-blur-sm sticky top-0 z-10">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <SheetTitle>Novo Colaborador</SheetTitle>
-                    <SheetDescription>Cadastre um novo membro na equipe interna.</SheetDescription>
+                    <SheetTitle>{editingEmployee ? "Editar Colaborador" : "Novo Colaborador"}</SheetTitle>
+                    <SheetDescription>
+                      {editingEmployee 
+                        ? `Altere as informações de ${editingEmployee.nome_completo}.` 
+                        : "Cadastre um novo membro na equipe interna."}
+                    </SheetDescription>
                   </div>
                   <Button 
                     onClick={() => {
                       const form = document.querySelector('form');
                       if (form) form.requestSubmit();
                     }}
-                    disabled={createEmployeeMutation.isPending}
+                    disabled={createEmployeeMutation.isPending || updateEmployeeMutation.isPending}
                     size="sm"
                     className="gap-2"
                   >
-                    {createEmployeeMutation.isPending ? (
+                    {createEmployeeMutation.isPending || updateEmployeeMutation.isPending ? (
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
                     ) : (
                       <Save className="w-4 h-4" />
@@ -175,9 +258,10 @@ export function ColaboradoresPage() {
                 </div>
               </SheetHeader>
               <EmployeeForm 
+                initialData={editingEmployee}
                 onSubmit={handleSave} 
                 onCancel={() => setIsDrawerOpen(false)} 
-                isSubmitting={createEmployeeMutation.isPending} 
+                isSubmitting={createEmployeeMutation.isPending || updateEmployeeMutation.isPending} 
               />
 
             </SheetContent>
@@ -296,7 +380,32 @@ export function ColaboradoresPage() {
                       <h3 className="font-semibold text-base truncate group-hover:text-primary transition-colors">
                         {emp.nome_completo}
                       </h3>
-                      <EmployeeStatusBadge status={emp.status as EmployeeStatus} />
+                      <div className="flex items-center gap-1">
+                        <EmployeeStatusBadge status={emp.status as EmployeeStatus} />
+                        {isUserAdmin && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+                              <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <MoreHorizontal className="h-3 w-3" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={(e) => handleEditClick(emp, e)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                className="text-destructive"
+                                onClick={(e) => handleDeleteClick(emp, e)}
+                              >
+                                <Trash className="mr-2 h-4 w-4" />
+                                Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
+                      </div>
                     </div>
                     <p className="text-sm text-muted-foreground truncate">{emp.cargo}</p>
                   </div>
@@ -344,7 +453,8 @@ export function ColaboradoresPage() {
                 <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">E-mail</TableHead>
                 <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">Ramal</TableHead>
                 <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">Gestor</TableHead>
-                <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest py-4">Status</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">Status</TableHead>
+                {isUserAdmin && <TableHead className="w-[50px]"></TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -380,15 +490,60 @@ export function ColaboradoresPage() {
                   <TableCell className="text-sm text-muted-foreground">
                     {emp.gestor ? emp.gestor.nome_completo : "-"}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell>
                     <EmployeeStatusBadge status={emp.status as EmployeeStatus} variant="outline" />
                   </TableCell>
+                  {isUserAdmin && (
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={(e) => handleEditClick(emp, e)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={(e) => handleDeleteClick(emp, e)}
+                          >
+                            <Trash className="mr-2 h-4 w-4" />
+                            Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
       )}
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente o perfil de <strong>{deletingEmployee?.nome_completo}</strong> e removerá seus dados de nossos servidores.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeletingEmployee(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => deletingEmployee && deleteEmployeeMutation.mutate(deletingEmployee.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir Colaborador
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
