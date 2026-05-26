@@ -40,6 +40,11 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
     assinatura_email: "",
     foto_url: "",
     coordenador_id: null as string | null,
+    foco: "",
+    perfil: "",
+    atuacao: "",
+    competencias_responsabilidades: "",
+    conhecimento_tecnico: "",
   });
 
   useEffect(() => {
