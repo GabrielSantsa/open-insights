@@ -34,10 +34,8 @@ function EmpresasPage() {
   const canManage = isApprover(roles);
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [isEditingNumbers, setIsEditingNumbers] = useState(false);
-  const [tempNumbers, setTempNumbers] = useState<Record<string, string>>({});
-  const [detail, setDetail] = useState<any | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [detail, setDetail] = useState<any | null>(null);
   const [form, setForm] = useState({
     company_number: "",
     razao_social: "",
@@ -64,6 +62,7 @@ function EmpresasPage() {
     c.cnpj?.includes(searchTerm) ||
     c.company_number?.includes(searchTerm)
   );
+
   const create = useMutation({
     mutationFn: async () => {
       if (!form.razao_social.trim()) throw new Error("Razão social é obrigatória");
@@ -87,9 +86,7 @@ function EmpresasPage() {
   });
 
   const fileRef = useRef<HTMLInputElement>(null);
-  const updateNumbersFileRef = useRef<HTMLInputElement>(null);
 
-  // dd/mm/yyyy or yyyy-mm-dd → ISO date or null
   const parseDate = (v: string): string | null => {
     if (!v) return null;
     const br = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
@@ -164,7 +161,6 @@ function EmpresasPage() {
 
       if (!payload.length) throw new Error("Nenhuma linha com 'razao_social' encontrada");
 
-      // Dedupe by CNPJ: ignora duplicados dentro do arquivo e contra a base
       const normCnpj = (v: string | null) => (v ? v.replace(/\D/g, "") : "");
       const existing = new Set(
         ((await supabase.from("companies").select("cnpj")).data ?? [])
@@ -197,82 +193,6 @@ function EmpresasPage() {
           ? `${inserted} importada(s) — ${skipped} CNPJ(s) duplicado(s) ignorado(s)`
           : `${inserted} empresa(s) importada(s)`,
       );
-      qc.invalidateQueries({ queryKey: ["companies"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const updateNumbersXlsx = useMutation({
-    mutationFn: async (file: File) => {
-      const buf = await file.arrayBuffer();
-      const wb = XLSX.read(buf);
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "", raw: false });
-      if (!rows.length) throw new Error("Planilha vazia");
-
-      const get = (r: Record<string, unknown>, keys: string[]) => {
-        for (const k of Object.keys(r)) {
-          if (keys.includes(k.toLowerCase().trim())) return String(r[k] ?? "").trim();
-        }
-        return "";
-      };
-
-      const normCnpj = (v: string | null) => (v ? v.replace(/\D/g, "") : "");
-      
-      const updates = rows
-        .map((r) => {
-          const cnpj = normCnpj(get(r, ["cnpj"]));
-          const number = get(r, ["nº", "n", "numero_empresa", "company_number", "n°", "n_empresa"]);
-          if (!cnpj || !number) return null;
-          return { cnpj, number };
-        })
-        .filter((x): x is { cnpj: string; number: string } => x !== null);
-
-      if (!updates.length) throw new Error("Nenhuma linha com CNPJ e N° encontrada");
-
-      // Get existing companies to map CNPJ -> ID
-      const { data: existing } = await supabase.from("companies").select("id, cnpj");
-      const cnpjMap = new Map((existing ?? []).map(c => [normCnpj(c.cnpj), c.id]));
-
-      let count = 0;
-      for (const item of updates) {
-        const id = cnpjMap.get(item.cnpj);
-        if (id) {
-          const { error } = await supabase
-            .from("companies")
-            .update({ company_number: item.number })
-            .eq("id", id);
-          if (!error) count++;
-        }
-      }
-
-      if (count === 0) throw new Error("Nenhum CNPJ correspondente encontrado no sistema");
-      return count;
-    },
-    onSuccess: (count) => {
-      toast.success(`${count} número(s) vinculado(s) com sucesso`);
-      qc.invalidateQueries({ queryKey: ["companies"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const saveBulkNumbers = useMutation({
-    mutationFn: async () => {
-      const entries = Object.entries(tempNumbers);
-      if (entries.length === 0) return;
-      
-      const promises = entries.map(([id, number]) => 
-        supabase.from("companies").update({ company_number: number }).eq("id", id)
-      );
-      
-      const results = await Promise.all(promises);
-      const errors = results.filter(r => r.error);
-      if (errors.length > 0) throw new Error("Erro ao salvar alguns números");
-    },
-    onSuccess: () => {
-      toast.success("Números salvos");
-      setIsEditingNumbers(false);
-      setTempNumbers({});
       qc.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -336,27 +256,12 @@ function EmpresasPage() {
                 e.target.value = "";
               }}
             />
+            <Button variant="outline" onClick={downloadTemplate}>
+              <Download className="w-4 h-4" />Modelo
+            </Button>
             <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={importXlsx.isPending}>
               <Upload className="w-4 h-4" />{importXlsx.isPending ? "Importando..." : "Importar Excel"}
             </Button>
-            <Button 
-              variant={isEditingNumbers ? "default" : "outline"} 
-              onClick={() => {
-                if (isEditingNumbers) {
-                  saveBulkNumbers.mutate();
-                } else {
-                  setIsEditingNumbers(true);
-                }
-              }}
-              disabled={saveBulkNumbers.isPending}
-            >
-              {isEditingNumbers ? (saveBulkNumbers.isPending ? "Salvando..." : "Salvar Números") : "Editar Números"}
-            </Button>
-            {isEditingNumbers && (
-              <Button variant="ghost" onClick={() => { setIsEditingNumbers(false); setTempNumbers({}); }}>
-                Cancelar
-              </Button>
-            )}
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button><Plus className="w-4 h-4" />Cadastrar empresa</Button>
@@ -462,7 +367,6 @@ function EmpresasPage() {
       })()}
 
       <Card>
-
         <CardContent className="p-0">
           <Table>
             <TableHeader><TableRow>
@@ -480,18 +384,7 @@ function EmpresasPage() {
                   className="cursor-pointer"
                   onClick={() => setDetail(c)}
                 >
-                  <TableCell className="font-bold text-primary text-base">
-                    {isEditingNumbers ? (
-                      <Input 
-                        className="h-8 w-24 text-sm font-bold border-primary/30" 
-                        value={tempNumbers[c.id] ?? c.company_number ?? ""} 
-                        onChange={(e) => setTempNumbers({ ...tempNumbers, [c.id]: e.target.value })}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    ) : (
-                      c.company_number ?? "—"
-                    )}
-                  </TableCell>
+                  <TableCell className="font-mono text-xs">{c.company_number ?? "—"}</TableCell>
                   <TableCell className="font-medium">
                     {c.razao_social}
                     {c.nome_fantasia && <div className="text-xs text-muted-foreground">{c.nome_fantasia}</div>}
@@ -503,7 +396,7 @@ function EmpresasPage() {
                 </TableRow>
               ))}
               {!companies.data?.length && (
-                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhuma empresa cadastrada ainda.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhuma empresa cadastrada ainda.</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
@@ -514,68 +407,62 @@ function EmpresasPage() {
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{detail?.razao_social}</DialogTitle></DialogHeader>
           {detail && (
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              {[
-                ["N°", detail.company_number],
-                ["CNPJ", detail.cnpj],
-                ["Nome fantasia", detail.nome_fantasia],
-                ["Situação", detail.situacao],
-                ["Data situação", detail.data_situacao],
-                ["Início atividades", detail.inicio_atividades],
-                ["Natureza jurídica", detail.natureza_juridica],
-                ["Porte", detail.porte],
-                ["Capital social", detail.capital_social != null ? Number(detail.capital_social).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : null],
-                ["Simples Nacional", detail.simples_nacional],
-                ["MEI", detail.mei],
-                ["CNAE principal", detail.cnae_principal],
-                ["CNAEs secundários", detail.cnaes_secundarios],
-                ["Endereço", [detail.logradouro, detail.numero, detail.complemento].filter(Boolean).join(", ") || null],
-                ["Bairro", detail.bairro],
-                ["Cidade/UF", detail.municipio ? `${detail.municipio}/${detail.uf ?? ""}` : null],
-                ["CEP", detail.cep],
-                ["Telefone 1", detail.telefone1],
-                ["Telefone 2", detail.telefone2],
-                ["E-mail", detail.email],
-                ["Setor", detail.sectors?.name],
-              ].filter(([, v]) => v).map(([k, v]) => (
-                <div key={k as string} className="col-span-2 sm:col-span-1">
-                  <dt className="text-xs text-muted-foreground">{k}</dt>
-                  <dd className="font-medium break-words">{v as string}</dd>
-                </div>
-              ))}
-              {detail.socios && (
-                <div className="col-span-2">
-                  <dt className="text-xs text-muted-foreground">Sócios</dt>
-                  <dd className="font-medium whitespace-pre-wrap">{detail.socios.split(" | ").join("\n")}</dd>
-                </div>
-              )}
+            <div className="space-y-6">
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                {[
+                  ["N°", detail.company_number],
+                  ["CNPJ", detail.cnpj],
+                  ["Nome fantasia", detail.nome_fantasia],
+                  ["Situação", detail.situacao],
+                  ["Início atividades", detail.inicio_atividades],
+                  ["Natureza jurídica", detail.natureza_juridica],
+                  ["Porte", detail.porte],
+                  ["Capital social", detail.capital_social ? `R$ ${detail.capital_social.toLocaleString()}` : ""],
+                  ["E-mail", detail.email],
+                  ["Telefone", detail.telefone1],
+                  ["Setor", detail.sectors?.name],
+                  ["Status", detail.status],
+                ].map(([label, val]) => (
+                  <div key={label as string} className="flex flex-col border-b border-muted py-1">
+                    <dt className="text-muted-foreground text-[10px] uppercase font-bold">{label}</dt>
+                    <dd className="font-medium">{val || "—"}</dd>
+                  </div>
+                ))}
+              </dl>
+              
+              <div className="space-y-2">
+                <h4 className="text-[10px] uppercase font-bold text-muted-foreground">Endereço</h4>
+                <p className="text-sm">
+                  {detail.logradouro}, {detail.numero} {detail.complemento && `- ${detail.complemento}`}
+                  <br />
+                  {detail.bairro} — {detail.municipio}/{detail.uf}
+                  <br />
+                  CEP: {detail.cep}
+                </p>
+              </div>
+
               {detail.observacoes && (
-                <div className="col-span-2">
-                  <dt className="text-xs text-muted-foreground">Observações</dt>
-                  <dd className="font-medium whitespace-pre-wrap">{detail.observacoes}</dd>
+                <div className="space-y-2">
+                  <h4 className="text-[10px] uppercase font-bold text-muted-foreground">Observações</h4>
+                  <p className="text-sm whitespace-pre-wrap text-muted-foreground">{detail.observacoes}</p>
                 </div>
               )}
-            </dl>
-          )}
-          {canManage && detail && (
-            <DialogFooter className="mt-6 border-t pt-4">
-              <Button
-                variant="destructive"
-                className="gap-2"
-                onClick={() => {
-                  if (confirm("Deseja realmente excluir esta empresa?")) {
-                    deleteCompany.mutate(detail.id);
-                  }
-                }}
-                disabled={deleteCompany.isPending}
-              >
-                <Trash2 className="w-4 h-4" />
-                Excluir Empresa
-              </Button>
-            </DialogFooter>
+
+              {canManage && (
+                <div className="flex justify-end pt-4 border-t">
+                  <Button variant="destructive" size="sm" onClick={() => {
+                    if (confirm("Deseja realmente excluir esta empresa?")) deleteCompany.mutate(detail.id);
+                  }} disabled={deleteCompany.isPending}>
+                    <Trash2 className="w-4 h-4" /> Excluir empresa
+                  </Button>
+                </div>
+              )}
+            </div>
           )}
         </DialogContent>
       </Dialog>
     </div>
   );
 }
+
+export default EmpresasPage;
