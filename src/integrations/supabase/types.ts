@@ -297,6 +297,44 @@ export type Database = {
           },
         ]
       }
+      deadlines: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          data_limite: string
+          id: string
+          status: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          data_limite: string
+          id?: string
+          status?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          data_limite?: string
+          id?: string
+          status?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deadlines_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "employee_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_access_log: {
         Row: {
           action: string
@@ -375,6 +413,136 @@ export type Database = {
             columns: ["sector_id"]
             isOneToOne: false
             referencedRelation: "sectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_activity: {
+        Row: {
+          acao: string
+          data: string
+          detalhes: Json | null
+          id: string
+          usuario_id: string
+        }
+        Insert: {
+          acao: string
+          data?: string
+          detalhes?: Json | null
+          id?: string
+          usuario_id: string
+        }
+        Update: {
+          acao?: string
+          data?: string
+          detalhes?: Json | null
+          id?: string
+          usuario_id?: string
+        }
+        Relationships: []
+      }
+      employee_profiles: {
+        Row: {
+          assinatura_email: string | null
+          cargo: string
+          cargo_padronizado: string | null
+          created_at: string
+          data_admissao: string
+          email_corporativo: string
+          foto_url: string | null
+          gestor_id: string | null
+          id: string
+          informacoes_institucionais: string | null
+          localizacao: string | null
+          nome_completo: string
+          ramal: string | null
+          setor: string
+          status: Database["public"]["Enums"]["employee_status"]
+          telefone: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          assinatura_email?: string | null
+          cargo: string
+          cargo_padronizado?: string | null
+          created_at?: string
+          data_admissao?: string
+          email_corporativo: string
+          foto_url?: string | null
+          gestor_id?: string | null
+          id?: string
+          informacoes_institucionais?: string | null
+          localizacao?: string | null
+          nome_completo: string
+          ramal?: string | null
+          setor: string
+          status?: Database["public"]["Enums"]["employee_status"]
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          assinatura_email?: string | null
+          cargo?: string
+          cargo_padronizado?: string | null
+          created_at?: string
+          data_admissao?: string
+          email_corporativo?: string
+          foto_url?: string | null
+          gestor_id?: string | null
+          id?: string
+          informacoes_institucionais?: string | null
+          localizacao?: string | null
+          nome_completo?: string
+          ramal?: string | null
+          setor?: string
+          status?: Database["public"]["Enums"]["employee_status"]
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_profiles_gestor_id_fkey"
+            columns: ["gestor_id"]
+            isOneToOne: false
+            referencedRelation: "employee_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_skills: {
+        Row: {
+          colaborador_id: string
+          competencia: string
+          created_at: string
+          id: string
+          nivel: number | null
+          tipo: string
+        }
+        Insert: {
+          colaborador_id: string
+          competencia: string
+          created_at?: string
+          id?: string
+          nivel?: number | null
+          tipo: string
+        }
+        Update: {
+          colaborador_id?: string
+          competencia?: string
+          created_at?: string
+          id?: string
+          nivel?: number | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_skills_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "employee_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -944,6 +1112,47 @@ export type Database = {
           },
         ]
       }
+      trainings: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          data: string
+          formato: string
+          id: string
+          status: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          data: string
+          formato: string
+          id?: string
+          status?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          data?: string
+          formato?: string
+          id?: string
+          status?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trainings_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "employee_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1022,6 +1231,7 @@ export type Database = {
         | "coordenador"
         | "colaborador"
       company_status: "ativo" | "inativo" | "prospecto"
+      employee_status: "ativo" | "afastado" | "ferias" | "desligado"
       event_type: "prazo_fiscal" | "reuniao" | "treinamento" | "aviso"
       news_status: "rascunho" | "aguardando_aprovacao" | "publicado"
       notification_type:
@@ -1168,6 +1378,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "diretoria", "gerente", "coordenador", "colaborador"],
       company_status: ["ativo", "inativo", "prospecto"],
+      employee_status: ["ativo", "afastado", "ferias", "desligado"],
       event_type: ["prazo_fiscal", "reuniao", "treinamento", "aviso"],
       news_status: ["rascunho", "aguardando_aprovacao", "publicado"],
       notification_type: [
