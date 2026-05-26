@@ -40,13 +40,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase.from("user_roles").select("role").eq("user_id", uid),
       ]);
       
-      if (profErr) throw profErr;
-      if (rolesErr) throw rolesErr;
+      if (profErr) {
+        console.error("Profile error:", profErr);
+      }
+      if (rolesErr) {
+        console.error("Roles error:", rolesErr);
+      }
 
       setProfile(prof as Profile | null);
       setRoles((rolesData ?? []).map((r) => r.role as AppRole));
     } catch (err) {
-      console.error("Error loading user data:", err);
+      console.error("Unexpected error loading user data:", err);
     } finally {
       setLoading(false);
     }
