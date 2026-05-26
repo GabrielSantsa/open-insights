@@ -238,9 +238,9 @@ function ColaboradorDetail() {
       </div>
 
 
-      <div className="flex flex-col gap-8">
-        <div className="lg:w-1/3 space-y-6">
-          <Card className="border-border/40 overflow-hidden shadow-sm">
+      <div className="flex flex-col lg:flex-row gap-8 items-stretch">
+        <div className="lg:w-1/3 flex flex-col gap-6">
+          <Card className="border-border/40 overflow-hidden shadow-sm flex-1">
             <div className="h-24 bg-gradient-to-r from-primary/10 to-primary/5" />
             <CardContent className="pt-0 -mt-12 text-center">
               <Avatar className="h-24 w-24 mx-auto border-4 border-background shadow-md">
@@ -355,7 +355,7 @@ function ColaboradorDetail() {
         </div>
 
         {/* Lado Direito - Conteúdo em Abas */}
-        <div className="lg:w-2/3 space-y-6">
+        <div className="lg:w-2/3 flex flex-col gap-6">
           <Tabs defaultValue="overview" className="w-full">
             <div className="overflow-x-auto pb-1">
               <TabsList className="w-max sm:w-full justify-start bg-muted/50 p-1 h-12 gap-1 rounded-xl">
