@@ -16,7 +16,9 @@ import {
   GraduationCap,
   LayoutDashboard,
   Edit2,
-  Save
+  Save,
+  Copy,
+  CheckCircle2
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -140,12 +142,22 @@ function ColaboradorDetail() {
           <span className="text-foreground font-medium">{employee.nome_completo}</span>
         </nav>
         
-        {isUserAdmin && (
-          <Button onClick={() => setIsEditDrawerOpen(true)} variant="outline" className="gap-2">
-            <Edit2 className="w-4 h-4" />
-            Editar Perfil
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary gap-2 h-9" onClick={() => {
+            navigator.clipboard.writeText(employee.email_corporativo);
+            toast.success("E-mail copiado!");
+          }}>
+            <Copy className="w-4 h-4" />
+            Copiar E-mail
           </Button>
-        )}
+          
+          {isUserAdmin && (
+            <Button onClick={() => setIsEditDrawerOpen(true)} variant="outline" className="gap-2 h-9 border-primary/20 text-primary hover:bg-primary/5">
+              <Edit2 className="w-4 h-4" />
+              Editar Perfil
+            </Button>
+          )}
+        </div>
       </div>
 
 
@@ -251,13 +263,17 @@ function ColaboradorDetail() {
                 <LayoutDashboard className="w-4 h-4 mr-2" />
                 Visão Geral
               </TabsTrigger>
-              <TabsTrigger value="skills" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <GraduationCap className="w-4 h-4 mr-2" />
-                Competências
+              <TabsTrigger value="hierarquia" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <ShieldCheck className="w-4 h-4 mr-2" />
+                Hierarquia
               </TabsTrigger>
-              <TabsTrigger value="activity" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <History className="w-4 h-4 mr-2" />
-                Histórico
+              <TabsTrigger value="demandas" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <Briefcase className="w-4 h-4 mr-2" />
+                Demandas
+              </TabsTrigger>
+              <TabsTrigger value="procedimentos" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <GraduationCap className="w-4 h-4 mr-2" />
+                Procedimentos
               </TabsTrigger>
             </TabsList>
 
@@ -279,12 +295,16 @@ function ColaboradorDetail() {
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-muted-foreground">Tempo de Empresa</span>
-                      <span className="font-medium">Calculando...</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Cargo Padronizado</span>
-                      <span className="font-medium text-primary bg-primary/5 px-2 py-0.5 rounded text-xs uppercase tracking-wide">
-                        {employee.cargo_padronizado || employee.cargo}
+                      <span className="font-medium">
+                        {(() => {
+                          const start = new Date(employee.data_admissao);
+                          const now = new Date();
+                          const diffTime = Math.abs(now.getTime() - start.getTime());
+                          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                          const years = Math.floor(diffDays / 365);
+                          const months = Math.floor((diffDays % 365) / 30);
+                          return `${years} ano(s) e ${months} mês(es)`;
+                        })()}
                       </span>
                     </div>
                   </CardContent>
@@ -304,77 +324,139 @@ function ColaboradorDetail() {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
 
+            <TabsContent value="hierarquia" className="mt-6">
               <Card className="border-border/40 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-sm font-semibold">Equipe Direta</CardTitle>
+                  <CardTitle className="text-sm font-semibold">Organograma Interno</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  {employee.subordinados && employee.subordinados.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {employee.subordinados.map((sub: any) => (
-                        <div key={sub.id} className="flex items-center gap-3 p-3 rounded-xl border border-border/40 bg-muted/5 hover:bg-muted/10 transition-colors">
-                          <Avatar className="h-9 w-9">
-                            <AvatarImage src={sub.foto_url || ""} />
-                            <AvatarFallback className="text-xs">
-                              {sub.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
-                            </AvatarFallback>
+                <CardContent className="space-y-8">
+                  <div className="space-y-4">
+                    <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-widest border-b pb-2">Gestão Direta</h4>
+                    {employee.gestor ? (
+                      <div className="flex items-center justify-between p-4 rounded-xl border border-primary/20 bg-primary/5 shadow-sm">
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-12 w-12 border-2 border-background">
+                            <AvatarImage src={employee.gestor.foto_url || ""} />
+                            <AvatarFallback className="bg-primary/10 text-primary">{employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}</AvatarFallback>
                           </Avatar>
-                          <div className="min-w-0">
-                            <p className="text-sm font-semibold truncate">{sub.nome_completo}</p>
-                            <p className="text-[11px] text-muted-foreground truncate">{sub.cargo}</p>
+                          <div>
+                            <p className="font-bold text-foreground">{employee.gestor.nome_completo}</p>
+                            <p className="text-xs text-muted-foreground font-medium">{employee.gestor.cargo}</p>
                           </div>
                         </div>
-                      ))}
+                        <Button variant="outline" size="sm" asChild className="rounded-full px-4 border-primary/30 hover:bg-primary/10 hover:text-primary transition-all">
+                          <Link to="/colaboradores/$id" params={{ id: employee.gestor.id }}>Ver Perfil</Link>
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="p-8 border border-dashed rounded-xl text-center text-sm text-muted-foreground bg-muted/20 italic">
+                        Sem gestor direto vinculado.
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b pb-2">
+                      <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Equipe Direta</h4>
+                      <Badge variant="secondary" className="rounded-full">{employee.subordinados?.length || 0} Membros</Badge>
                     </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground text-center py-6 border border-dashed rounded-xl">
-                      Este colaborador não possui liderados diretos.
-                    </p>
-                  )}
+                    {employee.subordinados && employee.subordinados.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {employee.subordinados.map((sub: any) => (
+                          <div key={sub.id} className="flex items-center justify-between p-3 rounded-xl border border-border/60 bg-background hover:border-primary/40 hover:shadow-md transition-all group">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={sub.foto_url || ""} />
+                                <AvatarFallback>{sub.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              <div className="min-w-0">
+                                <p className="text-sm font-bold truncate group-hover:text-primary transition-colors">{sub.nome_completo}</p>
+                                <p className="text-[11px] text-muted-foreground font-medium truncate">{sub.cargo}</p>
+                              </div>
+                            </div>
+                            <Button variant="ghost" size="icon" asChild className="rounded-full h-8 w-8">
+                              <Link to="/colaboradores/$id" params={{ id: sub.id }}>
+                                <ChevronRight className="w-4 h-4" />
+                              </Link>
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-8 border border-dashed rounded-xl text-center text-sm text-muted-foreground bg-muted/20 italic">
+                        Este colaborador não possui equipe vinculada.
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="skills" className="mt-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="border-border/40 shadow-sm">
-                  <CardHeader>
-                    <CardTitle className="text-sm font-semibold">Responsabilidades</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    {employee.skills?.filter((s: any) => s.tipo === 'responsabilidade').map((skill: any) => (
-                      <div key={skill.id} className="flex items-center gap-2 p-2 rounded-lg bg-emerald-50/30 border border-emerald-100/50">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        <span className="text-sm text-emerald-950">{skill.competencia}</span>
-                      </div>
-                    )) || <p className="text-sm text-muted-foreground italic">Nenhuma responsabilidade listada.</p>}
-                  </CardContent>
-                </Card>
-
-                <Card className="border-border/40 shadow-sm">
-                  <CardHeader>
-                    <CardTitle className="text-sm font-semibold">Conhecimentos</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-wrap gap-2">
-                    {employee.skills?.filter((s: any) => s.tipo === 'conhecimento').map((skill: any) => (
-                      <Badge key={skill.id} variant="secondary" className="px-2 py-1 font-normal">
-                        {skill.competencia}
-                      </Badge>
-                    )) || <p className="text-sm text-muted-foreground italic">Nenhum conhecimento listado.</p>}
-                  </CardContent>
-                </Card>
+            <TabsContent value="demandas" className="mt-6 space-y-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: 'Em andamento', count: 0, color: 'text-blue-600', bg: 'bg-blue-50' },
+                  { label: 'Pendentes', count: 0, color: 'text-amber-600', bg: 'bg-amber-50' },
+                  { label: 'Concluídas', count: 0, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                  { label: 'Atrasadas', count: 0, color: 'text-rose-600', bg: 'bg-rose-50' }
+                ].map((kpi) => (
+                  <Card key={kpi.label} className={`border-none shadow-none ${kpi.bg}`}>
+                    <CardContent className="p-4 pt-4 text-center">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">{kpi.label}</p>
+                      <p className={`text-2xl font-black ${kpi.color}`}>{kpi.count}</p>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            </TabsContent>
-
-            <TabsContent value="activity" className="mt-6">
-              <Card className="border-border/40 shadow-sm">
+              
+              <Card className="border-border/40 shadow-sm overflow-hidden">
+                <CardHeader className="bg-muted/30 border-b py-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Lista de Tarefas Recentes</CardTitle>
+                    <Button variant="ghost" size="sm" className="text-[10px] h-7 px-2 font-bold uppercase text-primary">Ver Todas</Button>
+                  </div>
+                </CardHeader>
                 <CardContent className="p-0">
-                  <div className="p-8 text-center">
-                    <History className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-                    <p className="text-sm text-muted-foreground">O histórico de atividades internas será habilitado em breve.</p>
+                  <div className="p-12 text-center bg-background">
+                    <History className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
+                    <p className="text-sm font-medium text-muted-foreground">Nenhuma demanda vinculada a este colaborador.</p>
+                    <p className="text-xs text-muted-foreground/60 mt-1">As demandas operacionais serão listadas aqui conforme forem criadas.</p>
                   </div>
                 </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="procedimentos" className="mt-6 space-y-6">
+               <Card className="border-border/40 shadow-sm overflow-hidden">
+                <Tabs defaultValue="favoritos" className="w-full">
+                  <div className="px-4 border-b bg-muted/10">
+                    <TabsList className="h-10 bg-transparent gap-4">
+                      <TabsTrigger value="favoritos" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 text-xs font-bold uppercase tracking-tighter">Favoritos</TabsTrigger>
+                      <TabsTrigger value="acessados" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 text-xs font-bold uppercase tracking-tighter">Mais Acessados</TabsTrigger>
+                      <TabsTrigger value="recentes" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 text-xs font-bold uppercase tracking-tighter">Últimos Visualizados</TabsTrigger>
+                    </TabsList>
+                  </div>
+                  <TabsContent value="favoritos" className="p-0 m-0">
+                    <div className="p-16 text-center">
+                      <ShieldCheck className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
+                      <p className="text-sm font-medium text-muted-foreground">Nenhum procedimento favoritado ainda.</p>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="acessados" className="p-0 m-0">
+                    <div className="p-16 text-center">
+                      <GraduationCap className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
+                      <p className="text-sm font-medium text-muted-foreground">Nenhum dado de acesso disponível.</p>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="recentes" className="p-0 m-0">
+                    <div className="p-16 text-center">
+                      <History className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
+                      <p className="text-sm font-medium text-muted-foreground">Nenhum procedimento visualizado recentemente.</p>
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </Card>
             </TabsContent>
           </Tabs>
