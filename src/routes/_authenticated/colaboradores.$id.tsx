@@ -239,11 +239,11 @@ function ColaboradorDetail() {
 
 
       <div className="flex flex-col gap-8">
-        {/* Topo - Perfil Resumo e Estrutura */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Lado Esquerdo - Perfil Resumo */}
-          <div className="lg:w-1/3 space-y-6">
-            <Card className="border-border/40 overflow-hidden shadow-sm">
+        {/* Topo - Perfil Resumo */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Coluna do Perfil (1/3) */}
+          <div className="lg:col-span-1">
+            <Card className="border-border/40 overflow-hidden shadow-sm h-full">
               <div className="h-24 bg-gradient-to-r from-primary/10 to-primary/5" />
               <CardContent className="pt-0 -mt-12 text-center">
                 <Avatar className="h-24 w-24 mx-auto border-4 border-background shadow-md">
@@ -300,23 +300,23 @@ function ColaboradorDetail() {
             </Card>
           </div>
 
-          {/* Lado Direito - Estrutura de Reporte */}
-          <div className="lg:w-2/3 space-y-6">
+          {/* Coluna da Estrutura de Reporte (2/3) */}
+          <div className="lg:col-span-2">
             <Card className="border-border/40 shadow-sm h-full">
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 border-b bg-muted/20">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-primary" />
                   Estrutura de Reporte
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
                   {employee.gestor && (
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground shrink-0">
-                        <Avatar className="h-full w-full rounded-lg">
+                      <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-border shadow-sm">
+                        <Avatar className="h-full w-full rounded-none">
                           <AvatarImage src={employee.gestor.foto_url || ""} />
-                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                          <AvatarFallback className="text-[10px] bg-primary/5 text-primary">
                             {employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
@@ -333,10 +333,10 @@ function ColaboradorDetail() {
                   )}
                   {employee.coordenador && (
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground shrink-0">
-                        <Avatar className="h-full w-full rounded-lg">
+                      <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-border shadow-sm">
+                        <Avatar className="h-full w-full rounded-none">
                           <AvatarImage src={employee.coordenador.foto_url || ""} />
-                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                          <AvatarFallback className="text-[10px] bg-primary/5 text-primary">
                             {employee.coordenador.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
@@ -352,7 +352,7 @@ function ColaboradorDetail() {
                     </div>
                   )}
                   {!employee.gestor && !employee.coordenador && (
-                    <p className="text-xs text-muted-foreground italic">Nenhuma estrutura de reporte atribuída.</p>
+                    <p className="text-xs text-muted-foreground italic col-span-full">Nenhuma estrutura de reporte atribuída.</p>
                   )}
                 </div>
               </CardContent>
