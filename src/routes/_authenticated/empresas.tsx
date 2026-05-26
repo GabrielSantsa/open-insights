@@ -34,6 +34,8 @@ function EmpresasPage() {
   const canManage = isApprover(roles);
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [isEditingNumbers, setIsEditingNumbers] = useState(false);
+  const [tempNumbers, setTempNumbers] = useState<Record<string, string>>({});
   const [detail, setDetail] = useState<any | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [form, setForm] = useState({
@@ -85,6 +87,7 @@ function EmpresasPage() {
   });
 
   const fileRef = useRef<HTMLInputElement>(null);
+  const updateNumbersFileRef = useRef<HTMLInputElement>(null);
 
   // dd/mm/yyyy or yyyy-mm-dd → ISO date or null
   const parseDate = (v: string): string | null => {
@@ -199,6 +202,82 @@ function EmpresasPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const updateNumbersXlsx = useMutation({
+    mutationFn: async (file: File) => {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf);
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "", raw: false });
+      if (!rows.length) throw new Error("Planilha vazia");
+
+      const get = (r: Record<string, unknown>, keys: string[]) => {
+        for (const k of Object.keys(r)) {
+          if (keys.includes(k.toLowerCase().trim())) return String(r[k] ?? "").trim();
+        }
+        return "";
+      };
+
+      const normCnpj = (v: string | null) => (v ? v.replace(/\D/g, "") : "");
+      
+      const updates = rows
+        .map((r) => {
+          const cnpj = normCnpj(get(r, ["cnpj"]));
+          const number = get(r, ["nº", "n", "numero_empresa", "company_number", "n°", "n_empresa"]);
+          if (!cnpj || !number) return null;
+          return { cnpj, number };
+        })
+        .filter((x): x is { cnpj: string; number: string } => x !== null);
+
+      if (!updates.length) throw new Error("Nenhuma linha com CNPJ e N° encontrada");
+
+      // Get existing companies to map CNPJ -> ID
+      const { data: existing } = await supabase.from("companies").select("id, cnpj");
+      const cnpjMap = new Map((existing ?? []).map(c => [normCnpj(c.cnpj), c.id]));
+
+      let count = 0;
+      for (const item of updates) {
+        const id = cnpjMap.get(item.cnpj);
+        if (id) {
+          const { error } = await supabase
+            .from("companies")
+            .update({ company_number: item.number })
+            .eq("id", id);
+          if (!error) count++;
+        }
+      }
+
+      if (count === 0) throw new Error("Nenhum CNPJ correspondente encontrado no sistema");
+      return count;
+    },
+    onSuccess: (count) => {
+      toast.success(`${count} número(s) vinculado(s) com sucesso`);
+      qc.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const saveBulkNumbers = useMutation({
+    mutationFn: async () => {
+      const entries = Object.entries(tempNumbers);
+      if (entries.length === 0) return;
+      
+      const promises = entries.map(([id, number]) => 
+        supabase.from("companies").update({ company_number: number }).eq("id", id)
+      );
+      
+      const results = await Promise.all(promises);
+      const errors = results.filter(r => r.error);
+      if (errors.length > 0) throw new Error("Erro ao salvar alguns números");
+    },
+    onSuccess: () => {
+      toast.success("Números salvos");
+      setIsEditingNumbers(false);
+      setTempNumbers({});
+      qc.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const deleteCompany = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("companies").delete().eq("id", id);
@@ -263,6 +342,38 @@ function EmpresasPage() {
             <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={importXlsx.isPending}>
               <Upload className="w-4 h-4" />{importXlsx.isPending ? "Importando..." : "Importar Excel"}
             </Button>
+            <input
+              ref={updateNumbersFileRef}
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) updateNumbersXlsx.mutate(f);
+                e.target.value = "";
+              }}
+            />
+            <Button variant="outline" onClick={() => updateNumbersFileRef.current?.click()} disabled={updateNumbersXlsx.isPending}>
+              <Upload className="w-4 h-4" />{updateNumbersXlsx.isPending ? "Processando..." : "Vincular Números"}
+            </Button>
+            <Button 
+              variant={isEditingNumbers ? "default" : "outline"} 
+              onClick={() => {
+                if (isEditingNumbers) {
+                  saveBulkNumbers.mutate();
+                } else {
+                  setIsEditingNumbers(true);
+                }
+              }}
+              disabled={saveBulkNumbers.isPending}
+            >
+              {isEditingNumbers ? (saveBulkNumbers.isPending ? "Salvando..." : "Salvar Números") : "Editar Números"}
+            </Button>
+            {isEditingNumbers && (
+              <Button variant="ghost" onClick={() => { setIsEditingNumbers(false); setTempNumbers({}); }}>
+                Cancelar
+              </Button>
+            )}
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button><Plus className="w-4 h-4" />Cadastrar empresa</Button>
@@ -386,7 +497,18 @@ function EmpresasPage() {
                   className="cursor-pointer"
                   onClick={() => setDetail(c)}
                 >
-                  <TableCell className="font-mono text-xs">{c.company_number ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-xs">
+                    {isEditingNumbers ? (
+                      <Input 
+                        className="h-8 w-24 text-xs" 
+                        value={tempNumbers[c.id] ?? c.company_number ?? ""} 
+                        onChange={(e) => setTempNumbers({ ...tempNumbers, [c.id]: e.target.value })}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      c.company_number ?? "—"
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium">
                     {c.razao_social}
                     {c.nome_fantasia && <div className="text-xs text-muted-foreground">{c.nome_fantasia}</div>}
