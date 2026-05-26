@@ -58,13 +58,18 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
         telefone: initialData.telefone || "",
         ramal: initialData.ramal || "",
         status: initialData.status || "ativo",
-        gestor_id: initialData.gestor_id || "none", // Use "none" as a placeholder for null in Select
+        gestor_id: initialData.gestor_id || "none",
         localizacao: initialData.localizacao || "",
         data_admissao: initialData.data_admissao ? new Date(initialData.data_admissao).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         informacoes_institucionais: initialData.informacoes_institucionais || "",
         assinatura_email: initialData.assinatura_email || "",
         foto_url: initialData.foto_url || "",
         coordenador_id: initialData.coordenador_id || "none",
+        foco: initialData.foco || "",
+        perfil: initialData.perfil || "",
+        atuacao: initialData.atuacao || "",
+        competencias_responsabilidades: initialData.competencias_responsabilidades || "",
+        conhecimento_tecnico: initialData.conhecimento_tecnico || "",
       });
     }
   }, [initialData]);
