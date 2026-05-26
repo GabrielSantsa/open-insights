@@ -251,13 +251,17 @@ function ColaboradorDetail() {
                 <LayoutDashboard className="w-4 h-4 mr-2" />
                 Visão Geral
               </TabsTrigger>
-              <TabsTrigger value="skills" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <GraduationCap className="w-4 h-4 mr-2" />
-                Competências
+              <TabsTrigger value="hierarquia" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <ShieldCheck className="w-4 h-4 mr-2" />
+                Hierarquia
               </TabsTrigger>
-              <TabsTrigger value="activity" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <History className="w-4 h-4 mr-2" />
-                Histórico
+              <TabsTrigger value="demandas" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <Briefcase className="w-4 h-4 mr-2" />
+                Demandas
+              </TabsTrigger>
+              <TabsTrigger value="procedimentos" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <GraduationCap className="w-4 h-4 mr-2" />
+                Procedimentos
               </TabsTrigger>
             </TabsList>
 
