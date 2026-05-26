@@ -266,6 +266,10 @@ function FeaturedCard({ news, authorName }: { news: NewsRow; authorName?: string
         )}
         <div className="p-6 md:p-8 flex flex-col justify-center">
           <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+            <Badge className="gap-1">
+              <Star className="w-3 h-3" />
+              Destaque
+            </Badge>
             {news.category && <Badge variant="secondary">{news.category}</Badge>}
             <span className="inline-flex items-center gap-1">
               <CalendarDays className="w-3 h-3" />
