@@ -389,7 +389,10 @@ export function ColaboradoresPage() {
                         <EmployeeStatusBadge status={emp.status as EmployeeStatus} />
                         {isUserAdmin && (
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+                            <DropdownMenuTrigger asChild onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}>
                               <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <MoreHorizontal className="h-3 w-3" />
                               </Button>
@@ -501,7 +504,7 @@ export function ColaboradoresPage() {
                   {isUserAdmin && (
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                           <Button variant="ghost" className="h-8 w-8 p-0">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
