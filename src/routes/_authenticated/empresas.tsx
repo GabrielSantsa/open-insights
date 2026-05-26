@@ -37,6 +37,7 @@ function EmpresasPage() {
   const [detail, setDetail] = useState<any | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [form, setForm] = useState({
+    company_number: "",
     razao_social: "",
     nome_fantasia: "",
     sector_id: "",
@@ -58,12 +59,14 @@ function EmpresasPage() {
   const filteredList = (companies.data ?? []).filter((c: any) => 
     c.razao_social.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.nome_fantasia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.cnpj?.includes(searchTerm)
+    c.cnpj?.includes(searchTerm) ||
+    c.company_number?.includes(searchTerm)
   );
   const create = useMutation({
     mutationFn: async () => {
       if (!form.razao_social.trim()) throw new Error("Razão social é obrigatória");
       const { error } = await supabase.from("companies").insert({
+        company_number: form.company_number.trim() || null,
         razao_social: form.razao_social.trim(),
         nome_fantasia: form.nome_fantasia.trim() || null,
         sector_id: form.sector_id || null,
@@ -74,7 +77,7 @@ function EmpresasPage() {
     },
     onSuccess: () => {
       toast.success("Empresa cadastrada");
-      setForm({ razao_social: "", nome_fantasia: "", sector_id: "", status: "ativo", observacoes: "" });
+      setForm({ company_number: "", razao_social: "", nome_fantasia: "", sector_id: "", status: "ativo", observacoes: "" });
       setOpen(false);
       qc.invalidateQueries({ queryKey: ["companies"] });
     },
@@ -124,6 +127,7 @@ function EmpresasPage() {
           const capRaw = get(r, ["capital social", "capital_social"]).replace(/\./g, "").replace(",", ".");
           const cap = capRaw ? Number(capRaw) : null;
           return {
+            company_number: get(r, ["nº", "n", "numero_empresa", "company_number"]) || null,
             razao_social: razao,
             nome_fantasia: get(r, ["nome_fantasia", "nome fantasia", "fantasia"]) || null,
             sector_id: setorNome ? sectorMap.get(setorNome.toLowerCase()) ?? null : null,
@@ -211,7 +215,7 @@ function EmpresasPage() {
   const downloadTemplate = () => {
     const ws = XLSX.utils.json_to_sheet([
       {
-        razao_social: "Exemplo LTDA", nome_fantasia: "Exemplo", setor: "", status: "ativo",
+        company_number: "001", razao_social: "Exemplo LTDA", nome_fantasia: "Exemplo", setor: "", status: "ativo",
         cnpj: "", "Situação": "", "Data Situação": "", "Início Atividades": "",
         "Natureza Jurídica": "", "Porte": "", "Capital Social": "",
         "CNAE Principal": "", "CNAEs Secundários": "",
@@ -235,7 +239,7 @@ function EmpresasPage() {
         </div>
         <div className="w-full md:w-72">
           <Input 
-            placeholder="Buscar por nome ou CNPJ..." 
+            placeholder="Buscar por N°, nome ou CNPJ..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -266,6 +270,13 @@ function EmpresasPage() {
             <DialogContent className="max-w-xl">
               <DialogHeader><DialogTitle>Cadastrar empresa</DialogTitle></DialogHeader>
               <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label>N° (Código da Empresa)</Label>
+                  <Input
+                    value={form.company_number}
+                    onChange={(e) => setForm({ ...form, company_number: e.target.value })}
+                  />
+                </div>
                 <div className="space-y-1.5">
                   <Label>Razão social *</Label>
                   <Input
@@ -361,6 +372,7 @@ function EmpresasPage() {
         <CardContent className="p-0">
           <Table>
             <TableHeader><TableRow>
+              <TableHead className="w-20">N°</TableHead>
               <TableHead>Razão social</TableHead>
               <TableHead>CNPJ</TableHead>
               <TableHead>Cidade/UF</TableHead>
@@ -374,6 +386,7 @@ function EmpresasPage() {
                   className="cursor-pointer"
                   onClick={() => setDetail(c)}
                 >
+                  <TableCell className="font-mono text-xs">{c.company_number ?? "—"}</TableCell>
                   <TableCell className="font-medium">
                     {c.razao_social}
                     {c.nome_fantasia && <div className="text-xs text-muted-foreground">{c.nome_fantasia}</div>}
