@@ -542,6 +542,7 @@ export function ColaboradoresPage() {
                           <DropdownMenuItem 
                             className="text-destructive"
                             onClick={(e) => {
+                              e.preventDefault();
                               e.stopPropagation();
                               handleDeleteClick(emp, e);
                             }}
