@@ -483,6 +483,38 @@ export type Database = {
         }
         Relationships: []
       }
+      procedure_access_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          procedure_id: string
+          user_id: string
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          id?: string
+          procedure_id: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          procedure_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "procedure_access_logs_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       procedure_favorites: {
         Row: {
           created_at: string
@@ -502,6 +534,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "procedure_favorites_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      procedure_files: {
+        Row: {
+          created_at: string
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          name: string
+          procedure_id: string
+          storage_path: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          name: string
+          procedure_id: string
+          storage_path: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          name?: string
+          procedure_id?: string
+          storage_path?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "procedure_files_procedure_id_fkey"
             columns: ["procedure_id"]
             isOneToOne: false
             referencedRelation: "procedures"
@@ -576,45 +649,110 @@ export type Database = {
           },
         ]
       }
+      procedure_versions: {
+        Row: {
+          change_note: string | null
+          content: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_major: boolean
+          procedure_id: string
+          title: string
+          version: string
+        }
+        Insert: {
+          change_note?: string | null
+          content?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_major?: boolean
+          procedure_id: string
+          title: string
+          version: string
+        }
+        Update: {
+          change_note?: string | null
+          content?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_major?: boolean
+          procedure_id?: string
+          title?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "procedure_versions_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       procedures: {
         Row: {
+          access_count: number
+          author_id: string | null
+          category: string | null
           content: string | null
           created_at: string
           description: string | null
           id: string
           last_revision: string | null
+          published_at: string | null
           responsible_id: string | null
           sector_id: string | null
+          slug: string | null
           status: Database["public"]["Enums"]["procedure_status"]
           title: string
           updated_at: string
           version: string
+          workflow: Database["public"]["Enums"]["procedure_workflow"]
         }
         Insert: {
+          access_count?: number
+          author_id?: string | null
+          category?: string | null
           content?: string | null
           created_at?: string
           description?: string | null
           id?: string
           last_revision?: string | null
+          published_at?: string | null
           responsible_id?: string | null
           sector_id?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["procedure_status"]
           title: string
           updated_at?: string
           version?: string
+          workflow?: Database["public"]["Enums"]["procedure_workflow"]
         }
         Update: {
+          access_count?: number
+          author_id?: string | null
+          category?: string | null
           content?: string | null
           created_at?: string
           description?: string | null
           id?: string
           last_revision?: string | null
+          published_at?: string | null
           responsible_id?: string | null
           sector_id?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["procedure_status"]
           title?: string
           updated_at?: string
           version?: string
+          workflow?: Database["public"]["Enums"]["procedure_workflow"]
         }
         Relationships: [
           {
@@ -861,6 +999,10 @@ export type Database = {
         Args: { _sector_id: string; _user_id: string }
         Returns: boolean
       }
+      increment_procedure_access: {
+        Args: { _procedure_id: string }
+        Returns: undefined
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
@@ -880,6 +1022,7 @@ export type Database = {
         | "nova_noticia"
         | "procedimento_atualizado"
       procedure_status: "rascunho" | "ativo" | "em_revisao" | "obsoleto"
+      procedure_workflow: "rascunho" | "em_revisao" | "publicado" | "arquivado"
       task_priority: "baixa" | "media" | "alta" | "urgente"
       task_status:
         | "nova"
@@ -1026,6 +1169,7 @@ export const Constants = {
         "procedimento_atualizado",
       ],
       procedure_status: ["rascunho", "ativo", "em_revisao", "obsoleto"],
+      procedure_workflow: ["rascunho", "em_revisao", "publicado", "arquivado"],
       task_priority: ["baixa", "media", "alta", "urgente"],
       task_status: [
         "nova",
