@@ -83,12 +83,19 @@ function ColaboradorDetail() {
       if (error) throw error;
       if (!data) return null;
 
-      const [gestorRes, subordinadosRes] = await Promise.all([
+      const [gestorRes, coordenadorRes, subordinadosRes] = await Promise.all([
         data.gestor_id
           ? supabase
               .from("employee_profiles")
               .select("id, nome_completo, cargo, foto_url")
               .eq("id", data.gestor_id)
+              .maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
+        data.coordenador_id
+          ? supabase
+              .from("employee_profiles")
+              .select("id, nome_completo, cargo, foto_url")
+              .eq("id", data.coordenador_id)
               .maybeSingle()
           : Promise.resolve({ data: null, error: null }),
         supabase
@@ -100,6 +107,7 @@ function ColaboradorDetail() {
       return {
         ...data,
         gestor: gestorRes.data,
+        coordenador: coordenadorRes.data,
         subordinados: subordinadosRes.data ?? [],
       };
     },
@@ -398,6 +406,29 @@ function ColaboradorDetail() {
                   <CardTitle className="text-sm font-semibold">Organograma Interno</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-8">
+                  <div className="space-y-4">
+                    <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-widest border-b pb-2">Coordenação</h4>
+                    {employee.coordenador ? (
+                      <div className="flex items-center justify-between p-4 rounded-xl border border-primary/10 bg-muted/20 shadow-sm">
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-12 w-12 border-2 border-background">
+                            <AvatarImage src={employee.coordenador.foto_url || ""} />
+                            <AvatarFallback className="bg-primary/5 text-primary">{employee.coordenador.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-bold text-foreground">{employee.coordenador.nome_completo}</p>
+                            <p className="text-xs text-muted-foreground font-medium">{employee.coordenador.cargo}</p>
+                          </div>
+                        </div>
+                        <Button variant="outline" size="sm" asChild className="rounded-full px-4 border-border hover:bg-primary/5 transition-all">
+                          <Link to="/colaboradores/$id" params={{ id: employee.coordenador.id }}>Ver Perfil</Link>
+                        </Button>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground italic pl-2">Nenhum coordenador vinculado.</p>
+                    )}
+                  </div>
+
                   <div className="space-y-4">
                     <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-widest border-b pb-2">Gestão Direta</h4>
                     {employee.gestor ? (
