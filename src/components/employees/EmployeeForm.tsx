@@ -121,7 +121,7 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
             <h3 className="text-sm font-semibold flex items-center gap-2">
               Dados Profissionais
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="cargo">Cargo (Exibição) *</Label>
                 <Input 
@@ -169,7 +169,7 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
             <h3 className="text-sm font-semibold flex items-center gap-2">
               Estrutura e Status
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 <Select value={formData.status} onValueChange={(val) => setFormData({...formData, status: val as any})}>
@@ -200,7 +200,7 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2 md:col-span-2">
+              <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="localizacao">Localização</Label>
                 <Input 
                   id="localizacao" 
@@ -217,8 +217,8 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
             <h3 className="text-sm font-semibold flex items-center gap-2">
               Informações de Contato
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2 md:col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="email_corporativo">E-mail corporativo *</Label>
                 <Input 
                   id="email_corporativo" 

@@ -93,7 +93,7 @@ function DashboardPage() {
         <p className="text-sm text-muted-foreground">Bem-vindo à central de operações da União Contadores.</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Pendências */}
         <Card>
           <CardHeader className="pb-3">
@@ -193,7 +193,7 @@ function DashboardPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2"><UserIcon className="w-4 h-4 text-primary" />Meu perfil</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-sm">
             <Info label="Nome" value={profile?.full_name} />
             <Info label="Cargo" value={profile?.position ?? "—"} />
             <Info label="Setor" value={profile?.primary_sector_id ? "Vinculado" : "—"} />

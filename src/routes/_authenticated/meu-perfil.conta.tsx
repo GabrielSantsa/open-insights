@@ -72,7 +72,7 @@ function MinhaConta() {
     return (
       <div className="space-y-6 max-w-4xl mx-auto pb-12">
         <Skeleton className="h-10 w-48" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <Skeleton className="h-64 md:col-span-1" />
           <Skeleton className="h-[500px] md:col-span-2" />
         </div>
@@ -87,8 +87,8 @@ function MinhaConta() {
         <p className="text-sm text-muted-foreground">Gerencie suas informações pessoais e configurações de segurança.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-1 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 space-y-6">
           <Card className="border-border/40 shadow-sm overflow-hidden bg-card/50">
             <CardHeader className="bg-muted/30 pb-4 border-b">
               <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Foto de Perfil</CardTitle>
@@ -115,7 +115,7 @@ function MinhaConta() {
           </Card>
         </div>
 
-        <div className="md:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6">
           <Card className="border-border/40 shadow-sm">
             <CardHeader>
               <CardTitle className="text-sm font-semibold uppercase">Dados Pessoais</CardTitle>

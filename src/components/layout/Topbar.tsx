@@ -84,11 +84,15 @@ export function Topbar() {
   const roleLabel = roles[0] ? ROLE_LABELS[roles[0]] : "Colaborador";
 
   return (
-    <div className="flex-1 flex items-center gap-3">
-      <div className="relative max-w-md flex-1">
+    <div className="flex-1 flex items-center gap-3 overflow-hidden">
+      <div className="relative max-w-md flex-1 hidden md:block">
         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <Input placeholder="Buscar..." className="pl-9 h-9 bg-background" />
       </div>
+
+      <Button variant="ghost" size="icon" className="md:hidden shrink-0">
+        <Search className="w-4 h-4" />
+      </Button>
 
       <div className="ml-auto flex items-center gap-2">
         <Popover>

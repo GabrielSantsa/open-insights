@@ -46,11 +46,11 @@ function AuthenticatedLayout() {
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
         <SidebarInset className="flex flex-col">
-          <header className="h-14 border-b bg-card flex items-center px-4 gap-3 sticky top-0 z-10">
+          <header className="h-14 border-b bg-card flex items-center px-4 gap-3 sticky top-0 z-20">
             <SidebarTrigger />
             <Topbar />
           </header>
-          <main className="flex-1 p-6 overflow-auto">
+          <main className="flex-1 p-4 md:p-6 overflow-x-hidden">
             <Outlet />
           </main>
           <InternalChat />

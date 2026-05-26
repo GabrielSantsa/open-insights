@@ -119,7 +119,7 @@ function ColaboradorDetail() {
     return (
       <div className="space-y-6 max-w-7xl mx-auto">
         <Skeleton className="h-8 w-32" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Skeleton className="h-[400px] md:col-span-1" />
           <Skeleton className="h-[400px] md:col-span-2" />
         </div>
@@ -140,14 +140,14 @@ function ColaboradorDetail() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
           <Link to="/colaboradores" className="hover:text-primary transition-colors">Colaboradores</Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-foreground font-medium">{employee.nome_completo}</span>
         </nav>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary gap-2 h-9" onClick={() => {
             navigator.clipboard.writeText(employee.email_corporativo);
             toast.success("E-mail copiado!");
@@ -157,7 +157,7 @@ function ColaboradorDetail() {
           </Button>
           
           {isUserAdmin && (
-            <Button onClick={() => setIsEditDrawerOpen(true)} variant="outline" className="gap-2 h-9 border-primary/20 text-primary hover:bg-primary/5">
+            <Button onClick={() => setIsEditDrawerOpen(true)} variant="outline" className="gap-2 h-9 border-primary/20 text-primary hover:bg-primary/5 flex-1 sm:flex-none">
               <Edit2 className="w-4 h-4" />
               Editar Perfil
             </Button>
@@ -258,7 +258,8 @@ function ColaboradorDetail() {
         {/* Lado Direito - Conteúdo Principal */}
         <div className="lg:w-2/3 space-y-6">
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="w-full justify-start bg-muted/50 p-1 h-12 gap-1 rounded-xl">
+            <div className="overflow-x-auto pb-1">
+              <TabsList className="w-max sm:w-full justify-start bg-muted/50 p-1 h-12 gap-1 rounded-xl">
               <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <LayoutDashboard className="w-4 h-4 mr-2" />
                 Visão Geral
@@ -287,10 +288,11 @@ function ColaboradorDetail() {
                 <Edit2 className="w-4 h-4 mr-2" />
                 Assinatura
               </TabsTrigger>
-            </TabsList>
+              </TabsList>
+            </div>
 
             <TabsContent value="overview" className="mt-6 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                 <Card className="border-border/40 shadow-sm">
                   <CardHeader>
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -376,7 +378,7 @@ function ColaboradorDetail() {
                       <Badge variant="secondary" className="rounded-full">{employee.subordinados?.length || 0} Membros</Badge>
                     </div>
                     {employee.subordinados && employee.subordinados.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {employee.subordinados.map((sub: any) => (
                           <div key={sub.id} className="flex items-center justify-between p-3 rounded-xl border border-border/60 bg-background hover:border-primary/40 hover:shadow-md transition-all group">
                             <div className="flex items-center gap-3">
