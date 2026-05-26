@@ -555,23 +555,21 @@ function ProcedureDetail() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center justify-between">
                   <span>Anexos</span>
-                  {canEdit && (
-                    <>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) uploadFile.mutate(f);
-                          if (fileInputRef.current) fileInputRef.current.value = "";
-                        }}
-                      />
-                      <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploadFile.isPending}>
-                        <Upload className="w-4 h-4 mr-1" />{uploadFile.isPending ? "Enviando..." : "Enviar arquivo"}
-                      </Button>
-                    </>
-                  )}
+                  <>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) uploadFile.mutate(f);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                    />
+                    <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploadFile.isPending}>
+                      <Upload className="w-4 h-4 mr-1" />{uploadFile.isPending ? "Enviando..." : "Enviar arquivo"}
+                    </Button>
+                  </>
                 </CardTitle>
               </CardHeader>
               <CardContent>
