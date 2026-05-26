@@ -17,7 +17,6 @@ interface ChatMessage {
   sender_id: string;
   profiles?: {
     full_name: string;
-    avatar_url: string | null;
   };
 }
 
@@ -34,7 +33,7 @@ export function InternalChat() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("internal_messages")
-        .select("*, profiles:sender_id(full_name, avatar_url)")
+        .select("*, profiles:sender_id(full_name)")
         .order("created_at", { ascending: false })
         .limit(100);
       
