@@ -53,7 +53,12 @@ function EmpresasPage() {
   const sectors = useQuery({
     queryKey: ["sectors-all"],
     queryFn: async () => (await supabase.from("sectors").select("id, name").order("name")).data ?? [],
-  });
+  const filteredList = (companies.data ?? []).filter((c: any) => 
+    c.razao_social.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.nome_fantasia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.cnpj?.includes(searchTerm)
+  );
+
 
   const create = useMutation({
     mutationFn: async () => {
@@ -328,11 +333,6 @@ function EmpresasPage() {
       </div>
 
       {(() => {
-        const filteredList = (companies.data ?? []).filter((c: any) => 
-          c.razao_social.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          c.nome_fantasia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          c.cnpj?.includes(searchTerm)
-        );
         const list = filteredList;
         const total = list.length;
         const by = (s: string) => list.filter((c: any) => c.status === s).length;
