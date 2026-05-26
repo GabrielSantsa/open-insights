@@ -310,41 +310,49 @@ function ColaboradorDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
                   {employee.gestor && (
-                    <div className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => employee.gestor && navigate({ to: "/colaboradores/$id", params: { id: employee.gestor.id } })}>
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={employee.gestor.foto_url || ""} />
-                        <AvatarFallback className="text-xs">
-                          {employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground font-medium">Gestor Direto</p>
-                        <p className="text-sm font-semibold truncate">{employee.gestor.nome_completo}</p>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground shrink-0">
+                        <Avatar className="h-full w-full rounded-lg">
+                          <AvatarImage src={employee.gestor.foto_url || ""} />
+                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                            {employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                      <div 
+                        className="flex-1 min-w-0 cursor-pointer group" 
+                        onClick={() => employee.gestor && navigate({ to: "/colaboradores/$id", params: { id: employee.gestor.id } })}
+                      >
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Gestor Direto</p>
+                        <p className="font-medium truncate group-hover:text-primary transition-colors">{employee.gestor.nome_completo}</p>
                         <p className="text-[11px] text-muted-foreground truncate">{employee.gestor.cargo}</p>
                       </div>
                     </div>
                   )}
                   {employee.coordenador && (
-                    <div className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => employee.coordenador && navigate({ to: "/colaboradores/$id", params: { id: employee.coordenador.id } })}>
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={employee.coordenador.foto_url || ""} />
-                        <AvatarFallback className="text-xs">
-                          {employee.coordenador.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground font-medium">Coordenador</p>
-                        <p className="text-sm font-semibold truncate">{employee.coordenador.nome_completo}</p>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground shrink-0">
+                        <Avatar className="h-full w-full rounded-lg">
+                          <AvatarImage src={employee.coordenador.foto_url || ""} />
+                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                            {employee.coordenador.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                      <div 
+                        className="flex-1 min-w-0 cursor-pointer group" 
+                        onClick={() => employee.coordenador && navigate({ to: "/colaboradores/$id", params: { id: employee.coordenador.id } })}
+                      >
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Coordenador</p>
+                        <p className="font-medium truncate group-hover:text-primary transition-colors">{employee.coordenador.nome_completo}</p>
                         <p className="text-[11px] text-muted-foreground truncate">{employee.coordenador.cargo}</p>
                       </div>
                     </div>
                   )}
                   {!employee.gestor && !employee.coordenador && (
-                    <div className="col-span-full py-8 text-center bg-muted/20 rounded-xl border border-dashed">
-                      <p className="text-xs text-muted-foreground italic">Nenhuma estrutura de reporte atribuída.</p>
-                    </div>
+                    <p className="text-xs text-muted-foreground italic">Nenhuma estrutura de reporte atribuída.</p>
                   )}
                 </div>
               </CardContent>
@@ -431,53 +439,59 @@ function ColaboradorDetail() {
                   <CardTitle className="text-sm font-semibold">Organograma Interno</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-8">
-                  <div className="space-y-4">
-                    <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-widest border-b pb-2">Coordenação</h4>
-                    {employee.coordenador ? (
-                      <div className="flex items-center justify-between p-4 rounded-xl border border-primary/10 bg-muted/20 shadow-sm">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12 border-2 border-background">
-                            <AvatarImage src={employee.coordenador.foto_url || ""} />
-                            <AvatarFallback className="bg-primary/5 text-primary">{employee.coordenador.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-bold text-foreground">{employee.coordenador.nome_completo}</p>
-                            <p className="text-xs text-muted-foreground font-medium">{employee.coordenador.cargo}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                      <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-widest border-b pb-2">Coordenação</h4>
+                      {employee.coordenador ? (
+                        <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-card shadow-sm hover:border-primary/30 transition-all group">
+                          <div className="flex items-center gap-4">
+                            <Avatar className="h-12 w-12 border-2 border-background">
+                              <AvatarImage src={employee.coordenador.foto_url || ""} />
+                              <AvatarFallback className="bg-primary/5 text-primary">{employee.coordenador.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-bold text-foreground group-hover:text-primary transition-colors">{employee.coordenador.nome_completo}</p>
+                              <p className="text-xs text-muted-foreground font-medium">{employee.coordenador.cargo}</p>
+                            </div>
                           </div>
+                          <Button variant="ghost" size="icon" asChild className="rounded-full h-8 w-8">
+                            <Link to="/colaboradores/$id" params={{ id: employee.coordenador.id }}>
+                              <ChevronRight className="w-4 h-4" />
+                            </Link>
+                          </Button>
                         </div>
-                        <Button variant="outline" size="sm" asChild className="rounded-full px-4 border-border hover:bg-primary/5 transition-all">
-                          <Link to="/colaboradores/$id" params={{ id: employee.coordenador.id }}>Ver Perfil</Link>
-                        </Button>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-muted-foreground italic pl-2">Nenhum coordenador vinculado.</p>
-                    )}
-                  </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground italic pl-2">Nenhum coordenador vinculado.</p>
+                      )}
+                    </div>
 
-                  <div className="space-y-4">
-                    <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-widest border-b pb-2">Gestão Direta</h4>
-                    {employee.gestor ? (
-                      <div className="flex items-center justify-between p-4 rounded-xl border border-primary/20 bg-primary/5 shadow-sm">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12 border-2 border-background">
-                            <AvatarImage src={employee.gestor.foto_url || ""} />
-                            <AvatarFallback className="bg-primary/10 text-primary">{employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-bold text-foreground">{employee.gestor.nome_completo}</p>
-                            <p className="text-xs text-muted-foreground font-medium">{employee.gestor.cargo}</p>
+                    <div className="space-y-4">
+                      <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-widest border-b pb-2">Gestão Direta</h4>
+                      {employee.gestor ? (
+                        <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-card shadow-sm hover:border-primary/30 transition-all group">
+                          <div className="flex items-center gap-4">
+                            <Avatar className="h-12 w-12 border-2 border-background">
+                              <AvatarImage src={employee.gestor.foto_url || ""} />
+                              <AvatarFallback className="bg-primary/10 text-primary">{employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-bold text-foreground group-hover:text-primary transition-colors">{employee.gestor.nome_completo}</p>
+                              <p className="text-xs text-muted-foreground font-medium">{employee.gestor.cargo}</p>
+                            </div>
                           </div>
+                          <Button variant="ghost" size="icon" asChild className="rounded-full h-8 w-8">
+                            <Link to="/colaboradores/$id" params={{ id: employee.gestor.id }}>
+                              <ChevronRight className="w-4 h-4" />
+                            </Link>
+                          </Button>
                         </div>
-                        <Button variant="outline" size="sm" asChild className="rounded-full px-4 border-primary/30 hover:bg-primary/10 hover:text-primary transition-all">
-                          <Link to="/colaboradores/$id" params={{ id: employee.gestor.id }}>Ver Perfil</Link>
-                        </Button>
-                      </div>
-                    ) : (
-                      <ModuleEmptyState 
-                        title="Sem gestão"
-                        description="Este colaborador não possui um gestor direto vinculado."
-                      />
-                    )}
+                      ) : (
+                        <ModuleEmptyState 
+                          title="Sem gestão"
+                          description="Este colaborador não possui um gestor direto vinculado."
+                        />
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-4">
