@@ -85,6 +85,7 @@ function EmpresasPage() {
   });
 
   const fileRef = useRef<HTMLInputElement>(null);
+  const updateNumbersFileRef = useRef<HTMLInputElement>(null);
 
   // dd/mm/yyyy or yyyy-mm-dd → ISO date or null
   const parseDate = (v: string): string | null => {
@@ -199,6 +200,60 @@ function EmpresasPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const updateNumbersXlsx = useMutation({
+    mutationFn: async (file: File) => {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf);
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "", raw: false });
+      if (!rows.length) throw new Error("Planilha vazia");
+
+      const get = (r: Record<string, unknown>, keys: string[]) => {
+        for (const k of Object.keys(r)) {
+          if (keys.includes(k.toLowerCase().trim())) return String(r[k] ?? "").trim();
+        }
+        return "";
+      };
+
+      const normCnpj = (v: string | null) => (v ? v.replace(/\D/g, "") : "");
+      
+      const updates = rows
+        .map((r) => {
+          const cnpj = normCnpj(get(r, ["cnpj"]));
+          const number = get(r, ["nº", "n", "numero_empresa", "company_number", "n°", "n_empresa"]);
+          if (!cnpj || !number) return null;
+          return { cnpj, number };
+        })
+        .filter((x): x is { cnpj: string; number: string } => x !== null);
+
+      if (!updates.length) throw new Error("Nenhuma linha com CNPJ e N° encontrada");
+
+      // Get existing companies to map CNPJ -> ID
+      const { data: existing } = await supabase.from("companies").select("id, cnpj");
+      const cnpjMap = new Map((existing ?? []).map(c => [normCnpj(c.cnpj), c.id]));
+
+      let count = 0;
+      for (const item of updates) {
+        const id = cnpjMap.get(item.cnpj);
+        if (id) {
+          const { error } = await supabase
+            .from("companies")
+            .update({ company_number: item.number })
+            .eq("id", id);
+          if (!error) count++;
+        }
+      }
+
+      if (count === 0) throw new Error("Nenhum CNPJ correspondente encontrado no sistema");
+      return count;
+    },
+    onSuccess: (count) => {
+      toast.success(`${count} número(s) vinculado(s) com sucesso`);
+      qc.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const deleteCompany = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("companies").delete().eq("id", id);
@@ -262,6 +317,20 @@ function EmpresasPage() {
             </Button>
             <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={importXlsx.isPending}>
               <Upload className="w-4 h-4" />{importXlsx.isPending ? "Importando..." : "Importar Excel"}
+            </Button>
+            <input
+              ref={updateNumbersFileRef}
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) updateNumbersXlsx.mutate(f);
+                e.target.value = "";
+              }}
+            />
+            <Button variant="outline" onClick={() => updateNumbersFileRef.current?.click()} disabled={updateNumbersXlsx.isPending}>
+              <Upload className="w-4 h-4" />{updateNumbersXlsx.isPending ? "Processando..." : "Vincular Números"}
             </Button>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
