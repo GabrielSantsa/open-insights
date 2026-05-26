@@ -110,25 +110,31 @@ function DemandasPage() {
           <h1 className="text-2xl font-bold tracking-tight">Demandas</h1>
           <p className="text-sm text-muted-foreground">Acompanhe e gerencie tarefas operacionais.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Select value={employeeFilter} onValueChange={setEmployeeFilter}>
-            <SelectTrigger className="w-48"><SelectValue placeholder="Funcionário" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos Funcionários</SelectItem>
-              {(profiles.data ?? []).map((p) => (
-                <SelectItem key={p.id} value={p.id}>{p.full_name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
-            <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todas">Todos Status</SelectItem>
-              {Object.entries(TASK_STATUS_LABELS).map(([k, v]) => (
-                <SelectItem key={k} value={k}>{v}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-col gap-1">
+            <Label className="text-[10px] uppercase text-muted-foreground ml-1">Funcionário</Label>
+            <Select value={employeeFilter} onValueChange={setEmployeeFilter}>
+              <SelectTrigger className="w-48 h-9"><SelectValue placeholder="Funcionário" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos Funcionários</SelectItem>
+                {(profiles.data ?? []).map((p) => (
+                  <SelectItem key={p.id} value={p.id}>{p.full_name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label className="text-[10px] uppercase text-muted-foreground ml-1">Status</Label>
+            <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
+              <SelectTrigger className="w-40 h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todas">Todos Status</SelectItem>
+                {Object.entries(TASK_STATUS_LABELS).map(([k, v]) => (
+                  <SelectItem key={k} value={k}>{v}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex border rounded-md overflow-hidden">
             <Button
               variant={viewMode === "table" ? "secondary" : "ghost"}

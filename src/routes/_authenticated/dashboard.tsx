@@ -117,8 +117,8 @@ function DashboardPage() {
           <CardContent>
             <ul className="space-y-2 text-sm">
               {(news.data ?? []).map((n) => (
-                <li key={n.id} className="flex flex-col">
-                  <span className="font-medium">{n.title}</span>
+                <li key={n.id} className="flex flex-col border-b last:border-0 pb-2 last:pb-0">
+                  <Link to="/noticias" className="font-medium hover:text-primary transition-colors">{n.title}</Link>
                   <span className="text-xs text-muted-foreground">
                     {n.published_at && formatDistanceToNow(new Date(n.published_at), { addSuffix: true, locale: ptBR })}
                   </span>
@@ -155,11 +155,15 @@ function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {(apps.data ?? []).map((a) => (
-                <a key={a.id} href={a.url} target="_blank" rel="noreferrer" className="px-3 py-2 rounded-md border bg-card hover:bg-accent/20 text-sm truncate transition-colors">
-                  {a.name}
-                </a>
-              ))}
+              {(apps.data ?? []).length > 0 ? (
+                (apps.data ?? []).map((a) => (
+                  <a key={a.id} href={a.url} target="_blank" rel="noreferrer" className="px-3 py-2 rounded-md border bg-card hover:bg-accent/20 text-sm truncate transition-colors flex items-center gap-2">
+                    {a.name}
+                  </a>
+                ))
+              ) : (
+                <p className="text-xs text-muted-foreground col-span-full">Nenhum app disponível.</p>
+              )}
             </div>
           </CardContent>
         </Card>

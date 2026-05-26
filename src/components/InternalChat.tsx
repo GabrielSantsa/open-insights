@@ -87,10 +87,10 @@ export function InternalChat() {
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && messages.length > 0) {
       scrollToBottom();
     }
-  }, [messages]);
+  }, [messages, isOpen]);
 
   const scrollToBottom = () => {
     if (scrollRef.current) {

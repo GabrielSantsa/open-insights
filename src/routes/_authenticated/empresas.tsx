@@ -60,8 +60,6 @@ function EmpresasPage() {
     c.nome_fantasia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.cnpj?.includes(searchTerm)
   );
-
-
   const create = useMutation({
     mutationFn: async () => {
       if (!form.razao_social.trim()) throw new Error("Razão social é obrigatória");
