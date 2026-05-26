@@ -22,6 +22,19 @@ interface EmployeeSkillsProps {
 }
 
 export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
+  const { data: employee } = useQuery({
+    queryKey: ["employee-profile-skills", employeeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("employee_profiles")
+        .select("foco, perfil, atuacao, competencias_responsabilidades, conhecimento_tecnico")
+        .eq("id", employeeId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const { data: skills, isLoading, error, refetch } = useQuery({
     queryKey: ["employee-skills", employeeId],
     queryFn: async () => {
