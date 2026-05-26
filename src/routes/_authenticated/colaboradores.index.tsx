@@ -218,9 +218,12 @@ export function ColaboradoresPage() {
           </p>
         </div>
         {isUserAdmin && (
-          <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <Sheet open={isDrawerOpen} onOpenChange={(open) => {
+            setIsDrawerOpen(open);
+            if (!open) setEditingEmployee(null);
+          }}>
             <SheetTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
+              <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto" onClick={() => setEditingEmployee(null)}>
                 <UserPlus className="w-4 h-4 mr-2" />
                 Novo colaborador
               </Button>
@@ -229,19 +232,23 @@ export function ColaboradoresPage() {
               <SheetHeader className="p-6 border-b bg-background/50 backdrop-blur-sm sticky top-0 z-10">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <SheetTitle>Novo Colaborador</SheetTitle>
-                    <SheetDescription>Cadastre um novo membro na equipe interna.</SheetDescription>
+                    <SheetTitle>{editingEmployee ? "Editar Colaborador" : "Novo Colaborador"}</SheetTitle>
+                    <SheetDescription>
+                      {editingEmployee 
+                        ? `Altere as informações de ${editingEmployee.nome_completo}.` 
+                        : "Cadastre um novo membro na equipe interna."}
+                    </SheetDescription>
                   </div>
                   <Button 
                     onClick={() => {
                       const form = document.querySelector('form');
                       if (form) form.requestSubmit();
                     }}
-                    disabled={createEmployeeMutation.isPending}
+                    disabled={createEmployeeMutation.isPending || updateEmployeeMutation.isPending}
                     size="sm"
                     className="gap-2"
                   >
-                    {createEmployeeMutation.isPending ? (
+                    {createEmployeeMutation.isPending || updateEmployeeMutation.isPending ? (
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
                     ) : (
                       <Save className="w-4 h-4" />
@@ -251,9 +258,10 @@ export function ColaboradoresPage() {
                 </div>
               </SheetHeader>
               <EmployeeForm 
+                initialData={editingEmployee}
                 onSubmit={handleSave} 
                 onCancel={() => setIsDrawerOpen(false)} 
-                isSubmitting={createEmployeeMutation.isPending} 
+                isSubmitting={createEmployeeMutation.isPending || updateEmployeeMutation.isPending} 
               />
 
             </SheetContent>
