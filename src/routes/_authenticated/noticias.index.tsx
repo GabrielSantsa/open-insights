@@ -249,27 +249,27 @@ function FeaturedCard({ news, authorName }: { news: NewsRow; authorName?: string
       params={{ id: news.id }}
       className="block group rounded-xl overflow-hidden border bg-card hover:shadow-lg transition-shadow"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2">
-        <div className="aspect-[16/10] md:aspect-auto bg-muted relative overflow-hidden">
-          {news.cover_image_url ? (
+      <div className={news.cover_image_url ? "grid grid-cols-1 md:grid-cols-2" : "grid grid-cols-1"}>
+        {news.cover_image_url && (
+          <div className="aspect-[16/10] md:aspect-auto bg-muted relative overflow-hidden">
             <img
               src={news.cover_image_url}
               alt={news.title}
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform"
               loading="lazy"
             />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-              <ImageIcon className="w-12 h-12" />
-            </div>
-          )}
-          <Badge className="absolute top-3 left-3 gap-1">
-            <Star className="w-3 h-3" />
-            Destaque
-          </Badge>
-        </div>
+            <Badge className="absolute top-3 left-3 gap-1">
+              <Star className="w-3 h-3" />
+              Destaque
+            </Badge>
+          </div>
+        )}
         <div className="p-6 md:p-8 flex flex-col justify-center">
           <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+            <Badge className="gap-1">
+              <Star className="w-3 h-3" />
+              Destaque
+            </Badge>
             {news.category && <Badge variant="secondary">{news.category}</Badge>}
             <span className="inline-flex items-center gap-1">
               <CalendarDays className="w-3 h-3" />
@@ -300,22 +300,18 @@ function FeaturedCard({ news, authorName }: { news: NewsRow; authorName?: string
 function NewsCard({ news, authorName }: { news: NewsRow; authorName?: string }) {
   return (
     <Card className="overflow-hidden flex flex-col group hover:shadow-md transition-shadow">
-      <Link to="/noticias/$id" params={{ id: news.id }} className="block">
-        <div className="aspect-[16/9] bg-muted overflow-hidden">
-          {news.cover_image_url ? (
+      {news.cover_image_url && (
+        <Link to="/noticias/$id" params={{ id: news.id }} className="block">
+          <div className="aspect-[16/9] bg-muted overflow-hidden">
             <img
               src={news.cover_image_url}
               alt={news.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
               loading="lazy"
             />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-              <ImageIcon className="w-8 h-8" />
-            </div>
-          )}
-        </div>
-      </Link>
+          </div>
+        </Link>
+      )}
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2 mb-1 text-xs text-muted-foreground">
           {news.category && <Badge variant="secondary" className="text-[10px]">{news.category}</Badge>}
@@ -393,15 +389,11 @@ function AdminRow({
 
   return (
     <div className="flex flex-wrap items-center gap-3 p-3">
-      <div className="w-14 h-14 rounded-md bg-muted overflow-hidden shrink-0">
-        {news.cover_image_url ? (
+      {news.cover_image_url && (
+        <div className="w-14 h-14 rounded-md bg-muted overflow-hidden shrink-0">
           <img src={news.cover_image_url} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-            <ImageIcon className="w-5 h-5" />
-          </div>
-        )}
-      </div>
+        </div>
+      )}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-medium truncate">{news.title}</span>
