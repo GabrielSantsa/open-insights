@@ -55,19 +55,23 @@ function ProceduresPage() {
         title: form.title.trim(),
         description: form.description.trim() || null,
         version: form.version.trim() || "1.0",
+        category: form.category,
         status: "ativo",
+        workflow: "rascunho" as any,
+        author_id: user!.id,
         responsible_id: user!.id,
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Procedimento publicado");
-      setForm({ title: "", description: "", version: "1.0" });
+      toast.success("Procedimento criado como rascunho");
+      setForm({ title: "", description: "", version: "1.0", category: "Fiscal" });
       setOpen(false);
       qc.invalidateQueries({ queryKey: ["procs"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   const procs = useQuery({
     queryKey: ["procs"],
