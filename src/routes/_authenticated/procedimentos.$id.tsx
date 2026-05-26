@@ -22,7 +22,9 @@ import {
 } from "@/components/ui/select";
 import {
   ArrowLeft, AArrowDown, AArrowUp, Pencil, Save, X, BookOpen, ListChecks, GitBranch, History,
+  Paperclip, Upload, Download, Trash2, FileText,
 } from "lucide-react";
+import { diffLines } from "diff";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/procedimentos/$id")({
