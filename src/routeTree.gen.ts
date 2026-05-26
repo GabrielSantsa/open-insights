@@ -13,7 +13,6 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedProcedimentosRouteImport } from './routes/_authenticated/procedimentos'
 import { Route as AuthenticatedNoticiasRouteImport } from './routes/_authenticated/noticias'
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
@@ -22,6 +21,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authenticated/calendario'
 import { Route as AuthenticatedAppsRouteImport } from './routes/_authenticated/apps'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedProcedimentosIndexRouteImport } from './routes/_authenticated/procedimentos.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedProcedimentosIdRouteImport } from './routes/_authenticated/procedimentos.$id'
 import { Route as AuthenticatedAdminUsuariosNovoRouteImport } from './routes/_authenticated/admin.usuarios.novo'
@@ -45,12 +45,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedProcedimentosRoute =
-  AuthenticatedProcedimentosRouteImport.update({
-    id: '/procedimentos',
-    path: '/procedimentos',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedNoticiasRoute = AuthenticatedNoticiasRouteImport.update({
   id: '/noticias',
   path: '/noticias',
@@ -91,6 +85,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedProcedimentosIndexRoute =
+  AuthenticatedProcedimentosIndexRouteImport.update({
+    id: '/procedimentos/',
+    path: '/procedimentos/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -98,9 +98,9 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
 } as any)
 const AuthenticatedProcedimentosIdRoute =
   AuthenticatedProcedimentosIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedProcedimentosRoute,
+    id: '/procedimentos/$id',
+    path: '/procedimentos/$id',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAdminUsuariosNovoRoute =
   AuthenticatedAdminUsuariosNovoRouteImport.update({
@@ -121,9 +121,9 @@ export interface FileRoutesByFullPath {
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/noticias': typeof AuthenticatedNoticiasRoute
-  '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/procedimentos/': typeof AuthenticatedProcedimentosIndexRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
 }
 export interface FileRoutesByTo {
@@ -137,9 +137,9 @@ export interface FileRoutesByTo {
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/noticias': typeof AuthenticatedNoticiasRoute
-  '/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/procedimentos': typeof AuthenticatedProcedimentosIndexRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
 }
 export interface FileRoutesById {
@@ -156,9 +156,9 @@ export interface FileRoutesById {
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
   '/_authenticated/noticias': typeof AuthenticatedNoticiasRoute
-  '/_authenticated/procedimentos': typeof AuthenticatedProcedimentosRouteWithChildren
   '/_authenticated/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/procedimentos/': typeof AuthenticatedProcedimentosIndexRoute
   '/_authenticated/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
 }
 export interface FileRouteTypes {
@@ -175,9 +175,9 @@ export interface FileRouteTypes {
     | '/documentos'
     | '/empresas'
     | '/noticias'
-    | '/procedimentos'
     | '/procedimentos/$id'
     | '/admin/'
+    | '/procedimentos/'
     | '/admin/usuarios/novo'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -191,9 +191,9 @@ export interface FileRouteTypes {
     | '/documentos'
     | '/empresas'
     | '/noticias'
-    | '/procedimentos'
     | '/procedimentos/$id'
     | '/admin'
+    | '/procedimentos'
     | '/admin/usuarios/novo'
   id:
     | '__root__'
@@ -209,9 +209,9 @@ export interface FileRouteTypes {
     | '/_authenticated/documentos'
     | '/_authenticated/empresas'
     | '/_authenticated/noticias'
-    | '/_authenticated/procedimentos'
     | '/_authenticated/procedimentos/$id'
     | '/_authenticated/admin/'
+    | '/_authenticated/procedimentos/'
     | '/_authenticated/admin/usuarios/novo'
   fileRoutesById: FileRoutesById
 }
@@ -251,13 +251,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/procedimentos': {
-      id: '/_authenticated/procedimentos'
-      path: '/procedimentos'
-      fullPath: '/procedimentos'
-      preLoaderRoute: typeof AuthenticatedProcedimentosRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/noticias': {
       id: '/_authenticated/noticias'
@@ -315,6 +308,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/procedimentos/': {
+      id: '/_authenticated/procedimentos/'
+      path: '/procedimentos'
+      fullPath: '/procedimentos/'
+      preLoaderRoute: typeof AuthenticatedProcedimentosIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -324,10 +324,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/procedimentos/$id': {
       id: '/_authenticated/procedimentos/$id'
-      path: '/$id'
+      path: '/procedimentos/$id'
       fullPath: '/procedimentos/$id'
       preLoaderRoute: typeof AuthenticatedProcedimentosIdRouteImport
-      parentRoute: typeof AuthenticatedProcedimentosRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin/usuarios/novo': {
       id: '/_authenticated/admin/usuarios/novo'
@@ -352,20 +352,6 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
-interface AuthenticatedProcedimentosRouteChildren {
-  AuthenticatedProcedimentosIdRoute: typeof AuthenticatedProcedimentosIdRoute
-}
-
-const AuthenticatedProcedimentosRouteChildren: AuthenticatedProcedimentosRouteChildren =
-  {
-    AuthenticatedProcedimentosIdRoute: AuthenticatedProcedimentosIdRoute,
-  }
-
-const AuthenticatedProcedimentosRouteWithChildren =
-  AuthenticatedProcedimentosRoute._addFileChildren(
-    AuthenticatedProcedimentosRouteChildren,
-  )
-
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAppsRoute: typeof AuthenticatedAppsRoute
@@ -375,7 +361,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
   AuthenticatedNoticiasRoute: typeof AuthenticatedNoticiasRoute
-  AuthenticatedProcedimentosRoute: typeof AuthenticatedProcedimentosRouteWithChildren
+  AuthenticatedProcedimentosIdRoute: typeof AuthenticatedProcedimentosIdRoute
+  AuthenticatedProcedimentosIndexRoute: typeof AuthenticatedProcedimentosIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -387,7 +374,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
   AuthenticatedNoticiasRoute: AuthenticatedNoticiasRoute,
-  AuthenticatedProcedimentosRoute: AuthenticatedProcedimentosRouteWithChildren,
+  AuthenticatedProcedimentosIdRoute: AuthenticatedProcedimentosIdRoute,
+  AuthenticatedProcedimentosIndexRoute: AuthenticatedProcedimentosIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -403,3 +391,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
