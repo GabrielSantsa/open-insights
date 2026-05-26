@@ -17,14 +17,17 @@ import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedDemandasRouteImport } from './routes/_authenticated/demandas'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedColaboradoresRouteImport } from './routes/_authenticated/colaboradores'
 import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authenticated/calendario'
 import { Route as AuthenticatedAppsRouteImport } from './routes/_authenticated/apps'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedProcedimentosIndexRouteImport } from './routes/_authenticated/procedimentos.index'
 import { Route as AuthenticatedNoticiasIndexRouteImport } from './routes/_authenticated/noticias.index'
+import { Route as AuthenticatedColaboradoresIndexRouteImport } from './routes/_authenticated/colaboradores.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedProcedimentosIdRouteImport } from './routes/_authenticated/procedimentos.$id'
 import { Route as AuthenticatedNoticiasIdRouteImport } from './routes/_authenticated/noticias.$id'
+import { Route as AuthenticatedColaboradoresIdRouteImport } from './routes/_authenticated/colaboradores.$id'
 import { Route as AuthenticatedAdminUsuariosNovoRouteImport } from './routes/_authenticated/admin.usuarios.novo'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -66,6 +69,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedColaboradoresRoute =
+  AuthenticatedColaboradoresRouteImport.update({
+    id: '/colaboradores',
+    path: '/colaboradores',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedCalendarioRoute = AuthenticatedCalendarioRouteImport.update({
   id: '/calendario',
   path: '/calendario',
@@ -93,6 +102,12 @@ const AuthenticatedNoticiasIndexRoute =
     path: '/noticias/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedColaboradoresIndexRoute =
+  AuthenticatedColaboradoresIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedColaboradoresRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -109,6 +124,12 @@ const AuthenticatedNoticiasIdRoute = AuthenticatedNoticiasIdRouteImport.update({
   path: '/noticias/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedColaboradoresIdRoute =
+  AuthenticatedColaboradoresIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedColaboradoresRoute,
+  } as any)
 const AuthenticatedAdminUsuariosNovoRoute =
   AuthenticatedAdminUsuariosNovoRouteImport.update({
     id: '/usuarios/novo',
@@ -123,13 +144,16 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/apps': typeof AuthenticatedAppsRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
+  '/colaboradores': typeof AuthenticatedColaboradoresRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/demandas': typeof AuthenticatedDemandasRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
+  '/colaboradores/$id': typeof AuthenticatedColaboradoresIdRoute
   '/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/colaboradores/': typeof AuthenticatedColaboradoresIndexRoute
   '/noticias/': typeof AuthenticatedNoticiasIndexRoute
   '/procedimentos/': typeof AuthenticatedProcedimentosIndexRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
@@ -144,9 +168,11 @@ export interface FileRoutesByTo {
   '/demandas': typeof AuthenticatedDemandasRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
+  '/colaboradores/$id': typeof AuthenticatedColaboradoresIdRoute
   '/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/colaboradores': typeof AuthenticatedColaboradoresIndexRoute
   '/noticias': typeof AuthenticatedNoticiasIndexRoute
   '/procedimentos': typeof AuthenticatedProcedimentosIndexRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
@@ -160,13 +186,16 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/apps': typeof AuthenticatedAppsRoute
   '/_authenticated/calendario': typeof AuthenticatedCalendarioRoute
+  '/_authenticated/colaboradores': typeof AuthenticatedColaboradoresRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/demandas': typeof AuthenticatedDemandasRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
+  '/_authenticated/colaboradores/$id': typeof AuthenticatedColaboradoresIdRoute
   '/_authenticated/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/_authenticated/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/colaboradores/': typeof AuthenticatedColaboradoresIndexRoute
   '/_authenticated/noticias/': typeof AuthenticatedNoticiasIndexRoute
   '/_authenticated/procedimentos/': typeof AuthenticatedProcedimentosIndexRoute
   '/_authenticated/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
@@ -180,13 +209,16 @@ export interface FileRouteTypes {
     | '/admin'
     | '/apps'
     | '/calendario'
+    | '/colaboradores'
     | '/dashboard'
     | '/demandas'
     | '/documentos'
     | '/empresas'
+    | '/colaboradores/$id'
     | '/noticias/$id'
     | '/procedimentos/$id'
     | '/admin/'
+    | '/colaboradores/'
     | '/noticias/'
     | '/procedimentos/'
     | '/admin/usuarios/novo'
@@ -201,9 +233,11 @@ export interface FileRouteTypes {
     | '/demandas'
     | '/documentos'
     | '/empresas'
+    | '/colaboradores/$id'
     | '/noticias/$id'
     | '/procedimentos/$id'
     | '/admin'
+    | '/colaboradores'
     | '/noticias'
     | '/procedimentos'
     | '/admin/usuarios/novo'
@@ -216,13 +250,16 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/apps'
     | '/_authenticated/calendario'
+    | '/_authenticated/colaboradores'
     | '/_authenticated/dashboard'
     | '/_authenticated/demandas'
     | '/_authenticated/documentos'
     | '/_authenticated/empresas'
+    | '/_authenticated/colaboradores/$id'
     | '/_authenticated/noticias/$id'
     | '/_authenticated/procedimentos/$id'
     | '/_authenticated/admin/'
+    | '/_authenticated/colaboradores/'
     | '/_authenticated/noticias/'
     | '/_authenticated/procedimentos/'
     | '/_authenticated/admin/usuarios/novo'
@@ -293,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/colaboradores': {
+      id: '/_authenticated/colaboradores'
+      path: '/colaboradores'
+      fullPath: '/colaboradores'
+      preLoaderRoute: typeof AuthenticatedColaboradoresRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/calendario': {
       id: '/_authenticated/calendario'
       path: '/calendario'
@@ -328,6 +372,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNoticiasIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/colaboradores/': {
+      id: '/_authenticated/colaboradores/'
+      path: '/'
+      fullPath: '/colaboradores/'
+      preLoaderRoute: typeof AuthenticatedColaboradoresIndexRouteImport
+      parentRoute: typeof AuthenticatedColaboradoresRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -348,6 +399,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/noticias/$id'
       preLoaderRoute: typeof AuthenticatedNoticiasIdRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/colaboradores/$id': {
+      id: '/_authenticated/colaboradores/$id'
+      path: '/$id'
+      fullPath: '/colaboradores/$id'
+      preLoaderRoute: typeof AuthenticatedColaboradoresIdRouteImport
+      parentRoute: typeof AuthenticatedColaboradoresRoute
     }
     '/_authenticated/admin/usuarios/novo': {
       id: '/_authenticated/admin/usuarios/novo'
@@ -372,10 +430,27 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedColaboradoresRouteChildren {
+  AuthenticatedColaboradoresIdRoute: typeof AuthenticatedColaboradoresIdRoute
+  AuthenticatedColaboradoresIndexRoute: typeof AuthenticatedColaboradoresIndexRoute
+}
+
+const AuthenticatedColaboradoresRouteChildren: AuthenticatedColaboradoresRouteChildren =
+  {
+    AuthenticatedColaboradoresIdRoute: AuthenticatedColaboradoresIdRoute,
+    AuthenticatedColaboradoresIndexRoute: AuthenticatedColaboradoresIndexRoute,
+  }
+
+const AuthenticatedColaboradoresRouteWithChildren =
+  AuthenticatedColaboradoresRoute._addFileChildren(
+    AuthenticatedColaboradoresRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAppsRoute: typeof AuthenticatedAppsRoute
   AuthenticatedCalendarioRoute: typeof AuthenticatedCalendarioRoute
+  AuthenticatedColaboradoresRoute: typeof AuthenticatedColaboradoresRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDemandasRoute: typeof AuthenticatedDemandasRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
@@ -390,6 +465,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAppsRoute: AuthenticatedAppsRoute,
   AuthenticatedCalendarioRoute: AuthenticatedCalendarioRoute,
+  AuthenticatedColaboradoresRoute: AuthenticatedColaboradoresRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDemandasRoute: AuthenticatedDemandasRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,

@@ -5,6 +5,14 @@ export type TaskStatus = Database["public"]["Enums"]["task_status"];
 export type TaskPriority = Database["public"]["Enums"]["task_priority"];
 export type NewsStatus = Database["public"]["Enums"]["news_status"];
 export type ProcedureStatus = Database["public"]["Enums"]["procedure_status"];
+export type EmployeeStatus = Database["public"]["Enums"]["employee_status"];
+
+export const EMPLOYEE_STATUS_LABELS: Record<EmployeeStatus, string> = {
+  ativo: "Ativo",
+  afastado: "Afastado",
+  ferias: "Férias",
+  desligado: "Desligado",
+};
 
 export const ROLE_LABELS: Record<AppRole, string> = {
   admin: "Administrador",
