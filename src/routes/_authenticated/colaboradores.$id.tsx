@@ -36,17 +36,31 @@ function ColaboradorDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employee_profiles")
-        .select(`
-          *,
-          gestor:gestor_id(id, nome_completo, cargo, foto_url),
-          subordinados:employee_profiles!employee_profiles_gestor_id_fkey(id, nome_completo, cargo, foto_url),
-          skills:employee_skills(*)
-        `)
+        .select("*, skills:employee_skills(*)")
         .eq("id", id)
-        .single();
-      
+        .maybeSingle();
       if (error) throw error;
-      return data;
+      if (!data) return null;
+
+      const [gestorRes, subordinadosRes] = await Promise.all([
+        data.gestor_id
+          ? supabase
+              .from("employee_profiles")
+              .select("id, nome_completo, cargo, foto_url")
+              .eq("id", data.gestor_id)
+              .maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
+        supabase
+          .from("employee_profiles")
+          .select("id, nome_completo, cargo, foto_url")
+          .eq("gestor_id", id),
+      ]);
+
+      return {
+        ...data,
+        gestor: gestorRes.data,
+        subordinados: subordinadosRes.data ?? [],
+      };
     },
   });
 
