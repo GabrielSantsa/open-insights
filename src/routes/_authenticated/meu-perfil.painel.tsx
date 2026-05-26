@@ -227,9 +227,11 @@ function MeuPainel() {
                 ))}
               </div>
             ) : (
-              <div className="py-8 text-center text-muted-foreground">
-                <p className="text-sm">Nenhuma atividade registrada hoje.</p>
-              </div>
+              <ModuleEmptyState 
+                icon={Clock}
+                title="Sem registros"
+                description="Suas atividades recentes aparecerão aqui conforme você utiliza a plataforma."
+              />
             )}
           </CardContent>
         </Card>
