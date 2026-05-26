@@ -89,7 +89,8 @@ export function ColaboradoresPage() {
           gestor:employee_profiles!employee_profiles_gestor_id_fkey(nome_completo),
           coordenador:employee_profiles!employee_profiles_coordenador_id_fkey(nome_completo)
         `)
-        .order("nome_completo");
+        .order("nome_completo")
+        .maybeSingle(); // This is the mistake, it should NOT be maybeSingle for a list
       
       if (error) throw error;
       return data;
