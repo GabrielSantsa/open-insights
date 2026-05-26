@@ -72,36 +72,37 @@ export function EmployeeSkills({ employeeId, employeeData }: EmployeeSkillsProps
     );
   }
 
-  const responsabilidades = skills?.filter(s => s.tipo === 'responsabilidade') || [];
-  const conhecimentos = skills?.filter(s => s.tipo === 'conhecimento') || [];
+  const responsabilidadesDb = skills?.filter(s => s.tipo === 'responsabilidade') || [];
+  const conhecimentosDb = skills?.filter(s => s.tipo === 'conhecimento') || [];
+
+  // Parse textarea content into individual items (split by newlines, semicolons, or bullets)
+  const parseTextToItems = (text?: string | null): string[] => {
+    if (!text) return [];
+    return text
+      .split(/\r?\n|;|•|·/)
+      .map(s => s.replace(/^[\s\-\*\d\.\)]+/, "").trim())
+      .filter(Boolean);
+  };
+
+  const responsabilidadesFromText = parseTextToItems(employee?.competencias_responsabilidades).map((c, i) => ({
+    id: `resp-text-${i}`,
+    competencia: c,
+  }));
+  const conhecimentosFromText = parseTextToItems(employee?.conhecimento_tecnico).map((c, i) => ({
+    id: `conh-text-${i}`,
+    competencia: c,
+    nivel: null as number | null,
+  }));
+
+  const responsabilidades = responsabilidadesDb.length > 0
+    ? responsabilidadesDb
+    : responsabilidadesFromText;
+  const conhecimentos = conhecimentosDb.length > 0
+    ? conhecimentosDb
+    : conhecimentosFromText;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {(employee?.competencias_responsabilidades || employee?.conhecimento_tecnico) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {employee.competencias_responsabilidades && (
-            <Card className="border-border/40 bg-muted/20">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Definição de Competências</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm whitespace-pre-wrap">{employee.competencias_responsabilidades}</p>
-              </CardContent>
-            </Card>
-          )}
-          {employee.conhecimento_tecnico && (
-            <Card className="border-border/40 bg-muted/20">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Definição de Conhecimento Técnico</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm whitespace-pre-wrap">{employee.conhecimento_tecnico}</p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      )}
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Responsabilidades */}
         <div className="space-y-4">
@@ -151,17 +152,32 @@ export function EmployeeSkills({ employeeId, employeeData }: EmployeeSkillsProps
 
           <div className="grid gap-4">
             {conhecimentos.length > 0 ? (
-              conhecimentos.map((item) => (
-                <div key={item.id} className="space-y-2">
-                  <div className="flex justify-between items-center px-1">
-                    <span className="text-sm font-semibold">{item.competencia}</span>
-                    <span className="text-xs font-bold text-primary">{item.nivel || 0}%</span>
+              conhecimentos.map((item: any) => (
+                item.nivel !== null && item.nivel !== undefined ? (
+                  <div key={item.id} className="space-y-2">
+                    <div className="flex justify-between items-center px-1">
+                      <span className="text-sm font-semibold">{item.competencia}</span>
+                      <span className="text-xs font-bold text-primary">{item.nivel || 0}%</span>
+                    </div>
+                    <div className="relative">
+                      <Progress value={item.nivel || 0} className="h-2 rounded-full" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent rounded-full -z-10" />
+                    </div>
                   </div>
-                  <div className="relative">
-                    <Progress value={item.nivel || 0} className="h-2 rounded-full" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent rounded-full -z-10" />
+                ) : (
+                  <div key={item.id} className="group p-4 rounded-xl border bg-card hover:border-primary/30 transition-all flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+                        <BookOpen className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold">{item.competencia}</p>
+                        <p className="text-[11px] text-muted-foreground uppercase tracking-tight font-medium">Conhecimento Técnico</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
                   </div>
-                </div>
+                )
               ))
             ) : (
               <ModuleEmptyState 
@@ -173,6 +189,7 @@ export function EmployeeSkills({ employeeId, employeeData }: EmployeeSkillsProps
           </div>
         </div>
       </div>
+
       
       {/* Cards de resumo de Especialidade */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
