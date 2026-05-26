@@ -73,6 +73,9 @@ function ProcedureDetail() {
   const [draft, setDraft] = useState("");
   const [versionDialog, setVersionDialog] = useState(false);
   const [versionForm, setVersionForm] = useState({ note: "", major: false });
+  const [diffFromId, setDiffFromId] = useState<string>("");
+  const [diffToId, setDiffToId] = useState<string>("current");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const articleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
