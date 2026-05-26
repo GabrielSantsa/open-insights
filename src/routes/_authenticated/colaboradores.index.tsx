@@ -86,8 +86,8 @@ export function ColaboradoresPage() {
         .from("employee_profiles")
         .select(`
           *,
-          gestor:gestor_id!employee_profiles_gestor_id_fkey(nome_completo),
-          coordenador:coordenador_id!employee_profiles_coordenador_id_fkey(nome_completo)
+          gestor:employee_profiles!employee_profiles_gestor_id_fkey(nome_completo),
+          coordenador:employee_profiles!employee_profiles_coordenador_id_fkey(nome_completo)
         `)
         .order("nome_completo");
       
