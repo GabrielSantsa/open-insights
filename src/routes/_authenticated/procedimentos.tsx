@@ -15,6 +15,24 @@ import {
 } from "@/components/ui/dialog";
 import { Star, Search, Plus } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+
+const CATEGORIES = ["Fiscal", "Departamento Pessoal", "RH", "Comercial", "Financeiro", "Administrativo"];
+
+const WORKFLOW_LABEL: Record<string, string> = {
+  rascunho: "Rascunho",
+  em_revisao: "Em revisão",
+  publicado: "Publicado",
+  arquivado: "Arquivado",
+};
+const WORKFLOW_VARIANT: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
+  rascunho: "outline",
+  em_revisao: "secondary",
+  publicado: "default",
+  arquivado: "destructive",
+};
 
 export const Route = createFileRoute("/_authenticated/procedimentos")({
   component: ProceduresPage,
@@ -27,7 +45,8 @@ function ProceduresPage() {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ title: "", description: "", version: "1.0" });
+  const [form, setForm] = useState({ title: "", description: "", version: "1.0", category: "Fiscal" });
+
 
   const publish = useMutation({
     mutationFn: async () => {
@@ -36,30 +55,35 @@ function ProceduresPage() {
         title: form.title.trim(),
         description: form.description.trim() || null,
         version: form.version.trim() || "1.0",
+        category: form.category,
         status: "ativo",
+        workflow: "rascunho" as any,
+        author_id: user!.id,
         responsible_id: user!.id,
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Procedimento publicado");
-      setForm({ title: "", description: "", version: "1.0" });
+      toast.success("Procedimento criado como rascunho");
+      setForm({ title: "", description: "", version: "1.0", category: "Fiscal" });
       setOpen(false);
       qc.invalidateQueries({ queryKey: ["procs"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
+
   const procs = useQuery({
     queryKey: ["procs"],
     queryFn: async () => {
       const { data } = await supabase
         .from("procedures")
-        .select("id, title, description, version, last_revision, status, sector_id, sectors(name)")
+        .select("id, title, description, version, last_revision, status, workflow, category, sector_id, sectors(name)")
         .order("title");
       return data ?? [];
     },
   });
+
 
   const favs = useQuery({
     queryKey: ["my-fav-procs", user?.id],
@@ -103,29 +127,44 @@ function ProceduresPage() {
                 <Button><Plus className="w-4 h-4" />Publicar</Button>
               </DialogTrigger>
               <DialogContent className="max-w-xl">
-                <DialogHeader><DialogTitle>Publicar procedimento</DialogTitle></DialogHeader>
+                <DialogHeader><DialogTitle>Novo procedimento</DialogTitle></DialogHeader>
                 <div className="space-y-3">
                   <div className="space-y-1.5">
                     <Label>Título</Label>
                     <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                   </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>Categoria</Label>
+                      <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Versão inicial</Label>
+                      <Input value={form.version} onChange={(e) => setForm({ ...form, version: e.target.value })} />
+                    </div>
+                  </div>
                   <div className="space-y-1.5">
                     <Label>Descrição</Label>
-                    <Textarea rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                    <Textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label>Versão</Label>
-                    <Input value={form.version} onChange={(e) => setForm({ ...form, version: e.target.value })} />
-                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Será criado como <strong>rascunho</strong>. Edite o conteúdo e mude o status para <strong>Publicado</strong> quando estiver pronto.
+                  </p>
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
                   <Button onClick={() => publish.mutate()} disabled={publish.isPending}>
-                    {publish.isPending ? "Publicando..." : "Publicar"}
+                    {publish.isPending ? "Criando..." : "Criar rascunho"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
           )}
         </div>
       </div>
@@ -151,10 +190,13 @@ function ProceduresPage() {
                 </div>
                 <CardDescription className="line-clamp-2">{p.description}</CardDescription>
               </CardHeader>
-              <CardContent className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>v{p.version}{p.sectors ? ` · ${p.sectors.name}` : ""}</span>
-                <Badge variant="outline" className="capitalize">{p.status.replace("_", " ")}</Badge>
+              <CardContent className="flex items-center justify-between text-xs text-muted-foreground gap-2">
+                <span className="truncate">v{p.version}{p.category ? ` · ${p.category}` : ""}{p.sectors ? ` · ${p.sectors.name}` : ""}</span>
+                <Badge variant={WORKFLOW_VARIANT[p.workflow ?? "rascunho"]} className="shrink-0">
+                  {WORKFLOW_LABEL[p.workflow ?? "rascunho"]}
+                </Badge>
               </CardContent>
+
             </Card>
           );
         })}
