@@ -13,7 +13,6 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedNoticiasRouteImport } from './routes/_authenticated/noticias'
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedDemandasRouteImport } from './routes/_authenticated/demandas'
@@ -22,6 +21,7 @@ import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppsRouteImport } from './routes/_authenticated/apps'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedProcedimentosIndexRouteImport } from './routes/_authenticated/procedimentos.index'
+import { Route as AuthenticatedNoticiasIndexRouteImport } from './routes/_authenticated/noticias.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedProcedimentosIdRouteImport } from './routes/_authenticated/procedimentos.$id'
 import { Route as AuthenticatedNoticiasIdRouteImport } from './routes/_authenticated/noticias.$id'
@@ -45,11 +45,6 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedNoticiasRoute = AuthenticatedNoticiasRouteImport.update({
-  id: '/noticias',
-  path: '/noticias',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedEmpresasRoute = AuthenticatedEmpresasRouteImport.update({
   id: '/empresas',
@@ -92,6 +87,12 @@ const AuthenticatedProcedimentosIndexRoute =
     path: '/procedimentos/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedNoticiasIndexRoute =
+  AuthenticatedNoticiasIndexRouteImport.update({
+    id: '/noticias/',
+    path: '/noticias/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -104,9 +105,9 @@ const AuthenticatedProcedimentosIdRoute =
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedNoticiasIdRoute = AuthenticatedNoticiasIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AuthenticatedNoticiasRoute,
+  id: '/noticias/$id',
+  path: '/noticias/$id',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAdminUsuariosNovoRoute =
   AuthenticatedAdminUsuariosNovoRouteImport.update({
@@ -126,10 +127,10 @@ export interface FileRoutesByFullPath {
   '/demandas': typeof AuthenticatedDemandasRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
-  '/noticias': typeof AuthenticatedNoticiasRouteWithChildren
   '/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/noticias/': typeof AuthenticatedNoticiasIndexRoute
   '/procedimentos/': typeof AuthenticatedProcedimentosIndexRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
 }
@@ -143,10 +144,10 @@ export interface FileRoutesByTo {
   '/demandas': typeof AuthenticatedDemandasRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
-  '/noticias': typeof AuthenticatedNoticiasRouteWithChildren
   '/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/noticias': typeof AuthenticatedNoticiasIndexRoute
   '/procedimentos': typeof AuthenticatedProcedimentosIndexRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
 }
@@ -163,10 +164,10 @@ export interface FileRoutesById {
   '/_authenticated/demandas': typeof AuthenticatedDemandasRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
-  '/_authenticated/noticias': typeof AuthenticatedNoticiasRouteWithChildren
   '/_authenticated/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/_authenticated/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/noticias/': typeof AuthenticatedNoticiasIndexRoute
   '/_authenticated/procedimentos/': typeof AuthenticatedProcedimentosIndexRoute
   '/_authenticated/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
 }
@@ -183,10 +184,10 @@ export interface FileRouteTypes {
     | '/demandas'
     | '/documentos'
     | '/empresas'
-    | '/noticias'
     | '/noticias/$id'
     | '/procedimentos/$id'
     | '/admin/'
+    | '/noticias/'
     | '/procedimentos/'
     | '/admin/usuarios/novo'
   fileRoutesByTo: FileRoutesByTo
@@ -200,10 +201,10 @@ export interface FileRouteTypes {
     | '/demandas'
     | '/documentos'
     | '/empresas'
-    | '/noticias'
     | '/noticias/$id'
     | '/procedimentos/$id'
     | '/admin'
+    | '/noticias'
     | '/procedimentos'
     | '/admin/usuarios/novo'
   id:
@@ -219,10 +220,10 @@ export interface FileRouteTypes {
     | '/_authenticated/demandas'
     | '/_authenticated/documentos'
     | '/_authenticated/empresas'
-    | '/_authenticated/noticias'
     | '/_authenticated/noticias/$id'
     | '/_authenticated/procedimentos/$id'
     | '/_authenticated/admin/'
+    | '/_authenticated/noticias/'
     | '/_authenticated/procedimentos/'
     | '/_authenticated/admin/usuarios/novo'
   fileRoutesById: FileRoutesById
@@ -263,13 +264,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/noticias': {
-      id: '/_authenticated/noticias'
-      path: '/noticias'
-      fullPath: '/noticias'
-      preLoaderRoute: typeof AuthenticatedNoticiasRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/empresas': {
       id: '/_authenticated/empresas'
@@ -327,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProcedimentosIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/noticias/': {
+      id: '/_authenticated/noticias/'
+      path: '/noticias'
+      fullPath: '/noticias/'
+      preLoaderRoute: typeof AuthenticatedNoticiasIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -343,10 +344,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/noticias/$id': {
       id: '/_authenticated/noticias/$id'
-      path: '/$id'
+      path: '/noticias/$id'
       fullPath: '/noticias/$id'
       preLoaderRoute: typeof AuthenticatedNoticiasIdRouteImport
-      parentRoute: typeof AuthenticatedNoticiasRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin/usuarios/novo': {
       id: '/_authenticated/admin/usuarios/novo'
@@ -371,19 +372,6 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
-interface AuthenticatedNoticiasRouteChildren {
-  AuthenticatedNoticiasIdRoute: typeof AuthenticatedNoticiasIdRoute
-}
-
-const AuthenticatedNoticiasRouteChildren: AuthenticatedNoticiasRouteChildren = {
-  AuthenticatedNoticiasIdRoute: AuthenticatedNoticiasIdRoute,
-}
-
-const AuthenticatedNoticiasRouteWithChildren =
-  AuthenticatedNoticiasRoute._addFileChildren(
-    AuthenticatedNoticiasRouteChildren,
-  )
-
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAppsRoute: typeof AuthenticatedAppsRoute
@@ -392,8 +380,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDemandasRoute: typeof AuthenticatedDemandasRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
-  AuthenticatedNoticiasRoute: typeof AuthenticatedNoticiasRouteWithChildren
+  AuthenticatedNoticiasIdRoute: typeof AuthenticatedNoticiasIdRoute
   AuthenticatedProcedimentosIdRoute: typeof AuthenticatedProcedimentosIdRoute
+  AuthenticatedNoticiasIndexRoute: typeof AuthenticatedNoticiasIndexRoute
   AuthenticatedProcedimentosIndexRoute: typeof AuthenticatedProcedimentosIndexRoute
 }
 
@@ -405,8 +394,9 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDemandasRoute: AuthenticatedDemandasRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
-  AuthenticatedNoticiasRoute: AuthenticatedNoticiasRouteWithChildren,
+  AuthenticatedNoticiasIdRoute: AuthenticatedNoticiasIdRoute,
   AuthenticatedProcedimentosIdRoute: AuthenticatedProcedimentosIdRoute,
+  AuthenticatedNoticiasIndexRoute: AuthenticatedNoticiasIndexRoute,
   AuthenticatedProcedimentosIndexRoute: AuthenticatedProcedimentosIndexRoute,
 }
 
@@ -423,13 +413,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

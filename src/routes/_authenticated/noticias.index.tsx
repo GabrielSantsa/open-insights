@@ -31,7 +31,7 @@ import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/noticias")({
+export const Route = createFileRoute("/_authenticated/noticias/")({
   component: NewsPage,
   head: () => ({ meta: [{ title: "Notícias — União Contadores" }] }),
 });
