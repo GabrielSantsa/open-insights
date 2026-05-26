@@ -591,13 +591,11 @@ function ProcedureDetail() {
                         <Button size="icon" variant="ghost" onClick={() => downloadFile(f)} title="Baixar">
                           <Download className="w-4 h-4" />
                         </Button>
-                        {canEdit && (
-                          <Button size="icon" variant="ghost" onClick={() => {
-                            if (confirm(`Remover "${f.name}"?`)) deleteFile.mutate({ id: f.id, storage_path: f.storage_path });
-                          }} title="Remover">
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
-                        )}
+                        <Button size="icon" variant="ghost" onClick={() => {
+                          if (confirm(`Remover "${f.name}"?`)) deleteFile.mutate({ id: f.id, storage_path: f.storage_path });
+                        }} title="Remover">
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
                       </li>
                     ))}
                   </ul>
