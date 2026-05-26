@@ -444,12 +444,58 @@ function EmpresasPage() {
                 </p>
               </div>
 
+              {detail.cnae_principal && (
+                <div className="space-y-2">
+                  <h4 className="text-[10px] uppercase font-bold text-muted-foreground">CNAE Principal</h4>
+                  {(() => {
+                    const m = String(detail.cnae_principal).match(/^(\d+)\s*-\s*(.+)$/);
+                    return m ? (
+                      <p className="text-sm"><span className="font-mono font-semibold">{m[1]}</span> — {m[2]}</p>
+                    ) : <p className="text-sm">{detail.cnae_principal}</p>;
+                  })()}
+                </div>
+              )}
+
+              {detail.cnaes_secundarios && (
+                <div className="space-y-2">
+                  <h4 className="text-[10px] uppercase font-bold text-muted-foreground">CNAEs Secundários</h4>
+                  <ul className="space-y-1">
+                    {String(detail.cnaes_secundarios).split(/\s*\|\s*/).filter(Boolean).map((c, i) => {
+                      const m = c.match(/^(\d+)\s*-\s*(.+)$/);
+                      return (
+                        <li key={i} className="text-sm flex gap-2">
+                          {m ? (<><span className="font-mono font-semibold text-muted-foreground shrink-0">{m[1]}</span><span>{m[2]}</span></>) : c}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+
+              {detail.socios && (
+                <div className="space-y-2">
+                  <h4 className="text-[10px] uppercase font-bold text-muted-foreground">Sócios</h4>
+                  <ul className="space-y-1">
+                    {String(detail.socios).split(/\s*\|\s*/).filter(Boolean).map((s, i) => {
+                      const m = s.match(/^(.+?)\s*\((.+)\)\s*$/);
+                      return (
+                        <li key={i} className="text-sm flex items-center gap-2">
+                          <span className="font-medium">{m ? m[1] : s}</span>
+                          {m && <Badge variant="secondary" className="text-[10px]">{m[2]}</Badge>}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+
               {detail.observacoes && (
                 <div className="space-y-2">
                   <h4 className="text-[10px] uppercase font-bold text-muted-foreground">Observações</h4>
                   <p className="text-sm whitespace-pre-wrap text-muted-foreground">{detail.observacoes}</p>
                 </div>
               )}
+
 
               {canManage && (
                 <div className="flex justify-end pt-4 border-t">
