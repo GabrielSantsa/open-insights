@@ -314,7 +314,12 @@ function ColaboradorDetail() {
                   {employee.gestor && (
                     <div className="flex items-center gap-3 text-sm">
                       <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
-                        <ShieldCheck className="w-4 h-4" />
+                        <Avatar className="h-full w-full rounded-lg">
+                          <AvatarImage src={employee.gestor.foto_url || ""} />
+                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                            {employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
                       </div>
                       <div 
                         className="flex-1 min-w-0 cursor-pointer group" 
@@ -329,7 +334,12 @@ function ColaboradorDetail() {
                   {employee.coordenador && (
                     <div className="flex items-center gap-3 text-sm">
                       <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
-                        <UserCircle className="w-4 h-4" />
+                        <Avatar className="h-full w-full rounded-lg">
+                          <AvatarImage src={employee.coordenador.foto_url || ""} />
+                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                            {employee.coordenador.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
                       </div>
                       <div 
                         className="flex-1 min-w-0 cursor-pointer group" 
