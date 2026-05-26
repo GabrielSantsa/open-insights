@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { 
   LayoutDashboard, 
   CheckSquare, 
@@ -33,7 +34,7 @@ function MeuPainel() {
       if (!user) return null;
 
       const [tasks, procedures, activities, trainings, deadlines, profile] = await Promise.all([
-        supabase.from("tasks").select("*").eq("responsavel_id", user.id),
+        supabase.from("tasks").select("*").eq("assignee_id", user.id),
         supabase.from("procedure_favorites").select("*, procedures(*)").eq("user_id", user.id).limit(3),
         supabase.from("employee_activity").select("*").eq("usuario_id", user.id).order("data", { ascending: false }).limit(5),
         supabase.from("trainings").select("*").eq("colaborador_id", user.id).gte("data", new Date().toISOString()).limit(3),
@@ -69,7 +70,7 @@ function MeuPainel() {
   }
 
   const pendingTasks = dashboardData?.tasks.filter(t => t.status !== 'concluida') || [];
-  const overdueTasks = pendingTasks.filter(t => t.prazo && new Date(t.prazo) < new Date());
+  const overdueTasks = pendingTasks.filter(t => t.due_date && new Date(t.due_date) < new Date());
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
@@ -151,11 +152,11 @@ function MeuPainel() {
                 {pendingTasks.slice(0, 3).map(task => (
                   <div key={task.id} className="p-3 rounded-lg border bg-muted/20 flex items-center justify-between">
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold truncate">{task.titulo}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Prazo: {task.prazo ? format(new Date(task.prazo), "dd/MM/yyyy") : 'S/P'}</p>
+                      <p className="text-sm font-semibold truncate">{task.title}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Prazo: {task.due_date ? format(new Date(task.due_date), "dd/MM/yyyy") : 'S/P'}</p>
                     </div>
-                    <Badge variant={task.prioridade === 'alta' ? 'destructive' : 'secondary'} className="text-[10px] h-5">
-                      {task.prioridade}
+                    <Badge variant={task.priority === 'alta' || task.priority === 'urgente' ? 'destructive' : 'secondary'} className="text-[10px] h-5">
+                      {task.priority}
                     </Badge>
                   </div>
                 ))}
