@@ -432,11 +432,11 @@ function ColaboradorDetail() {
                   </div>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <div className="p-12 text-center bg-background">
-                    <History className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
-                    <p className="text-sm font-medium text-muted-foreground">Nenhuma demanda vinculada a este colaborador.</p>
-                    <p className="text-xs text-muted-foreground/60 mt-1">As demandas operacionais serão listadas aqui conforme forem criadas.</p>
-                  </div>
+                  <ModuleEmptyState 
+                    icon={History}
+                    title="Nenhuma demanda vinculada"
+                    description="As demandas operacionais serão listadas aqui conforme forem criadas e atribuídas."
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -452,22 +452,25 @@ function ColaboradorDetail() {
                     </TabsList>
                   </div>
                   <TabsContent value="favoritos" className="p-0 m-0">
-                    <div className="p-16 text-center">
-                      <ShieldCheck className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
-                      <p className="text-sm font-medium text-muted-foreground">Nenhum procedimento favoritado ainda.</p>
-                    </div>
+                    <ModuleEmptyState 
+                      icon={ShieldCheck}
+                      title="Sem favoritos"
+                      description="Nenhum procedimento favoritado por este colaborador ainda."
+                    />
                   </TabsContent>
                   <TabsContent value="acessados" className="p-0 m-0">
-                    <div className="p-16 text-center">
-                      <GraduationCap className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
-                      <p className="text-sm font-medium text-muted-foreground">Nenhum dado de acesso disponível.</p>
-                    </div>
+                    <ModuleEmptyState 
+                      icon={GraduationCap}
+                      title="Sem dados de acesso"
+                      description="Ainda não há registros de acesso a procedimentos para este perfil."
+                    />
                   </TabsContent>
                   <TabsContent value="recentes" className="p-0 m-0">
-                    <div className="p-16 text-center">
-                      <History className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
-                      <p className="text-sm font-medium text-muted-foreground">Nenhum procedimento visualizado recentemente.</p>
-                    </div>
+                    <ModuleEmptyState 
+                      icon={History}
+                      title="Sem histórico"
+                      description="Nenhum procedimento visualizado recentemente por este colaborador."
+                    />
                   </TabsContent>
                 </Tabs>
               </Card>
