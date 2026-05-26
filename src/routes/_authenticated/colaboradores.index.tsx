@@ -13,7 +13,7 @@ import { EMPLOYEE_STATUS_LABELS, isAdmin, type EmployeeStatus } from "@/lib/perm
 import { EmployeeStatusBadge } from "@/components/employees/EmployeeStatusBadge";
 import { ModuleEmptyState } from "@/components/employees/ModuleEmptyState";
 import { toast } from "sonner";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import {
   Table,
@@ -47,6 +47,7 @@ import { EmployeeForm } from "@/components/employees/EmployeeForm";
 export function ColaboradoresPage() {
   const { roles } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [view, setView] = useState<"cards" | "table">("cards");
   const [search, setSearch] = useState("");
   const [setorFilter, setSetorFilter] = useState<string>("all");
@@ -334,21 +335,28 @@ export function ColaboradoresPage() {
           ))}
         </div>
       ) : (
-        <div className="rounded-xl border border-border/40 bg-card overflow-hidden shadow-sm">
+        <div className="rounded-xl border border-border/40 bg-card overflow-hidden shadow-sm animate-in fade-in duration-500">
           <Table>
             <TableHeader className="bg-muted/30">
-              <TableRow>
-                <TableHead className="w-[300px]">Colaborador</TableHead>
-                <TableHead>Setor</TableHead>
-                <TableHead>E-mail</TableHead>
-                <TableHead>Ramal</TableHead>
-                <TableHead>Gestor</TableHead>
-                <TableHead className="text-right">Status</TableHead>
+              <TableRow className="hover:bg-transparent border-b border-border/40">
+                <TableHead className="w-[300px] text-[10px] font-bold uppercase tracking-widest py-4">Colaborador</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">Setor</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">E-mail</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">Ramal</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">Gestor</TableHead>
+                <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest py-4">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredEmployees.map((emp) => (
-                <TableRow key={emp.id} className="cursor-pointer group hover:bg-muted/30" onClick={() => window.location.href=`/colaboradores/${emp.id}`}>
+                <TableRow 
+                  key={emp.id} 
+                  className={cn(
+                    "cursor-pointer group hover:bg-muted/30 transition-colors border-b border-border/40 last:border-0",
+                    emp.status === "desligado" && "opacity-60 grayscale-[0.5]"
+                  )} 
+                  onClick={() => navigate({ to: "/colaboradores/$id", params: { id: emp.id } })}
+                >
 
                   <TableCell>
                     <div className="flex items-center gap-3">
