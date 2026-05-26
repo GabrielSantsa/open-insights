@@ -10,6 +10,7 @@ import {
   Newspaper,
   Shield,
   Building2,
+  Users,
 } from "lucide-react";
 import {
   Sidebar,
@@ -35,7 +36,7 @@ const mainItems = [
   { title: "Empresas", url: "/empresas", icon: Building },
   { title: "Calendário", url: "/calendario", icon: Calendar },
   { title: "Notícias", url: "/noticias", icon: Newspaper },
-  { title: "Colaboradores", url: "/colaboradores", icon: UserIcon },
+  { title: "Colaboradores", url: "/colaboradores", icon: Users },
 ] as const;
 
 export function AppSidebar() {
