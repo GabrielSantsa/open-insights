@@ -272,21 +272,9 @@ function ColaboradorDetail() {
                 <Briefcase className="w-4 h-4 mr-2" />
                 Demandas
               </TabsTrigger>
-              <TabsTrigger value="procedimentos" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <GraduationCap className="w-4 h-4 mr-2" />
-                Procedimentos
-              </TabsTrigger>
-              <TabsTrigger value="atividades" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <History className="w-4 h-4 mr-2" />
-                Atividades
-              </TabsTrigger>
               <TabsTrigger value="competencias" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <CheckCircle2 className="w-4 h-4 mr-2" />
                 Competências
-              </TabsTrigger>
-              <TabsTrigger value="assinatura" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <Edit2 className="w-4 h-4 mr-2" />
-                Assinatura
               </TabsTrigger>
               </TabsList>
             </div>
