@@ -365,6 +365,7 @@ export function ColaboradoresPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredEmployees.map((emp) => (
             <Link key={emp.id} to="/colaboradores/$id" params={{ id: emp.id }}>
+
               <Card className="hover:shadow-lg hover:border-primary/20 transition-all group cursor-pointer border-border/60 bg-card overflow-hidden h-full flex flex-col">
                 <CardHeader className="flex-row items-center gap-4 space-y-0 pb-4">
                   <Avatar className="h-14 w-14 border-2 border-background shadow-sm ring-1 ring-border/20">
