@@ -474,6 +474,39 @@ function ColaboradorDetail() {
                 </Tabs>
               </Card>
             </TabsContent>
+
+            <TabsContent value="atividades" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+              <Card className="border-border/40 shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-sm font-semibold">Histórico de Atividades</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <EmployeeActivity employeeId={id} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="competencias" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+              <Card className="border-border/40 shadow-sm">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-sm font-semibold">Competências & Responsabilidades</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <EmployeeSkills employeeId={id} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="assinatura" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+              <Card className="border-border/40 shadow-sm">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-sm font-semibold">Assinatura Corporativa</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <EmployeeSignature employee={employee} />
+                </CardContent>
+              </Card>
+            </TabsContent>
           </Tabs>
         </div>
       </div>
