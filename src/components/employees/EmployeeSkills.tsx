@@ -117,9 +117,9 @@ export function EmployeeSkills({ employeeId, employeeData }: EmployeeSkillsProps
           <div className="grid gap-3">
             {responsabilidades.length > 0 ? (
               responsabilidades.map((item) => (
-                <div key={item.id} className="group p-4 rounded-xl border bg-card hover:border-primary/30 transition-all flex items-center justify-between">
+                <div key={item.id} className="p-4 rounded-xl border bg-card flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+                    <div className="h-8 w-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
                       <CheckCircle2 className="w-4 h-4" />
                     </div>
                     <div>
@@ -127,7 +127,6 @@ export function EmployeeSkills({ employeeId, employeeData }: EmployeeSkillsProps
                       <p className="text-[11px] text-muted-foreground uppercase tracking-tight font-medium">Rotina Operacional</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
                 </div>
               ))
             ) : (
@@ -165,9 +164,9 @@ export function EmployeeSkills({ employeeId, employeeData }: EmployeeSkillsProps
                     </div>
                   </div>
                 ) : (
-                  <div key={item.id} className="group p-4 rounded-xl border bg-card hover:border-primary/30 transition-all flex items-center justify-between">
+                  <div key={item.id} className="p-4 rounded-xl border bg-card flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+                      <div className="h-8 w-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
                         <BookOpen className="w-4 h-4" />
                       </div>
                       <div>
@@ -175,7 +174,6 @@ export function EmployeeSkills({ employeeId, employeeData }: EmployeeSkillsProps
                         <p className="text-[11px] text-muted-foreground uppercase tracking-tight font-medium">Conhecimento Técnico</p>
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
                   </div>
                 )
               ))
