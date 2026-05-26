@@ -228,7 +228,7 @@ export function ColaboradoresPage() {
               setIsDrawerOpen(open);
               if (!open) setEditingEmployee(null);
             }}>
-              <SheetContent className="w-full sm:max-w-md md:max-w-lg p-0 flex flex-col h-full">
+              <SheetContent className="w-full sm:max-w-md md:max-w-lg p-0 flex flex-col h-full overflow-hidden">
                 <SheetHeader className="p-6 border-b bg-background/50 backdrop-blur-sm sticky top-0 z-10">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
@@ -257,12 +257,14 @@ export function ColaboradoresPage() {
                     </Button>
                   </div>
                 </SheetHeader>
-                <EmployeeForm 
-                  initialData={editingEmployee}
-                  onSubmit={handleSave} 
-                  onCancel={() => setIsDrawerOpen(false)} 
-                  isSubmitting={createEmployeeMutation.isPending || updateEmployeeMutation.isPending} 
-                />
+                <div className="flex-1 overflow-hidden">
+                  <EmployeeForm 
+                    initialData={editingEmployee}
+                    onSubmit={handleSave} 
+                    onCancel={() => setIsDrawerOpen(false)} 
+                    isSubmitting={createEmployeeMutation.isPending || updateEmployeeMutation.isPending} 
+                  />
+                </div>
               </SheetContent>
             </Sheet>
 
