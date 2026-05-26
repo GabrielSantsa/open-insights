@@ -27,6 +27,8 @@ import { Route as AuthenticatedColaboradoresIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedProcedimentosIdRouteImport } from './routes/_authenticated/procedimentos.$id'
 import { Route as AuthenticatedNoticiasIdRouteImport } from './routes/_authenticated/noticias.$id'
+import { Route as AuthenticatedMeuPerfilPainelRouteImport } from './routes/_authenticated/meu-perfil.painel'
+import { Route as AuthenticatedMeuPerfilContaRouteImport } from './routes/_authenticated/meu-perfil.conta'
 import { Route as AuthenticatedColaboradoresIdRouteImport } from './routes/_authenticated/colaboradores.$id'
 import { Route as AuthenticatedAdminUsuariosNovoRouteImport } from './routes/_authenticated/admin.usuarios.novo'
 
@@ -124,6 +126,18 @@ const AuthenticatedNoticiasIdRoute = AuthenticatedNoticiasIdRouteImport.update({
   path: '/noticias/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedMeuPerfilPainelRoute =
+  AuthenticatedMeuPerfilPainelRouteImport.update({
+    id: '/meu-perfil/painel',
+    path: '/meu-perfil/painel',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedMeuPerfilContaRoute =
+  AuthenticatedMeuPerfilContaRouteImport.update({
+    id: '/meu-perfil/conta',
+    path: '/meu-perfil/conta',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedColaboradoresIdRoute =
   AuthenticatedColaboradoresIdRouteImport.update({
     id: '/$id',
@@ -150,6 +164,8 @@ export interface FileRoutesByFullPath {
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/colaboradores/$id': typeof AuthenticatedColaboradoresIdRoute
+  '/meu-perfil/conta': typeof AuthenticatedMeuPerfilContaRoute
+  '/meu-perfil/painel': typeof AuthenticatedMeuPerfilPainelRoute
   '/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -169,6 +185,8 @@ export interface FileRoutesByTo {
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/colaboradores/$id': typeof AuthenticatedColaboradoresIdRoute
+  '/meu-perfil/conta': typeof AuthenticatedMeuPerfilContaRoute
+  '/meu-perfil/painel': typeof AuthenticatedMeuPerfilPainelRoute
   '/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -192,6 +210,8 @@ export interface FileRoutesById {
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
   '/_authenticated/colaboradores/$id': typeof AuthenticatedColaboradoresIdRoute
+  '/_authenticated/meu-perfil/conta': typeof AuthenticatedMeuPerfilContaRoute
+  '/_authenticated/meu-perfil/painel': typeof AuthenticatedMeuPerfilPainelRoute
   '/_authenticated/noticias/$id': typeof AuthenticatedNoticiasIdRoute
   '/_authenticated/procedimentos/$id': typeof AuthenticatedProcedimentosIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -215,6 +235,8 @@ export interface FileRouteTypes {
     | '/documentos'
     | '/empresas'
     | '/colaboradores/$id'
+    | '/meu-perfil/conta'
+    | '/meu-perfil/painel'
     | '/noticias/$id'
     | '/procedimentos/$id'
     | '/admin/'
@@ -234,6 +256,8 @@ export interface FileRouteTypes {
     | '/documentos'
     | '/empresas'
     | '/colaboradores/$id'
+    | '/meu-perfil/conta'
+    | '/meu-perfil/painel'
     | '/noticias/$id'
     | '/procedimentos/$id'
     | '/admin'
@@ -256,6 +280,8 @@ export interface FileRouteTypes {
     | '/_authenticated/documentos'
     | '/_authenticated/empresas'
     | '/_authenticated/colaboradores/$id'
+    | '/_authenticated/meu-perfil/conta'
+    | '/_authenticated/meu-perfil/painel'
     | '/_authenticated/noticias/$id'
     | '/_authenticated/procedimentos/$id'
     | '/_authenticated/admin/'
@@ -400,6 +426,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNoticiasIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/meu-perfil/painel': {
+      id: '/_authenticated/meu-perfil/painel'
+      path: '/meu-perfil/painel'
+      fullPath: '/meu-perfil/painel'
+      preLoaderRoute: typeof AuthenticatedMeuPerfilPainelRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/meu-perfil/conta': {
+      id: '/_authenticated/meu-perfil/conta'
+      path: '/meu-perfil/conta'
+      fullPath: '/meu-perfil/conta'
+      preLoaderRoute: typeof AuthenticatedMeuPerfilContaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/colaboradores/$id': {
       id: '/_authenticated/colaboradores/$id'
       path: '/$id'
@@ -455,6 +495,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDemandasRoute: typeof AuthenticatedDemandasRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
+  AuthenticatedMeuPerfilContaRoute: typeof AuthenticatedMeuPerfilContaRoute
+  AuthenticatedMeuPerfilPainelRoute: typeof AuthenticatedMeuPerfilPainelRoute
   AuthenticatedNoticiasIdRoute: typeof AuthenticatedNoticiasIdRoute
   AuthenticatedProcedimentosIdRoute: typeof AuthenticatedProcedimentosIdRoute
   AuthenticatedNoticiasIndexRoute: typeof AuthenticatedNoticiasIndexRoute
@@ -470,6 +512,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDemandasRoute: AuthenticatedDemandasRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
+  AuthenticatedMeuPerfilContaRoute: AuthenticatedMeuPerfilContaRoute,
+  AuthenticatedMeuPerfilPainelRoute: AuthenticatedMeuPerfilPainelRoute,
   AuthenticatedNoticiasIdRoute: AuthenticatedNoticiasIdRoute,
   AuthenticatedProcedimentosIdRoute: AuthenticatedProcedimentosIdRoute,
   AuthenticatedNoticiasIndexRoute: AuthenticatedNoticiasIndexRoute,

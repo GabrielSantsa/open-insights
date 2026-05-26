@@ -37,6 +37,9 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { EmployeeForm } from "@/components/employees/EmployeeForm";
+import { EmployeeActivity } from "@/components/employees/EmployeeActivity";
+import { EmployeeSkills } from "@/components/employees/EmployeeSkills";
+import { EmployeeSignature } from "@/components/employees/EmployeeSignature";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -275,6 +278,18 @@ function ColaboradorDetail() {
                 <GraduationCap className="w-4 h-4 mr-2" />
                 Procedimentos
               </TabsTrigger>
+              <TabsTrigger value="atividades" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <History className="w-4 h-4 mr-2" />
+                Atividades
+              </TabsTrigger>
+              <TabsTrigger value="competencias" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+                Competências
+              </TabsTrigger>
+              <TabsTrigger value="assinatura" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <Edit2 className="w-4 h-4 mr-2" />
+                Assinatura
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="mt-6 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -457,6 +472,39 @@ function ColaboradorDetail() {
                     </div>
                   </TabsContent>
                 </Tabs>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="atividades" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+              <Card className="border-border/40 shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-sm font-semibold">Histórico de Atividades</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <EmployeeActivity employeeId={id} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="competencias" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+              <Card className="border-border/40 shadow-sm">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-sm font-semibold">Competências & Responsabilidades</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <EmployeeSkills employeeId={id} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="assinatura" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+              <Card className="border-border/40 shadow-sm">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-sm font-semibold">Assinatura Corporativa</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <EmployeeSignature employee={employee} />
+                </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
