@@ -78,11 +78,12 @@ function ProceduresPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("procedures")
-        .select("id, title, description, version, last_revision, status, sector_id, sectors(name)")
+        .select("id, title, description, version, last_revision, status, workflow, category, sector_id, sectors(name)")
         .order("title");
       return data ?? [];
     },
   });
+
 
   const favs = useQuery({
     queryKey: ["my-fav-procs", user?.id],
