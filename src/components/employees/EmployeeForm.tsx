@@ -39,6 +39,7 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
     informacoes_institucionais: "",
     assinatura_email: "",
     foto_url: "",
+    coordenador_id: null as string | null,
   });
 
   useEffect(() => {
@@ -58,6 +59,7 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
         informacoes_institucionais: initialData.informacoes_institucionais || "",
         assinatura_email: initialData.assinatura_email || "",
         foto_url: initialData.foto_url || "",
+        coordenador_id: initialData.coordenador_id || "none",
       });
     }
   }, [initialData]);
@@ -79,6 +81,7 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
     const dataToSubmit = {
       ...formData,
       gestor_id: formData.gestor_id === "none" ? null : formData.gestor_id,
+      coordenador_id: formData.coordenador_id === "none" ? null : formData.coordenador_id,
     };
     onSubmit(dataToSubmit);
   };
@@ -189,6 +192,22 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
                 <Select value={formData.gestor_id || "none"} onValueChange={(val) => setFormData({...formData, gestor_id: val})}>
                   <SelectTrigger id="gestor_id">
                     <SelectValue placeholder="Selecione um gestor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Nenhum</SelectItem>
+                    {managers?.filter(m => m.id !== initialData?.id).map((manager) => (
+                      <SelectItem key={manager.id} value={manager.id}>
+                        {manager.nome_completo}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="coordenador_id">Coordenador</Label>
+                <Select value={formData.coordenador_id || "none"} onValueChange={(val) => setFormData({...formData, coordenador_id: val})}>
+                  <SelectTrigger id="coordenador_id">
+                    <SelectValue placeholder="Selecione um coordenador" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Nenhum</SelectItem>

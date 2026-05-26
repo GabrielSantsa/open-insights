@@ -446,6 +446,7 @@ export type Database = {
           assinatura_email: string | null
           cargo: string
           cargo_padronizado: string | null
+          coordenador_id: string | null
           created_at: string
           data_admissao: string
           email_corporativo: string
@@ -466,6 +467,7 @@ export type Database = {
           assinatura_email?: string | null
           cargo: string
           cargo_padronizado?: string | null
+          coordenador_id?: string | null
           created_at?: string
           data_admissao?: string
           email_corporativo: string
@@ -486,6 +488,7 @@ export type Database = {
           assinatura_email?: string | null
           cargo?: string
           cargo_padronizado?: string | null
+          coordenador_id?: string | null
           created_at?: string
           data_admissao?: string
           email_corporativo?: string
@@ -503,6 +506,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "employee_profiles_coordenador_id_fkey"
+            columns: ["coordenador_id"]
+            isOneToOne: false
+            referencedRelation: "employee_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "employee_profiles_gestor_id_fkey"
             columns: ["gestor_id"]
