@@ -74,17 +74,27 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
     }
   }, [initialData]);
 
-  const { data: managers } = useQuery({
+  const { data: allEmployees } = useQuery({
     queryKey: ["employees-list-mini"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employee_profiles")
-        .select("id, nome_completo")
+        .select("id, nome_completo, cargo")
         .order("nome_completo");
       if (error) throw error;
       return data;
     },
   });
+
+  const managers = allEmployees?.filter(e => 
+    e.cargo?.toLowerCase().includes("gerente") || 
+    e.cargo?.toLowerCase().includes("gestor") ||
+    e.cargo?.toLowerCase().includes("diretor")
+  ) || [];
+
+  const coordinators = allEmployees?.filter(e => 
+    e.cargo?.toLowerCase().includes("coordenador")
+  ) || [];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,7 +215,7 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Nenhum</SelectItem>
-                    {managers?.filter(m => m.id !== initialData?.id).map((manager) => (
+                    {managers.filter(m => m.id !== initialData?.id).map((manager) => (
                       <SelectItem key={manager.id} value={manager.id}>
                         {manager.nome_completo}
                       </SelectItem>
@@ -221,9 +231,9 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Nenhum</SelectItem>
-                    {managers?.filter(m => m.id !== initialData?.id).map((manager) => (
-                      <SelectItem key={manager.id} value={manager.id}>
-                        {manager.nome_completo}
+                    {coordinators.filter(m => m.id !== initialData?.id).map((coord) => (
+                      <SelectItem key={coord.id} value={coord.id}>
+                        {coord.nome_completo}
                       </SelectItem>
                     ))}
                   </SelectContent>
