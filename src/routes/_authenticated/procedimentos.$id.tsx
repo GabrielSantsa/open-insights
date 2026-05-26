@@ -477,11 +477,9 @@ function ProcedureDetail() {
                     <CardContent className="py-12 text-center text-muted-foreground">
                       <BookOpen className="w-10 h-10 mx-auto mb-3 opacity-50" />
                       <p className="text-sm">Este procedimento ainda não tem um artigo de leitura.</p>
-                      {canEdit && (
-                        <Button className="mt-4" onClick={() => { setDraft(""); setEditing(true); }}>
-                          <Pencil className="w-4 h-4 mr-1" />Escrever artigo
-                        </Button>
-                      )}
+                      <Button className="mt-4" onClick={() => { setDraft(""); setEditing(true); }}>
+                        <Pencil className="w-4 h-4 mr-1" />Escrever artigo
+                      </Button>
                     </CardContent>
                   </Card>
                 )}
