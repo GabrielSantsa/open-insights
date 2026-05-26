@@ -8,24 +8,77 @@ import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import { toast } from "sonner";
 import { User, Phone, Lock, Mail, Camera } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_authenticated/meu-perfil/conta")({
   component: MinhaConta,
 });
 
 function MinhaConta() {
-  const { profile, user } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    // Simulation
-    setTimeout(() => {
-      setLoading(false);
+  const { data: employee, isLoading } = useQuery({
+    queryKey: ["my-employee-profile", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from("employee_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (updatedData: any) => {
+      if (!employee?.id) throw new Error("Perfil não encontrado");
+      const { error } = await supabase
+        .from("employee_profiles")
+        .update(updatedData)
+        .eq("id", employee.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-employee-profile", user?.id] });
       toast.success("Alterações salvas com sucesso!");
-    }, 1000);
+      setSaving(false);
+    },
+    onError: (err: any) => {
+      toast.error(`Erro ao salvar: ${err.message}`);
+      setSaving(false);
+    }
+  });
+
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSaving(true);
+    const formData = new FormData(e.currentTarget);
+    const updates = {
+      telefone: formData.get("phone") as string,
+      ramal: formData.get("extension") as string,
+    };
+    updateMutation.mutate(updates);
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 max-w-4xl mx-auto pb-12">
+        <Skeleton className="h-10 w-48" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <Skeleton className="h-64 md:col-span-1" />
+          <Skeleton className="h-[500px] md:col-span-2" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
@@ -42,9 +95,9 @@ function MinhaConta() {
             <CardContent className="pt-6 flex flex-col items-center">
               <div className="relative group">
                 <Avatar className="h-24 w-24 border-4 border-background shadow-md">
-                  <AvatarImage src={profile?.avatar_url || ""} />
+                  <AvatarImage src={employee?.foto_url || ""} />
                   <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                    {profile?.full_name?.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
+                    {employee?.nome_completo?.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase() || "?"}
                   </AvatarFallback>
                 </Avatar>
                 <button className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
@@ -70,14 +123,14 @@ function MinhaConta() {
                     <Label htmlFor="phone">Telefone / WhatsApp</Label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input id="phone" placeholder="(XX) XXXXX-XXXX" className="pl-9 h-11" defaultValue={profile?.phone || ""} />
+                      <Input name="phone" id="phone" placeholder="(XX) XXXXX-XXXX" className="pl-9 h-11" defaultValue={employee?.telefone || ""} />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="extension">Ramal</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input id="extension" placeholder="000" className="pl-9 h-11" defaultValue={profile?.extension || ""} />
+                      <Input name="extension" id="extension" placeholder="000" className="pl-9 h-11" defaultValue={employee?.ramal || ""} />
                     </div>
                   </div>
                 </div>
@@ -85,13 +138,13 @@ function MinhaConta() {
                   <Label htmlFor="email">E-mail Corporativo</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input id="email" readOnly disabled className="pl-9 h-11 bg-muted/30" value={user?.email || ""} />
+                    <Input id="email" readOnly disabled className="pl-9 h-11 bg-muted/30" value={employee?.email_corporativo || user?.email || ""} />
                   </div>
                   <p className="text-[10px] text-muted-foreground">O e-mail corporativo não pode ser alterado por aqui.</p>
                 </div>
                 <div className="flex justify-end pt-2">
-                  <Button type="submit" disabled={loading} className="px-8 h-11 rounded-xl shadow-sm">
-                    {loading ? "Salvando..." : "Salvar Alterações"}
+                  <Button type="submit" disabled={saving} className="px-8 h-11 rounded-xl shadow-sm">
+                    {saving ? "Salvando..." : "Salvar Alterações"}
                   </Button>
                 </div>
               </form>
