@@ -281,13 +281,18 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
         </div>
       </ScrollArea>
 
-      <div className="p-6 border-t bg-muted/20 flex gap-3">
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+      <div className="p-6 border-t bg-background/95 backdrop-blur-sm flex gap-3 sticky bottom-0 z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+        <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={isSubmitting}>
           <X className="w-4 h-4 mr-2" />
           Cancelar
         </Button>
-        <Button type="submit" className="flex-1" disabled={isSubmitting}>
-          {isSubmitting ? "Salvando..." : (
+        <Button type="submit" className="flex-1 shadow-sm" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+              Salvando...
+            </div>
+          ) : (
             <>
               <Save className="w-4 h-4 mr-2" />
               Salvar Alterações
