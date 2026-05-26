@@ -308,7 +308,7 @@ function ColaboradorDetail() {
             <CardContent>
                <div className="space-y-3">
                 {employee.gestor && (
-                  <div className="flex items-center gap-3 p-2 rounded-lg border border-transparent hover:border-border/60 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => navigate({ to: "/colaboradores/$id", params: { id: employee.gestor.id } })}>
+                  <div className="flex items-center gap-3 p-2 rounded-lg border border-transparent hover:border-border/60 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => employee.gestor && navigate({ to: "/colaboradores/$id", params: { id: employee.gestor.id } })}>
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={employee.gestor.foto_url || ""} />
                       <AvatarFallback className="text-xs">
@@ -323,7 +323,7 @@ function ColaboradorDetail() {
                   </div>
                 )}
                 {employee.coordenador && (
-                  <div className="flex items-center gap-3 p-2 rounded-lg border border-transparent hover:border-border/60 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => navigate({ to: "/colaboradores/$id", params: { id: employee.coordenador.id } })}>
+                  <div className="flex items-center gap-3 p-2 rounded-lg border border-transparent hover:border-border/60 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => employee.coordenador && navigate({ to: "/colaboradores/$id", params: { id: employee.coordenador.id } })}>
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={employee.coordenador.foto_url || ""} />
                       <AvatarFallback className="text-xs">
