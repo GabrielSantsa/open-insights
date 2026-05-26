@@ -117,8 +117,8 @@ function DashboardPage() {
           <CardContent>
             <ul className="space-y-2 text-sm">
               {(news.data ?? []).map((n) => (
-                <li key={n.id} className="flex flex-col">
-                  <span className="font-medium">{n.title}</span>
+                <li key={n.id} className="flex flex-col border-b last:border-0 pb-2 last:pb-0">
+                  <Link to="/noticias" className="font-medium hover:text-primary transition-colors">{n.title}</Link>
                   <span className="text-xs text-muted-foreground">
                     {n.published_at && formatDistanceToNow(new Date(n.published_at), { addSuffix: true, locale: ptBR })}
                   </span>
