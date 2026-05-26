@@ -190,10 +190,13 @@ function ProceduresPage() {
                 </div>
                 <CardDescription className="line-clamp-2">{p.description}</CardDescription>
               </CardHeader>
-              <CardContent className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>v{p.version}{p.sectors ? ` · ${p.sectors.name}` : ""}</span>
-                <Badge variant="outline" className="capitalize">{p.status.replace("_", " ")}</Badge>
+              <CardContent className="flex items-center justify-between text-xs text-muted-foreground gap-2">
+                <span className="truncate">v{p.version}{p.category ? ` · ${p.category}` : ""}{p.sectors ? ` · ${p.sectors.name}` : ""}</span>
+                <Badge variant={WORKFLOW_VARIANT[p.workflow ?? "rascunho"]} className="shrink-0">
+                  {WORKFLOW_LABEL[p.workflow ?? "rascunho"]}
+                </Badge>
               </CardContent>
+
             </Card>
           );
         })}
