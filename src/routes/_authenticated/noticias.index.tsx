@@ -300,22 +300,18 @@ function FeaturedCard({ news, authorName }: { news: NewsRow; authorName?: string
 function NewsCard({ news, authorName }: { news: NewsRow; authorName?: string }) {
   return (
     <Card className="overflow-hidden flex flex-col group hover:shadow-md transition-shadow">
-      <Link to="/noticias/$id" params={{ id: news.id }} className="block">
-        <div className="aspect-[16/9] bg-muted overflow-hidden">
-          {news.cover_image_url ? (
+      {news.cover_image_url && (
+        <Link to="/noticias/$id" params={{ id: news.id }} className="block">
+          <div className="aspect-[16/9] bg-muted overflow-hidden">
             <img
               src={news.cover_image_url}
               alt={news.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
               loading="lazy"
             />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-              <ImageIcon className="w-8 h-8" />
-            </div>
-          )}
-        </div>
-      </Link>
+          </div>
+        </Link>
+      )}
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2 mb-1 text-xs text-muted-foreground">
           {news.category && <Badge variant="secondary" className="text-[10px]">{news.category}</Badge>}
