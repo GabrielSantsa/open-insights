@@ -179,7 +179,7 @@ export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
                 <Wrench className="w-5 h-5 text-primary" />
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Foco</p>
-              <p className="text-sm font-semibold">Excelência Operacional</p>
+              <p className="text-sm font-semibold">{employee?.foco || "Não definido"}</p>
             </div>
           </CardContent>
         </Card>
@@ -191,7 +191,7 @@ export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
                 <Search className="w-5 h-5 text-primary" />
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Perfil</p>
-              <p className="text-sm font-semibold">Análise & Detalhes</p>
+              <p className="text-sm font-semibold">{employee?.perfil || "Não definido"}</p>
             </div>
           </CardContent>
         </Card>
@@ -203,7 +203,7 @@ export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
                 <Target className="w-5 h-5 text-primary" />
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Atuação</p>
-              <p className="text-sm font-semibold">Suporte Estratégico</p>
+              <p className="text-sm font-semibold">{employee?.atuacao || "Não definido"}</p>
             </div>
           </CardContent>
         </Card>
