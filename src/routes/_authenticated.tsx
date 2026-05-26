@@ -7,8 +7,6 @@ import { InternalChat } from "@/components/InternalChat";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated")({
-  // Auth gating happens client-side via useAuth below — avoids a blocking
-  // supabase.auth.getSession() roundtrip on every navigation.
   component: AuthenticatedLayout,
 });
 
@@ -18,15 +16,30 @@ function AuthenticatedLayout() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!loading) {
-      if (!user) navigate({ to: "/login" });
-      else setReady(true);
+    // If we're not loading and have no user, redirect to login
+    if (!loading && !user) {
+      navigate({ to: "/login" });
+      return;
+    }
+
+    // If we have a user, we're ready to show the layout, even if some profile data is still fetching
+    if (user) {
+      setReady(true);
     }
   }, [loading, user, navigate]);
 
-  if (!ready) {
-    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Carregando...</div>;
+  // Only show the global loading spinner if we're actively loading AND have no user yet
+  if (loading && !user && !ready) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background text-muted-foreground gap-4">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="animate-pulse">Acessando sistema...</p>
+      </div>
+    );
   }
+
+  // If after loading we still have no user (and redirect hasn't happened yet), keep blank or show login
+  if (!user && !loading) return null;
 
   return (
     <SidebarProvider>

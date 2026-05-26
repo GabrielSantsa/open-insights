@@ -34,18 +34,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadUserData = async (uid: string) => {
+    // We don't block loading here to prevent infinite spinners on slow networks
     try {
       const [{ data: prof, error: profErr }, { data: rolesData, error: rolesErr }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", uid),
       ]);
       
-      if (profErr) {
-        console.error("Profile load error:", profErr);
-      }
-      if (rolesErr) {
-        console.error("Roles load error:", rolesErr);
-      }
+      if (profErr) console.error("Profile load error:", profErr);
+      if (rolesErr) console.error("Roles load error:", rolesErr);
 
       setProfile(prof as Profile | null);
       setRoles((rolesData ?? []).map((r) => r.role as AppRole));
@@ -59,42 +56,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    // Initial session check
-    supabase.auth.getSession().then(({ data: { session: s }, error: sessionErr }) => {
-      if (!mounted) return;
-      
-      if (sessionErr) {
-        console.error("Session fetch error:", sessionErr);
-        setLoading(false);
-        return;
-      }
+    // Initial check - minimal blocking
+    const checkInitialAuth = async () => {
+      try {
+        const { data: { session: s }, error } = await supabase.auth.getSession();
+        if (!mounted) return;
 
-      setSession(s);
-      setUser(s?.user ?? null);
-      
-      if (s?.user) {
-        loadUserData(s.user.id);
-      } else {
-        setLoading(false);
+        if (error) {
+          console.error("Initial session error:", error);
+          setLoading(false);
+          return;
+        }
+
+        setSession(s);
+        setUser(s?.user ?? null);
+        
+        if (s?.user) {
+          await loadUserData(s.user.id);
+        } else {
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Auth init catch:", err);
+        if (mounted) setLoading(false);
       }
-    });
+    };
+
+    checkInitialAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, s) => {
       if (!mounted) return;
       
       const sessionUser = s?.user ?? null;
-      
-      // Update basic session info immediately
       setSession(s);
       setUser(sessionUser);
       
       if (sessionUser) {
-        // Only trigger loading state for major events if we don't have a profile yet
+        // For events like sign in, we want to ensure data is fresh
         if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-          setLoading(true);
-          await loadUserData(sessionUser.id);
-        } else {
-          // Silent refresh for TOKEN_REFRESHED, etc.
+          loadUserData(sessionUser.id);
+        } else if (!profile && !loading) {
+          // If we have a user but no profile, try to load it silently
           loadUserData(sessionUser.id);
         }
       } else {
@@ -104,9 +106,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
+    // Safety timeout: Never let loading take more than 5 seconds
+    const timeout = setTimeout(() => {
+      if (mounted && loading) {
+        console.warn("Auth safety timeout triggered");
+        setLoading(false);
+      }
+    }, 5000);
+
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      clearTimeout(timeout);
     };
   }, []);
 
