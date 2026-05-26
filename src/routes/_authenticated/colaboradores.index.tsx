@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { EmployeeForm } from "@/components/employees/EmployeeForm";
+
 
 export function ColaboradoresPage() {
   const { roles } = useAuth();
@@ -48,20 +50,8 @@ export function ColaboradoresPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // Form State
-  const [formData, setFormData] = useState({
-    nome_completo: "",
-    cargo: "",
-    setor: "",
-    email_corporativo: "",
-    telefone: "",
-    ramal: "",
-    status: "ativo" as any,
-    gestor_id: null as string | null,
-    localizacao: "",
-  });
-
   const isUserAdmin = isAdmin(roles);
+
 
   const { data: employees, isLoading, error } = useQuery({
     queryKey: ["employees"],
@@ -80,7 +70,7 @@ export function ColaboradoresPage() {
   });
 
   const createEmployeeMutation = useMutation({
-    mutationFn: async (newData: typeof formData) => {
+    mutationFn: async (newData: any) => {
       const { error } = await supabase
         .from("employee_profiles")
         .insert([newData]);
@@ -90,26 +80,12 @@ export function ColaboradoresPage() {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       toast.success("Colaborador criado com sucesso!");
       setIsDrawerOpen(false);
-      resetForm();
     },
     onError: (err: any) => {
       toast.error(`Erro ao criar colaborador: ${err.message}`);
     },
   });
 
-  const resetForm = () => {
-    setFormData({
-      nome_completo: "",
-      cargo: "",
-      setor: "",
-      email_corporativo: "",
-      telefone: "",
-      ramal: "",
-      status: "ativo",
-      gestor_id: null,
-      localizacao: "",
-    });
-  };
 
   const filteredEmployees = useMemo(() => {
     if (!employees) return [];
@@ -138,13 +114,10 @@ export function ColaboradoresPage() {
     setStatusFilter("all");
   };
 
-  const handleSave = () => {
-    if (!formData.nome_completo || !formData.cargo || !formData.setor || !formData.email_corporativo) {
-      toast.error("Por favor, preencha todos os campos obrigatórios.");
-      return;
-    }
-    createEmployeeMutation.mutate(formData);
+  const handleSave = (data: any) => {
+    createEmployeeMutation.mutate(data);
   };
+
 
   if (error) {
     return (
@@ -177,93 +150,12 @@ export function ColaboradoresPage() {
                 <SheetTitle>Novo Colaborador</SheetTitle>
                 <SheetDescription>Cadastre um novo membro na equipe interna da União Contadores.</SheetDescription>
               </SheetHeader>
-              <ScrollArea className="flex-1 p-6">
-                <div className="space-y-6 pb-20">
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px]">1</span>
-                      Dados principais
-                    </h3>
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="nome">Nome completo *</Label>
-                        <Input id="nome" placeholder="Ex: João Silva" value={formData.nome_completo} onChange={(e) => setFormData({...formData, nome_completo: e.target.value})} />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="cargo">Cargo *</Label>
-                          <Input id="cargo" placeholder="Ex: Contador Sênior" value={formData.cargo} onChange={(e) => setFormData({...formData, cargo: e.target.value})} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="setor">Setor *</Label>
-                          <Input id="setor" placeholder="Ex: Fiscal" value={formData.setor} onChange={(e) => setFormData({...formData, setor: e.target.value})} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <EmployeeForm 
+                onSubmit={handleSave} 
+                onCancel={() => setIsDrawerOpen(false)} 
+                isSubmitting={createEmployeeMutation.isPending} 
+              />
 
-                  <div className="space-y-4 pt-4 border-t">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px]">2</span>
-                      Estrutura
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="status">Status</Label>
-                        <Select value={formData.status} onValueChange={(val) => setFormData({...formData, status: val as any})}>
-                          <SelectTrigger id="status">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="ativo">Ativo</SelectItem>
-                            <SelectItem value="ferias">Férias</SelectItem>
-                            <SelectItem value="afastado">Afastado</SelectItem>
-                            <SelectItem value="desligado">Desligado</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="localizacao">Localização</Label>
-                        <Input id="localizacao" placeholder="Ex: Sede" value={formData.localizacao} onChange={(e) => setFormData({...formData, localizacao: e.target.value})} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 pt-4 border-t">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px]">3</span>
-                      Contato
-                    </h3>
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="email">E-mail corporativo *</Label>
-                        <Input id="email" type="email" placeholder="nome@uniaocontadores.com.br" value={formData.email_corporativo} onChange={(e) => setFormData({...formData, email_corporativo: e.target.value})} />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="telefone">Telefone</Label>
-                          <Input id="telefone" placeholder="(11) 0000-0000" value={formData.telefone} onChange={(e) => setFormData({...formData, telefone: e.target.value})} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="ramal">Ramal</Label>
-                          <Input id="ramal" placeholder="123" value={formData.ramal} onChange={(e) => setFormData({...formData, ramal: e.target.value})} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </ScrollArea>
-              <SheetFooter className="p-6 border-t bg-muted/20">
-                <Button variant="outline" onClick={() => setIsDrawerOpen(false)} className="flex-1">Cancelar</Button>
-                <Button onClick={handleSave} className="flex-1" disabled={createEmployeeMutation.isPending}>
-                  {createEmployeeMutation.isPending ? "Salvando..." : (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      Salvar colaborador
-                    </>
-                  )}
-                </Button>
-              </SheetFooter>
             </SheetContent>
           </Sheet>
         )}

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   ArrowLeft, 
@@ -14,15 +14,29 @@ import {
   Briefcase,
   History,
   GraduationCap,
-  LayoutDashboard
+  LayoutDashboard,
+  Edit2
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EMPLOYEE_STATUS_LABELS } from "@/lib/permissions";
+import { EMPLOYEE_STATUS_LABELS, isAdmin } from "@/lib/permissions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { EmployeeForm } from "@/components/employees/EmployeeForm";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
+
 
 export const Route = createFileRoute("/_authenticated/colaboradores/$id")({
   component: ColaboradorDetail,
@@ -30,6 +44,11 @@ export const Route = createFileRoute("/_authenticated/colaboradores/$id")({
 
 function ColaboradorDetail() {
   const { id } = Route.useParams();
+  const { roles } = useAuth();
+  const queryClient = useQueryClient();
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const isUserAdmin = isAdmin(roles);
+
 
   const { data: employee, isLoading, error } = useQuery({
     queryKey: ["employee", id],
@@ -64,6 +83,30 @@ function ColaboradorDetail() {
     },
   });
 
+  const updateEmployeeMutation = useMutation({
+    mutationFn: async (updatedData: any) => {
+      const { error } = await supabase
+        .from("employee_profiles")
+        .update(updatedData)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employee", id] });
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      toast.success("Perfil atualizado com sucesso!");
+      setIsEditDrawerOpen(false);
+    },
+    onError: (err: any) => {
+      toast.error(`Erro ao atualizar perfil: ${err.message}`);
+    },
+  });
+
+  const handleUpdate = (data: any) => {
+    updateEmployeeMutation.mutate(data);
+  };
+
+
   if (isLoading) {
     return (
       <div className="space-y-6 max-w-7xl mx-auto">
@@ -89,11 +132,21 @@ function ColaboradorDetail() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
-      <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link to="/colaboradores" className="hover:text-primary transition-colors">Colaboradores</Link>
-        <ChevronRight className="w-4 h-4" />
-        <span className="text-foreground font-medium">{employee.nome_completo}</span>
-      </nav>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Link to="/colaboradores" className="hover:text-primary transition-colors">Colaboradores</Link>
+          <ChevronRight className="w-4 h-4" />
+          <span className="text-foreground font-medium">{employee.nome_completo}</span>
+        </nav>
+        
+        {isUserAdmin && (
+          <Button onClick={() => setIsEditDrawerOpen(true)} variant="outline" className="gap-2">
+            <Edit2 className="w-4 h-4" />
+            Editar Perfil
+          </Button>
+        )}
+      </div>
+
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Lado Esquerdo - Perfil Resumo */}
@@ -326,6 +379,21 @@ function ColaboradorDetail() {
           </Tabs>
         </div>
       </div>
+
+      <Sheet open={isEditDrawerOpen} onOpenChange={setIsEditDrawerOpen}>
+        <SheetContent className="sm:max-w-md md:max-w-lg p-0 flex flex-col">
+          <SheetHeader className="p-6 border-b">
+            <SheetTitle>Editar Colaborador</SheetTitle>
+            <SheetDescription>Altere as informações cadastrais de {employee.nome_completo}.</SheetDescription>
+          </SheetHeader>
+          <EmployeeForm 
+            initialData={employee} 
+            onSubmit={handleUpdate} 
+            onCancel={() => setIsEditDrawerOpen(false)}
+            isSubmitting={updateEmployeeMutation.isPending}
+          />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
