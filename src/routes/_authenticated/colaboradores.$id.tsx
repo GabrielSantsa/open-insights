@@ -416,20 +416,6 @@ function ColaboradorDetail() {
                     </div>
                   </CardContent>
                 </Card>
-
-                <Card className="border-border/40 shadow-sm">
-                  <CardHeader>
-                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                      <UserCircle className="w-4 h-4 text-primary" />
-                      Status Institucional
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground leading-relaxed italic">
-                      {employee.informacoes_institucionais || "Nenhuma informação institucional adicional cadastrada."}
-                    </p>
-                  </CardContent>
-                </Card>
               </div>
             </TabsContent>
 
