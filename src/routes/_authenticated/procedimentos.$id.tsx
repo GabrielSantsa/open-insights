@@ -400,24 +400,22 @@ function ProcedureDetail() {
             {proc.data.published_at && (
               <span>Publicado em: {new Date(proc.data.published_at).toLocaleDateString("pt-BR")}</span>
             )}
-            {canEdit && (
-              <span className="flex items-center gap-2">
-                <span>Status:</span>
-                <Select
-                  value={workflow}
-                  onValueChange={(v) => changeWorkflow.mutate(v)}
-                  disabled={changeWorkflow.isPending}
-                >
-                  <SelectTrigger className="h-7 w-36 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="rascunho">Rascunho</SelectItem>
-                    <SelectItem value="em_revisao">Em revisão</SelectItem>
-                    <SelectItem value="publicado">Publicado</SelectItem>
-                    <SelectItem value="arquivado">Arquivado</SelectItem>
-                  </SelectContent>
-                </Select>
-              </span>
-            )}
+            <span className="flex items-center gap-2">
+              <span>Status:</span>
+              <Select
+                value={workflow}
+                onValueChange={(v) => changeWorkflow.mutate(v)}
+                disabled={changeWorkflow.isPending}
+              >
+                <SelectTrigger className="h-7 w-36 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="rascunho">Rascunho</SelectItem>
+                  <SelectItem value="em_revisao">Em revisão</SelectItem>
+                  <SelectItem value="publicado">Publicado</SelectItem>
+                  <SelectItem value="arquivado">Arquivado</SelectItem>
+                </SelectContent>
+              </Select>
+            </span>
           </div>
         </header>
 
