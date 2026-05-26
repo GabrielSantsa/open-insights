@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ModuleEmptyState } from "@/components/employees/ModuleEmptyState";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -86,12 +87,11 @@ export function EmployeeActivity({ employeeId }: EmployeeActivityProps) {
 
   if (!activities || activities.length === 0) {
     return (
-      <Card className="border-dashed">
-        <CardContent className="py-12 text-center text-muted-foreground">
-          <Clock className="w-12 h-12 mx-auto mb-4 opacity-20" />
-          <p>Nenhuma atividade registrada recentemente.</p>
-        </CardContent>
-      </Card>
+      <ModuleEmptyState 
+        icon={Clock}
+        title="Nenhuma atividade"
+        description="Este colaborador ainda não possui atividades registradas no sistema."
+      />
     );
   }
 

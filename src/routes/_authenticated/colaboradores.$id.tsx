@@ -26,7 +26,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EMPLOYEE_STATUS_LABELS, isAdmin } from "@/lib/permissions";
+import { EMPLOYEE_STATUS_LABELS, isAdmin, type EmployeeStatus } from "@/lib/permissions";
+import { EmployeeStatusBadge } from "@/components/employees/EmployeeStatusBadge";
+import { ModuleEmptyState } from "@/components/employees/ModuleEmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import {
@@ -179,12 +181,7 @@ function ColaboradorDetail() {
               <h1 className="mt-4 text-xl font-bold">{employee.nome_completo}</h1>
               <p className="text-muted-foreground text-sm font-medium">{employee.cargo}</p>
               <div className="mt-3 flex justify-center">
-                <Badge variant="outline" className={`
-                  font-normal px-2.5 py-0.5
-                  ${employee.status === "ativo" ? "border-emerald-200 text-emerald-700 bg-emerald-50/50" : ""}
-                `}>
-                  {EMPLOYEE_STATUS_LABELS[employee.status]}
-                </Badge>
+                <EmployeeStatusBadge status={employee.status as EmployeeStatus} variant="outline" className="h-6 px-3" />
               </div>
 
               <div className="mt-8 space-y-4 text-left">
