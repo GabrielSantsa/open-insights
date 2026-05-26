@@ -223,7 +223,7 @@ export function ColaboradoresPage() {
           </p>
         </div>
         {isUserAdmin && (
-          <>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <Sheet open={isDrawerOpen} onOpenChange={(open) => {
               setIsDrawerOpen(open);
               if (!open) setEditingEmployee(null);
@@ -273,7 +273,7 @@ export function ColaboradoresPage() {
               <UserPlus className="w-4 h-4 mr-2" />
               Novo colaborador
             </Button>
-          </>
+          </div>
         )}
       </div>
 
