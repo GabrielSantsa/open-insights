@@ -367,7 +367,11 @@ export function ColaboradoresPage() {
       ) : view === "cards" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredEmployees.map((emp) => (
-            <Link key={emp.id} to="/colaboradores/$id" params={{ id: emp.id }}>
+            <div 
+              key={emp.id} 
+              className="cursor-pointer"
+              onClick={() => navigate({ to: "/colaboradores/$id", params: { id: emp.id } })}
+            >
 
               <Card className={cn(
                 "hover:shadow-lg hover:border-primary/20 transition-all group cursor-pointer border-border/60 bg-card overflow-hidden h-full flex flex-col",
@@ -453,7 +457,7 @@ export function ColaboradoresPage() {
                   <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
               </Card>
-            </Link>
+            </div>
           ))}
         </div>
       ) : (
