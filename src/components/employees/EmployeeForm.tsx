@@ -304,9 +304,67 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
                   value={formData.assinatura_email} 
                   onChange={(e) => setFormData({...formData, assinatura_email: e.target.value})} 
                 />
+            </div>
+          </div>
+
+          {/* Sessão 6: Especialidades e Competências */}
+          <div className="space-y-4 pt-4 border-t">
+            <h3 className="text-sm font-semibold flex items-center gap-2">
+              Especialidades e Competências
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="foco">Foco</Label>
+                <Input 
+                  id="foco" 
+                  placeholder="Ex: Excelência Operacional" 
+                  value={formData.foco} 
+                  onChange={(e) => setFormData({...formData, foco: e.target.value})} 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="perfil">Perfil</Label>
+                <Input 
+                  id="perfil" 
+                  placeholder="Ex: Análise & Detalhes" 
+                  value={formData.perfil} 
+                  onChange={(e) => setFormData({...formData, perfil: e.target.value})} 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="atuacao">Atuação</Label>
+                <Input 
+                  id="atuacao" 
+                  placeholder="Ex: Suporte Estratégico" 
+                  value={formData.atuacao} 
+                  onChange={(e) => setFormData({...formData, atuacao: e.target.value})} 
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="competencias_responsabilidades">Competências & Responsabilidades</Label>
+                <Textarea 
+                  id="competencias_responsabilidades" 
+                  placeholder="Defina as competências e responsabilidades principais..." 
+                  className="min-h-[100px]"
+                  value={formData.competencias_responsabilidades} 
+                  onChange={(e) => setFormData({...formData, competencias_responsabilidades: e.target.value})} 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="conhecimento_tecnico">Conhecimento Técnico</Label>
+                <Textarea 
+                  id="conhecimento_tecnico" 
+                  placeholder="Liste os conhecimentos técnicos exigidos ou demonstrados..." 
+                  className="min-h-[100px]"
+                  value={formData.conhecimento_tecnico} 
+                  onChange={(e) => setFormData({...formData, conhecimento_tecnico: e.target.value})} 
+                />
               </div>
             </div>
           </div>
+        </div>
         </div>
       </ScrollArea>
 
