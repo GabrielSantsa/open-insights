@@ -377,7 +377,7 @@ export function ColaboradoresPage() {
                   <Avatar className="h-14 w-14 border-2 border-background shadow-sm ring-1 ring-border/20 group-hover:ring-primary/20 transition-all">
                     <AvatarImage src={emp.foto_url || ""} />
                     <AvatarFallback className="bg-primary/5 text-primary text-lg font-medium">
-                      {emp.nome_completo.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase()}
+                      {emp.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
@@ -478,7 +478,7 @@ export function ColaboradoresPage() {
                       <Avatar className="h-9 w-9 ring-1 ring-border/10">
                         <AvatarImage src={emp.foto_url || ""} />
                         <AvatarFallback className="text-xs">
-                          {emp.nome_completo.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase()}
+                          {emp.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col min-w-0">
