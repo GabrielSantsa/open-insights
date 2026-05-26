@@ -384,10 +384,26 @@ function ColaboradorDetail() {
         <SheetContent className="sm:max-w-md md:max-w-lg p-0 flex flex-col h-full">
           <SheetHeader className="p-6 border-b bg-background/50 backdrop-blur-sm sticky top-0 z-10">
             <div className="flex items-center justify-between">
-              <div>
+              <div className="space-y-1">
                 <SheetTitle>Editar Colaborador</SheetTitle>
-                <SheetDescription>Altere as informações cadastrais de {employee.nome_completo}.</SheetDescription>
+                <SheetDescription>Altere as informações de {employee.nome_completo}.</SheetDescription>
               </div>
+              <Button 
+                onClick={() => {
+                  const form = document.querySelector('form');
+                  if (form) form.requestSubmit();
+                }}
+                disabled={updateEmployeeMutation.isPending}
+                size="sm"
+                className="gap-2"
+              >
+                {updateEmployeeMutation.isPending ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                Salvar
+              </Button>
             </div>
           </SheetHeader>
           <EmployeeForm 
