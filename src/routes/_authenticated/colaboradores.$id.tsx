@@ -381,10 +381,14 @@ function ColaboradorDetail() {
       </div>
 
       <Sheet open={isEditDrawerOpen} onOpenChange={setIsEditDrawerOpen}>
-        <SheetContent className="sm:max-w-md md:max-w-lg p-0 flex flex-col">
-          <SheetHeader className="p-6 border-b">
-            <SheetTitle>Editar Colaborador</SheetTitle>
-            <SheetDescription>Altere as informações cadastrais de {employee.nome_completo}.</SheetDescription>
+        <SheetContent className="sm:max-w-md md:max-w-lg p-0 flex flex-col h-full">
+          <SheetHeader className="p-6 border-b bg-background/50 backdrop-blur-sm sticky top-0 z-10">
+            <div className="flex items-center justify-between">
+              <div>
+                <SheetTitle>Editar Colaborador</SheetTitle>
+                <SheetDescription>Altere as informações cadastrais de {employee.nome_completo}.</SheetDescription>
+              </div>
+            </div>
           </SheetHeader>
           <EmployeeForm 
             initialData={employee} 
