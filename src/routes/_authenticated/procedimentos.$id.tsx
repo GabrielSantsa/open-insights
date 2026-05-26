@@ -22,7 +22,9 @@ import {
 } from "@/components/ui/select";
 import {
   ArrowLeft, AArrowDown, AArrowUp, Pencil, Save, X, BookOpen, ListChecks, GitBranch, History,
+  Paperclip, Upload, Download, Trash2, FileText,
 } from "lucide-react";
+import { diffLines } from "diff";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/procedimentos/$id")({
@@ -71,6 +73,9 @@ function ProcedureDetail() {
   const [draft, setDraft] = useState("");
   const [versionDialog, setVersionDialog] = useState(false);
   const [versionForm, setVersionForm] = useState({ note: "", major: false });
+  const [diffFromId, setDiffFromId] = useState<string>("");
+  const [diffToId, setDiffToId] = useState<string>("current");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const articleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -101,12 +106,61 @@ function ProcedureDetail() {
     queryFn: async () => {
       const { data } = await supabase
         .from("procedure_versions")
-        .select("id, version, change_note, is_major, created_at, created_by")
+        .select("id, version, change_note, is_major, content, created_at, created_by")
         .eq("procedure_id", id)
         .order("created_at", { ascending: false });
       return data ?? [];
     },
   });
+
+  const files = useQuery({
+    queryKey: ["proc-files", id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("procedure_files")
+        .select("*")
+        .eq("procedure_id", id)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  const uploadFile = useMutation({
+    mutationFn: async (file: File) => {
+      if (!user) throw new Error("Não autenticado");
+      const path = `${id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+      const { error: upErr } = await supabase.storage.from("procedures").upload(path, file, {
+        contentType: file.type, upsert: false,
+      });
+      if (upErr) throw upErr;
+      const { error } = await supabase.from("procedure_files").insert({
+        procedure_id: id, name: file.name, storage_path: path,
+        file_size: file.size, mime_type: file.type, uploaded_by: user.id,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Anexo enviado"); qc.invalidateQueries({ queryKey: ["proc-files", id] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteFile = useMutation({
+    mutationFn: async (f: { id: string; storage_path: string }) => {
+      await supabase.storage.from("procedures").remove([f.storage_path]);
+      const { error } = await supabase.from("procedure_files").delete().eq("id", f.id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Anexo removido"); qc.invalidateQueries({ queryKey: ["proc-files", id] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const downloadFile = async (f: { storage_path: string; name: string }) => {
+    const { data, error } = await supabase.storage.from("procedures")
+      .createSignedUrl(f.storage_path, 60, { download: f.name });
+    if (error || !data) return toast.error(error?.message ?? "Erro");
+    window.open(data.signedUrl, "_blank");
+  };
+
+
 
   const steps = useQuery({
     queryKey: ["proc-steps", id],
@@ -375,6 +429,7 @@ function ProcedureDetail() {
           <TabsList>
             <TabsTrigger value="artigo"><BookOpen className="w-4 h-4 mr-1" />Artigo</TabsTrigger>
             <TabsTrigger value="checklist"><ListChecks className="w-4 h-4 mr-1" />Checklist {total > 0 && `(${done}/${total})`}</TabsTrigger>
+            <TabsTrigger value="anexos"><Paperclip className="w-4 h-4 mr-1" />Anexos {(files.data?.length ?? 0) > 0 && `(${files.data?.length})`}</TabsTrigger>
             <TabsTrigger value="historico"><History className="w-4 h-4 mr-1" />Histórico {(versions.data?.length ?? 0) > 0 && `(${versions.data?.length})`}</TabsTrigger>
           </TabsList>
 
@@ -503,33 +558,163 @@ function ProcedureDetail() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="historico" className="mt-6">
+          <TabsContent value="anexos" className="mt-6">
             <Card className="max-w-3xl">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">Histórico de versões</CardTitle>
+                <CardTitle className="text-base flex items-center justify-between">
+                  <span>Anexos</span>
+                  {canEdit && (
+                    <>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) uploadFile.mutate(f);
+                          if (fileInputRef.current) fileInputRef.current.value = "";
+                        }}
+                      />
+                      <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploadFile.isPending}>
+                        <Upload className="w-4 h-4 mr-1" />{uploadFile.isPending ? "Enviando..." : "Enviar arquivo"}
+                      </Button>
+                    </>
+                  )}
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                {versions.isLoading ? (
+                {files.isLoading ? (
                   <p className="text-sm text-muted-foreground text-center py-8">Carregando...</p>
-                ) : (versions.data?.length ?? 0) === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">Nenhuma versão registrada ainda.</p>
+                ) : (files.data?.length ?? 0) === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">Nenhum anexo neste procedimento.</p>
                 ) : (
-                  <ul className="space-y-3">
-                    {versions.data!.map((v) => (
-                      <li key={v.id} className="flex items-start gap-3 py-2 border-b last:border-0">
-                        <Badge variant={v.is_major ? "default" : "outline"} className="shrink-0 mt-0.5">v{v.version}</Badge>
+                  <ul className="space-y-2">
+                    {files.data!.map((f) => (
+                      <li key={f.id} className="flex items-center gap-3 py-2 border-b last:border-0">
+                        <FileText className="w-5 h-5 text-muted-foreground shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm">{v.change_note || (v.is_major ? "Mudança major" : "Atualização")}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">
-                            {new Date(v.created_at).toLocaleString("pt-BR")}
+                          <div className="text-sm font-medium truncate">{f.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {f.file_size ? `${(f.file_size / 1024).toFixed(1)} KB` : "—"} · {new Date(f.created_at).toLocaleDateString("pt-BR")}
                           </div>
                         </div>
+                        <Button size="icon" variant="ghost" onClick={() => downloadFile(f)} title="Baixar">
+                          <Download className="w-4 h-4" />
+                        </Button>
+                        {canEdit && (
+                          <Button size="icon" variant="ghost" onClick={() => {
+                            if (confirm(`Remover "${f.name}"?`)) deleteFile.mutate({ id: f.id, storage_path: f.storage_path });
+                          }} title="Remover">
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        )}
                       </li>
                     ))}
                   </ul>
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="historico" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 max-w-6xl">
+              <Card>
+                <CardHeader className="pb-3"><CardTitle className="text-base">Versões</CardTitle></CardHeader>
+                <CardContent>
+                  {versions.isLoading ? (
+                    <p className="text-sm text-muted-foreground text-center py-8">Carregando...</p>
+                  ) : (versions.data?.length ?? 0) === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-8">Sem versões.</p>
+                  ) : (
+                    <ul className="space-y-2">
+                      {versions.data!.map((v) => (
+                        <li key={v.id} className="flex items-start gap-2 py-1.5 border-b last:border-0">
+                          <Badge variant={v.is_major ? "default" : "outline"} className="shrink-0 mt-0.5">v{v.version}</Badge>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm truncate">{v.change_note || (v.is_major ? "Mudança major" : "Atualização")}</div>
+                            <div className="text-[11px] text-muted-foreground">
+                              {new Date(v.created_at).toLocaleString("pt-BR")}
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Comparar versões</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">De (base)</Label>
+                      <Select value={diffFromId} onValueChange={setDiffFromId}>
+                        <SelectTrigger><SelectValue placeholder="Selecione uma versão" /></SelectTrigger>
+                        <SelectContent>
+                          {(versions.data ?? []).map((v) => (
+                            <SelectItem key={v.id} value={v.id}>v{v.version} — {new Date(v.created_at).toLocaleDateString("pt-BR")}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Para</Label>
+                      <Select value={diffToId} onValueChange={setDiffToId}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="current">Versão atual (v{proc.data.version})</SelectItem>
+                          {(versions.data ?? []).map((v) => (
+                            <SelectItem key={v.id} value={v.id}>v{v.version} — {new Date(v.created_at).toLocaleDateString("pt-BR")}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {(() => {
+                    if (!diffFromId) {
+                      return <p className="text-sm text-muted-foreground text-center py-8">Escolha uma versão base para comparar.</p>;
+                    }
+                    const from = versions.data?.find((v) => v.id === diffFromId);
+                    const to = diffToId === "current"
+                      ? { content, version: proc.data.version }
+                      : versions.data?.find((v) => v.id === diffToId);
+                    if (!from || !to) return null;
+                    const parts = diffLines(from.content ?? "", to.content ?? "");
+                    const added = parts.filter((p) => p.added).reduce((a, p) => a + (p.count ?? 0), 0);
+                    const removed = parts.filter((p) => p.removed).reduce((a, p) => a + (p.count ?? 0), 0);
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className="text-emerald-600 dark:text-emerald-400">+{added} linhas</span>
+                          <span className="text-red-600 dark:text-red-400">−{removed} linhas</span>
+                        </div>
+                        <pre className="text-xs font-mono border rounded-md max-h-[60vh] overflow-auto p-0 leading-relaxed">
+                          {parts.map((p, i) => {
+                            const cls = p.added
+                              ? "bg-emerald-500/10 text-emerald-900 dark:text-emerald-200 border-l-2 border-emerald-500"
+                              : p.removed
+                              ? "bg-red-500/10 text-red-900 dark:text-red-200 border-l-2 border-red-500"
+                              : "text-muted-foreground border-l-2 border-transparent";
+                            const prefix = p.added ? "+ " : p.removed ? "− " : "  ";
+                            return (
+                              <div key={i} className={`${cls} px-3 py-0.5 whitespace-pre-wrap break-words`}>
+                                {p.value.split("\n").filter((_, idx, arr) => idx < arr.length - 1 || _ !== "").map((line, j) => (
+                                  <div key={j}>{prefix}{line}</div>
+                                ))}
+                              </div>
+                            );
+                          })}
+                        </pre>
+                      </div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
