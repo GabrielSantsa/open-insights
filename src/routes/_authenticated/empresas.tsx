@@ -411,6 +411,7 @@ function EmpresasPage() {
           {detail && (
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
               {[
+                ["N°", detail.company_number],
                 ["CNPJ", detail.cnpj],
                 ["Nome fantasia", detail.nome_fantasia],
                 ["Situação", detail.situacao],
