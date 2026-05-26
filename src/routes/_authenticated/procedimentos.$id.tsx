@@ -424,7 +424,7 @@ function ProcedureDetail() {
             <TabsTrigger value="artigo"><BookOpen className="w-4 h-4 mr-1" />Artigo</TabsTrigger>
             <TabsTrigger value="checklist"><ListChecks className="w-4 h-4 mr-1" />Checklist {total > 0 && `(${done}/${total})`}</TabsTrigger>
             <TabsTrigger value="anexos"><Paperclip className="w-4 h-4 mr-1" />Anexos {(files.data?.length ?? 0) > 0 && `(${files.data?.length})`}</TabsTrigger>
-            <TabsTrigger value="historico"><History className="w-4 h-4 mr-1" />Histórico {(versions.data?.length ?? 0) > 0 && `(${versions.data?.length})`}</TabsTrigger>
+            {canEdit && <TabsTrigger value="historico"><History className="w-4 h-4 mr-1" />Histórico {(versions.data?.length ?? 0) > 0 && `(${versions.data?.length})`}</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="artigo" className="mt-6">
