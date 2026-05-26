@@ -310,41 +310,39 @@ function ColaboradorDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-4">
                   {employee.gestor && (
-                    <div className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => employee.gestor && navigate({ to: "/colaboradores/$id", params: { id: employee.gestor.id } })}>
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={employee.gestor.foto_url || ""} />
-                        <AvatarFallback className="text-xs">
-                          {employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground font-medium">Gestor Direto</p>
-                        <p className="text-sm font-semibold truncate">{employee.gestor.nome_completo}</p>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                      <div 
+                        className="flex-1 min-w-0 cursor-pointer hover:text-primary transition-colors" 
+                        onClick={() => employee.gestor && navigate({ to: "/colaboradores/$id", params: { id: employee.gestor.id } })}
+                      >
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Gestor Direto</p>
+                        <p className="font-medium truncate">{employee.gestor.nome_completo}</p>
                         <p className="text-[11px] text-muted-foreground truncate">{employee.gestor.cargo}</p>
                       </div>
                     </div>
                   )}
                   {employee.coordenador && (
-                    <div className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => employee.coordenador && navigate({ to: "/colaboradores/$id", params: { id: employee.coordenador.id } })}>
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={employee.coordenador.foto_url || ""} />
-                        <AvatarFallback className="text-xs">
-                          {employee.coordenador.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground font-medium">Coordenador</p>
-                        <p className="text-sm font-semibold truncate">{employee.coordenador.nome_completo}</p>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
+                        <UserCircle className="w-4 h-4" />
+                      </div>
+                      <div 
+                        className="flex-1 min-w-0 cursor-pointer hover:text-primary transition-colors" 
+                        onClick={() => employee.coordenador && navigate({ to: "/colaboradores/$id", params: { id: employee.coordenador.id } })}
+                      >
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Coordenador</p>
+                        <p className="font-medium truncate">{employee.coordenador.nome_completo}</p>
                         <p className="text-[11px] text-muted-foreground truncate">{employee.coordenador.cargo}</p>
                       </div>
                     </div>
                   )}
                   {!employee.gestor && !employee.coordenador && (
-                    <div className="col-span-full py-8 text-center bg-muted/20 rounded-xl border border-dashed">
-                      <p className="text-xs text-muted-foreground italic">Nenhuma estrutura de reporte atribuída.</p>
-                    </div>
+                    <p className="text-xs text-muted-foreground italic">Nenhuma estrutura de reporte atribuída.</p>
                   )}
                 </div>
               </CardContent>
