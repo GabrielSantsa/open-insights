@@ -73,6 +73,31 @@ export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      {(employee?.competencias_responsabilidades || employee?.conhecimento_tecnico) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {employee.competencias_responsabilidades && (
+            <Card className="border-border/40 bg-muted/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Definição de Competências</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm whitespace-pre-wrap">{employee.competencias_responsabilidades}</p>
+              </CardContent>
+            </Card>
+          )}
+          {employee.conhecimento_tecnico && (
+            <Card className="border-border/40 bg-muted/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Definição de Conhecimento Técnico</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm whitespace-pre-wrap">{employee.conhecimento_tecnico}</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Responsabilidades */}
         <div className="space-y-4">
