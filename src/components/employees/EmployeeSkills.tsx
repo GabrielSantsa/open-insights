@@ -7,8 +7,10 @@ import {
   ChevronRight,
   Plus,
   Target,
-  Search
+  Search,
+  BookOpen
 } from "lucide-react";
+import { ModuleEmptyState } from "@/components/employees/ModuleEmptyState";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -86,9 +88,11 @@ export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
                 </div>
               ))
             ) : (
-              <div className="p-8 border border-dashed rounded-xl text-center text-sm text-muted-foreground bg-muted/20 italic">
-                Nenhuma responsabilidade cadastrada.
-              </div>
+              <ModuleEmptyState 
+                icon={Target}
+                title="Sem responsabilidades"
+                description="Nenhuma responsabilidade operacional foi vinculada a este perfil."
+              />
             )}
           </div>
         </div>
@@ -118,9 +122,11 @@ export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
                 </div>
               ))
             ) : (
-              <div className="p-8 border border-dashed rounded-xl text-center text-sm text-muted-foreground bg-muted/20 italic">
-                Nenhum conhecimento técnico cadastrado.
-              </div>
+              <ModuleEmptyState 
+                icon={Award}
+                title="Sem conhecimentos"
+                description="Nenhum conhecimento técnico ou competência foi listada ainda."
+              />
             )}
           </div>
         </div>

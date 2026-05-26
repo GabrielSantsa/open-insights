@@ -281,12 +281,12 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
         </div>
       </ScrollArea>
 
-      <div className="p-6 border-t bg-background/95 backdrop-blur-sm flex gap-3 sticky bottom-0 z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={isSubmitting}>
+      <div className="p-6 border-t bg-background/95 backdrop-blur-sm flex gap-3 sticky bottom-0 z-20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+        <Button type="button" variant="ghost" onClick={onCancel} className="flex-1 rounded-xl h-11" disabled={isSubmitting}>
           <X className="w-4 h-4 mr-2" />
           Cancelar
         </Button>
-        <Button type="submit" className="flex-1 shadow-sm" disabled={isSubmitting}>
+        <Button type="submit" className="flex-1 shadow-sm rounded-xl h-11" disabled={isSubmitting}>
           {isSubmitting ? (
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
@@ -295,7 +295,7 @@ export function EmployeeForm({ initialData, onSubmit, onCancel, isSubmitting }: 
           ) : (
             <>
               <Save className="w-4 h-4 mr-2" />
-              Salvar Alterações
+              Salvar Informações
             </>
           )}
         </Button>

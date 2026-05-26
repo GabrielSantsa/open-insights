@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ModuleEmptyState } from "@/components/employees/ModuleEmptyState";
 import { 
   LayoutDashboard, 
   CheckSquare, 
@@ -162,10 +163,11 @@ function MeuPainel() {
                 ))}
               </div>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
-                <CheckSquare className="w-8 h-8 opacity-20 mb-2" />
-                <p className="text-sm">Nenhuma demanda pendente no momento.</p>
-              </div>
+              <ModuleEmptyState 
+                icon={CheckSquare}
+                title="Tudo em dia!"
+                description="Você não possui demandas pendentes no momento. Aproveite para atualizar seus conhecimentos."
+              />
             )}
           </CardContent>
         </Card>
@@ -194,10 +196,11 @@ function MeuPainel() {
                 ))}
               </div>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
-                <Star className="w-8 h-8 opacity-20 mb-2" />
-                <p className="text-sm">Você ainda não favoritou procedimentos.</p>
-              </div>
+              <ModuleEmptyState 
+                icon={Star}
+                title="Sem favoritos"
+                description="Favorite os procedimentos que você mais utiliza para acessá-los rapidamente aqui."
+              />
             )}
           </CardContent>
         </Card>
@@ -224,9 +227,11 @@ function MeuPainel() {
                 ))}
               </div>
             ) : (
-              <div className="py-8 text-center text-muted-foreground">
-                <p className="text-sm">Nenhuma atividade registrada hoje.</p>
-              </div>
+              <ModuleEmptyState 
+                icon={Clock}
+                title="Sem registros"
+                description="Suas atividades recentes aparecerão aqui conforme você utiliza a plataforma."
+              />
             )}
           </CardContent>
         </Card>

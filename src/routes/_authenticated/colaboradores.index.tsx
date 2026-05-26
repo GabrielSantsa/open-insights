@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Search, UserPlus, LayoutGrid, List, FilterX, Building2, MapPin, Mail, Phone, ExternalLink, Users, Save, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -8,9 +9,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { EMPLOYEE_STATUS_LABELS, isAdmin } from "@/lib/permissions";
+import { EMPLOYEE_STATUS_LABELS, isAdmin, type EmployeeStatus } from "@/lib/permissions";
+import { EmployeeStatusBadge } from "@/components/employees/EmployeeStatusBadge";
+import { ModuleEmptyState } from "@/components/employees/ModuleEmptyState";
 import { toast } from "sonner";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import {
   Table,
@@ -44,6 +47,7 @@ import { EmployeeForm } from "@/components/employees/EmployeeForm";
 export function ColaboradoresPage() {
   const { roles } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [view, setView] = useState<"cards" | "table">("cards");
   const [search, setSearch] = useState("");
   const [setorFilter, setSetorFilter] = useState<string>("all");
@@ -265,22 +269,23 @@ export function ColaboradoresPage() {
           ))}
         </div>
       ) : filteredEmployees.length === 0 ? (
-        <div className="flex flex-col items-center justify-center min-h-[300px] border rounded-xl bg-muted/10 p-8 text-center border-dashed">
-          <Users className="w-12 h-12 text-muted-foreground/30 mb-4" />
-          <h3 className="text-lg font-medium">Nenhum colaborador encontrado</h3>
-          <p className="text-muted-foreground max-w-xs mx-auto">
-            Não encontramos nenhum registro com os filtros atuais. Tente ajustar sua busca.
-          </p>
-          <Button variant="outline" className="mt-4" onClick={clearFilters}>Limpar tudo</Button>
-        </div>
+        <ModuleEmptyState 
+          title="Nenhum colaborador encontrado"
+          description="Não encontramos nenhum registro com os filtros atuais. Tente ajustar sua busca ou limpar os filtros."
+          actionLabel="Limpar filtros"
+          onAction={clearFilters}
+        />
       ) : view === "cards" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredEmployees.map((emp) => (
             <Link key={emp.id} to="/colaboradores/$id" params={{ id: emp.id }}>
 
-              <Card className="hover:shadow-lg hover:border-primary/20 transition-all group cursor-pointer border-border/60 bg-card overflow-hidden h-full flex flex-col">
+              <Card className={cn(
+                "hover:shadow-lg hover:border-primary/20 transition-all group cursor-pointer border-border/60 bg-card overflow-hidden h-full flex flex-col",
+                emp.status === "desligado" && "opacity-60 grayscale-[0.5]"
+              )}>
                 <CardHeader className="flex-row items-center gap-4 space-y-0 pb-4">
-                  <Avatar className="h-14 w-14 border-2 border-background shadow-sm ring-1 ring-border/20">
+                  <Avatar className="h-14 w-14 border-2 border-background shadow-sm ring-1 ring-border/20 group-hover:ring-primary/20 transition-all">
                     <AvatarImage src={emp.foto_url || ""} />
                     <AvatarFallback className="bg-primary/5 text-primary text-lg font-medium">
                       {emp.nome_completo.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase()}
@@ -291,18 +296,7 @@ export function ColaboradoresPage() {
                       <h3 className="font-semibold text-base truncate group-hover:text-primary transition-colors">
                         {emp.nome_completo}
                       </h3>
-                      <Badge 
-                        variant="secondary" 
-                        className={`
-                          text-[10px] font-medium h-5 px-1.5
-                          ${emp.status === "ativo" ? "bg-emerald-50 text-emerald-700 border-emerald-100" : ""}
-                          ${emp.status === "ferias" ? "bg-amber-50 text-amber-700 border-amber-100" : ""}
-                          ${emp.status === "afastado" ? "bg-blue-50 text-blue-700 border-blue-100" : ""}
-                          ${emp.status === "desligado" ? "bg-rose-50 text-rose-700 border-rose-100" : ""}
-                        `}
-                      >
-                        {EMPLOYEE_STATUS_LABELS[emp.status]}
-                      </Badge>
+                      <EmployeeStatusBadge status={emp.status as EmployeeStatus} />
                     </div>
                     <p className="text-sm text-muted-foreground truncate">{emp.cargo}</p>
                   </div>
@@ -341,21 +335,28 @@ export function ColaboradoresPage() {
           ))}
         </div>
       ) : (
-        <div className="rounded-xl border border-border/40 bg-card overflow-hidden shadow-sm">
+        <div className="rounded-xl border border-border/40 bg-card overflow-hidden shadow-sm animate-in fade-in duration-500">
           <Table>
             <TableHeader className="bg-muted/30">
-              <TableRow>
-                <TableHead className="w-[300px]">Colaborador</TableHead>
-                <TableHead>Setor</TableHead>
-                <TableHead>E-mail</TableHead>
-                <TableHead>Ramal</TableHead>
-                <TableHead>Gestor</TableHead>
-                <TableHead className="text-right">Status</TableHead>
+              <TableRow className="hover:bg-transparent border-b border-border/40">
+                <TableHead className="w-[300px] text-[10px] font-bold uppercase tracking-widest py-4">Colaborador</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">Setor</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">E-mail</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">Ramal</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-widest py-4">Gestor</TableHead>
+                <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest py-4">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredEmployees.map((emp) => (
-                <TableRow key={emp.id} className="cursor-pointer group hover:bg-muted/30" onClick={() => window.location.href=`/colaboradores/${emp.id}`}>
+                <TableRow 
+                  key={emp.id} 
+                  className={cn(
+                    "cursor-pointer group hover:bg-muted/30 transition-colors border-b border-border/40 last:border-0",
+                    emp.status === "desligado" && "opacity-60 grayscale-[0.5]"
+                  )} 
+                  onClick={() => navigate({ to: "/colaboradores/$id", params: { id: emp.id } })}
+                >
 
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -380,12 +381,7 @@ export function ColaboradoresPage() {
                     {emp.gestor ? emp.gestor.nome_completo : "-"}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Badge variant="outline" className={`
-                      font-normal text-[10px]
-                      ${emp.status === "ativo" ? "border-emerald-200 text-emerald-700 bg-emerald-50/30" : ""}
-                    `}>
-                      {EMPLOYEE_STATUS_LABELS[emp.status]}
-                    </Badge>
+                    <EmployeeStatusBadge status={emp.status as EmployeeStatus} variant="outline" />
                   </TableCell>
                 </TableRow>
               ))}

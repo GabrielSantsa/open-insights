@@ -81,31 +81,36 @@ function MinhaConta() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-12">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Configurações da Conta</h1>
+    <div className="space-y-6 max-w-4xl mx-auto pb-12 animate-in fade-in duration-500">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-bold tracking-tight">Configurações da Conta</h1>
+        <p className="text-sm text-muted-foreground">Gerencie suas informações pessoais e configurações de segurança.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1 space-y-6">
-          <Card className="border-border/40 shadow-sm overflow-hidden">
-            <CardHeader className="bg-muted/30 pb-4">
-              <CardTitle className="text-sm font-semibold uppercase">Foto de Perfil</CardTitle>
+          <Card className="border-border/40 shadow-sm overflow-hidden bg-card/50">
+            <CardHeader className="bg-muted/30 pb-4 border-b">
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Foto de Perfil</CardTitle>
             </CardHeader>
-            <CardContent className="pt-6 flex flex-col items-center">
-              <div className="relative group">
-                <Avatar className="h-24 w-24 border-4 border-background shadow-md">
+            <CardContent className="pt-8 flex flex-col items-center">
+              <div className="relative group cursor-pointer">
+                <Avatar className="h-28 w-28 border-4 border-background shadow-xl ring-1 ring-border/10 group-hover:ring-primary/20 transition-all">
                   <AvatarImage src={employee?.foto_url || ""} />
-                  <AvatarFallback className="text-2xl bg-primary/10 text-primary">
+                  <AvatarFallback className="text-3xl bg-primary/5 text-primary">
                     {employee?.nome_completo?.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase() || "?"}
                   </AvatarFallback>
                 </Avatar>
-                <button className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="w-6 h-6 text-white" />
-                </button>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-8 h-8 text-white" />
+                </div>
               </div>
-              <p className="mt-4 text-xs text-muted-foreground text-center">Clique para alterar sua foto de perfil pública.</p>
-              <Button variant="outline" size="sm" className="mt-4 w-full h-9 rounded-lg">Atualizar Foto</Button>
+              <p className="mt-6 text-[11px] text-muted-foreground text-center max-w-[150px]">
+                Sua foto será visível para todos os colegas na plataforma.
+              </p>
+              <Button variant="outline" size="sm" className="mt-6 w-full h-10 rounded-xl border-border/60 hover:bg-primary/5 hover:text-primary hover:border-primary/20 transition-all">
+                Alterar Imagem
+              </Button>
             </CardContent>
           </Card>
         </div>

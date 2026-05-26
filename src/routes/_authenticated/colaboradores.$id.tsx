@@ -26,7 +26,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EMPLOYEE_STATUS_LABELS, isAdmin } from "@/lib/permissions";
+import { EMPLOYEE_STATUS_LABELS, isAdmin, type EmployeeStatus } from "@/lib/permissions";
+import { EmployeeStatusBadge } from "@/components/employees/EmployeeStatusBadge";
+import { ModuleEmptyState } from "@/components/employees/ModuleEmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import {
@@ -179,12 +181,7 @@ function ColaboradorDetail() {
               <h1 className="mt-4 text-xl font-bold">{employee.nome_completo}</h1>
               <p className="text-muted-foreground text-sm font-medium">{employee.cargo}</p>
               <div className="mt-3 flex justify-center">
-                <Badge variant="outline" className={`
-                  font-normal px-2.5 py-0.5
-                  ${employee.status === "ativo" ? "border-emerald-200 text-emerald-700 bg-emerald-50/50" : ""}
-                `}>
-                  {EMPLOYEE_STATUS_LABELS[employee.status]}
-                </Badge>
+                <EmployeeStatusBadge status={employee.status as EmployeeStatus} variant="outline" className="h-6 px-3" />
               </div>
 
               <div className="mt-8 space-y-4 text-left">
@@ -366,9 +363,10 @@ function ColaboradorDetail() {
                         </Button>
                       </div>
                     ) : (
-                      <div className="p-8 border border-dashed rounded-xl text-center text-sm text-muted-foreground bg-muted/20 italic">
-                        Sem gestor direto vinculado.
-                      </div>
+                      <ModuleEmptyState 
+                        title="Sem gestão"
+                        description="Este colaborador não possui um gestor direto vinculado."
+                      />
                     )}
                   </div>
 
@@ -434,11 +432,11 @@ function ColaboradorDetail() {
                   </div>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <div className="p-12 text-center bg-background">
-                    <History className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
-                    <p className="text-sm font-medium text-muted-foreground">Nenhuma demanda vinculada a este colaborador.</p>
-                    <p className="text-xs text-muted-foreground/60 mt-1">As demandas operacionais serão listadas aqui conforme forem criadas.</p>
-                  </div>
+                  <ModuleEmptyState 
+                    icon={History}
+                    title="Nenhuma demanda vinculada"
+                    description="As demandas operacionais serão listadas aqui conforme forem criadas e atribuídas."
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -454,22 +452,25 @@ function ColaboradorDetail() {
                     </TabsList>
                   </div>
                   <TabsContent value="favoritos" className="p-0 m-0">
-                    <div className="p-16 text-center">
-                      <ShieldCheck className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
-                      <p className="text-sm font-medium text-muted-foreground">Nenhum procedimento favoritado ainda.</p>
-                    </div>
+                    <ModuleEmptyState 
+                      icon={ShieldCheck}
+                      title="Sem favoritos"
+                      description="Nenhum procedimento favoritado por este colaborador ainda."
+                    />
                   </TabsContent>
                   <TabsContent value="acessados" className="p-0 m-0">
-                    <div className="p-16 text-center">
-                      <GraduationCap className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
-                      <p className="text-sm font-medium text-muted-foreground">Nenhum dado de acesso disponível.</p>
-                    </div>
+                    <ModuleEmptyState 
+                      icon={GraduationCap}
+                      title="Sem dados de acesso"
+                      description="Ainda não há registros de acesso a procedimentos para este perfil."
+                    />
                   </TabsContent>
                   <TabsContent value="recentes" className="p-0 m-0">
-                    <div className="p-16 text-center">
-                      <History className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
-                      <p className="text-sm font-medium text-muted-foreground">Nenhum procedimento visualizado recentemente.</p>
-                    </div>
+                    <ModuleEmptyState 
+                      icon={History}
+                      title="Sem histórico"
+                      description="Nenhum procedimento visualizado recentemente por este colaborador."
+                    />
                   </TabsContent>
                 </Tabs>
               </Card>
