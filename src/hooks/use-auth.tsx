@@ -34,70 +34,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadUserData = async (uid: string) => {
-    try {
-      const [{ data: prof, error: profErr }, { data: rolesData, error: rolesErr }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
-        supabase.from("user_roles").select("role").eq("user_id", uid),
-      ]);
-      
-      if (profErr) console.error("Profile error:", profErr);
-      if (rolesErr) console.error("Roles error:", rolesErr);
-
-      setProfile(prof as Profile | null);
-      setRoles((rolesData ?? []).map((r) => r.role as AppRole));
-    } catch (err) {
-      console.error("Unexpected error loading user data:", err);
-    } finally {
-      setLoading(false);
-    }
+    const [{ data: prof }, { data: rolesData }] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
+      supabase.from("user_roles").select("role").eq("user_id", uid),
+    ]);
+    setProfile(prof as Profile | null);
+    setRoles((rolesData ?? []).map((r) => r.role as AppRole));
   };
 
   useEffect(() => {
-    let mounted = true;
-
-    const initAuth = async () => {
-      try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
-        
-        if (!mounted) return;
-
-        if (initialSession) {
-          setSession(initialSession);
-          setUser(initialSession.user);
-          await loadUserData(initialSession.user.id);
-        } else {
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error("Error during auth initialization:", error);
-        if (mounted) setLoading(false);
-      }
-    };
-
-    initAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-      if (!mounted) return;
-
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-        if (currentSession?.user) {
-          await loadUserData(currentSession.user.id);
-        }
-      } else if (event === 'SIGNED_OUT') {
-        setSession(null);
-        setUser(null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      setUser(s?.user ?? null);
+      if (s?.user) {
+        setTimeout(() => loadUserData(s.user.id), 0);
+      } else {
         setProfile(null);
         setRoles([]);
-        setLoading(false);
       }
     });
 
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      setSession(s);
+      setUser(s?.user ?? null);
+      if (s?.user) loadUserData(s.user.id).finally(() => setLoading(false));
+      else setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const signOut = async () => {

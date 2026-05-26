@@ -19,12 +19,8 @@ function AuthenticatedLayout() {
 
   useEffect(() => {
     if (!loading) {
-      if (!user) {
-        navigate({ to: "/login" });
-      } else {
-        // Adicionamos um pequeno delay ou garantimos que o perfil foi tentado carregar
-        setReady(true);
-      }
+      if (!user) navigate({ to: "/login" });
+      else setReady(true);
     }
   }, [loading, user, navigate]);
 
