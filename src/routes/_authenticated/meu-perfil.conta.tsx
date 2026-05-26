@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import { toast } from "sonner";
-import { User, Phone, Lock, Mail, Camera } from "lucide-react";
+import { User, Phone, Lock, Mail, Camera, Edit2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -148,6 +148,39 @@ function MinhaConta() {
                   </Button>
                 </div>
               </form>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/40 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-sm font-semibold uppercase">Assinatura de E-mail</CardTitle>
+              <CardDescription>Esta assinatura será exibida em seu perfil institucional.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="signature">Texto da Assinatura (Opcional)</Label>
+                  <textarea 
+                    id="signature"
+                    name="signature"
+                    className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    defaultValue={employee?.assinatura_email || ""}
+                    placeholder="Adicione uma frase curta ou informação adicional..."
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <Button 
+                    variant="outline" 
+                    className="px-8 h-11 rounded-xl border-border/60"
+                    onClick={() => {
+                      const sig = (document.getElementById("signature") as HTMLTextAreaElement).value;
+                      updateMutation.mutate({ assinatura_email: sig });
+                    }}
+                  >
+                    Atualizar Assinatura
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
