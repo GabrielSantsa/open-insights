@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Topbar } from "@/components/layout/Topbar";
+import { InternalChat } from "@/components/InternalChat";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -39,6 +40,7 @@ function AuthenticatedLayout() {
           <main className="flex-1 p-6 overflow-auto">
             <Outlet />
           </main>
+          <InternalChat />
         </SidebarInset>
       </div>
     </SidebarProvider>
