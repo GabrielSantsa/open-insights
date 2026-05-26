@@ -32,8 +32,9 @@ export function InternalChat() {
 
   const sendMessage = useMutation({
     mutationFn: async (content: string) => {
+      if (!user?.id) throw new Error("Usuário não autenticado");
       const { error } = await supabase.from("internal_messages").insert({
-        sender_id: user?.id,
+        sender_id: user.id,
         content,
       });
       if (error) throw error;
@@ -95,7 +96,7 @@ export function InternalChat() {
             </Button>
           </CardHeader>
           <CardContent className="flex-1 p-0 overflow-hidden bg-muted/30">
-            <ScrollArea className="h-full p-4" viewportRef={scrollRef}>
+            <div className="h-full overflow-y-auto p-4" ref={scrollRef}>
               <div className="space-y-4">
                 {messages.map((msg: any) => (
                   <div
@@ -124,7 +125,7 @@ export function InternalChat() {
                   </div>
                 ))}
               </div>
-            </ScrollArea>
+            </div>
           </CardContent>
           <CardFooter className="p-3 border-t bg-card">
             <form onSubmit={handleSend} className="flex w-full gap-2">
