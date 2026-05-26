@@ -1,0 +1,2 @@
+UPDATE public.apps SET url = 'https://receita.pr.gov.br/login' WHERE id = '533d2e46-861b-4830-881f-2883be1c42b9';
+UPDATE public.apps SET name = 'Site da empresa', url = 'https://www.contabilidadeuniao.com.br/', description = 'Acesso ao site institucional da União Contadores.' WHERE id = '6404647c-08fb-4d11-9270-61e364195c70';
