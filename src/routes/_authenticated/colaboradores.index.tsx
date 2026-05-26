@@ -380,7 +380,32 @@ export function ColaboradoresPage() {
                       <h3 className="font-semibold text-base truncate group-hover:text-primary transition-colors">
                         {emp.nome_completo}
                       </h3>
-                      <EmployeeStatusBadge status={emp.status as EmployeeStatus} />
+                      <div className="flex items-center gap-1">
+                        <EmployeeStatusBadge status={emp.status as EmployeeStatus} />
+                        {isUserAdmin && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+                              <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <MoreHorizontal className="h-3 w-3" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={(e) => handleEditClick(emp, e)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                className="text-destructive"
+                                onClick={(e) => handleDeleteClick(emp, e)}
+                              >
+                                <Trash className="mr-2 h-4 w-4" />
+                                Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
+                      </div>
                     </div>
                     <p className="text-sm text-muted-foreground truncate">{emp.cargo}</p>
                   </div>
