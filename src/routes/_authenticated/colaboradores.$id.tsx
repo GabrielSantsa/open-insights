@@ -313,7 +313,7 @@ function ColaboradorDetail() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
                   {employee.gestor && (
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
+                      <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground shrink-0">
                         <Avatar className="h-full w-full rounded-lg">
                           <AvatarImage src={employee.gestor.foto_url || ""} />
                           <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
@@ -333,7 +333,7 @@ function ColaboradorDetail() {
                   )}
                   {employee.coordenador && (
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
+                      <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground shrink-0">
                         <Avatar className="h-full w-full rounded-lg">
                           <AvatarImage src={employee.coordenador.foto_url || ""} />
                           <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
