@@ -387,7 +387,7 @@ function EmpresasPage() {
                   className="cursor-pointer"
                   onClick={() => setDetail(c)}
                 >
-                  <TableCell className="font-mono text-xs">{c.company_number ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-sm font-bold text-primary">{c.company_number ?? "—"}</TableCell>
                   <TableCell className="font-medium">
                     {c.razao_social}
                     {c.nome_fantasia && <div className="text-xs text-muted-foreground">{c.nome_fantasia}</div>}
