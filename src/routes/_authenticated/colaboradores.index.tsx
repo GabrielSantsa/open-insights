@@ -86,16 +86,16 @@ export function ColaboradoresPage() {
         .from("employee_profiles")
         .select(`
           *,
-          gestor:employee_profiles!employee_profiles_gestor_id_fkey(nome_completo),
-          coordenador:employee_profiles!employee_profiles_coordenador_id_fkey(nome_completo)
+          gestor:gestor_id(nome_completo),
+          coordenador:coordenador_id(nome_completo)
         `)
         .order("nome_completo");
       
       if (error) throw error;
       return (data as any[]).map(emp => ({
         ...emp,
-        gestor: Array.isArray(emp.gestor) ? emp.gestor[0] : emp.gestor,
-        coordenador: Array.isArray(emp.coordenador) ? emp.coordenador[0] : emp.coordenador
+        gestor: Array.isArray(emp.gestor) ? emp.gestor[0] : (emp.gestor || null),
+        coordenador: Array.isArray(emp.coordenador) ? emp.coordenador[0] : (emp.coordenador || null)
       }));
     },
   });
@@ -223,54 +223,59 @@ export function ColaboradoresPage() {
           </p>
         </div>
         {isUserAdmin && (
-          <Sheet open={isDrawerOpen} onOpenChange={(open) => {
-            setIsDrawerOpen(open);
-            if (!open) setEditingEmployee(null);
-          }}>
-            <SheetTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto" onClick={() => setEditingEmployee(null)}>
-                <UserPlus className="w-4 h-4 mr-2" />
-                Novo colaborador
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="w-full sm:max-w-md md:max-w-lg p-0 flex flex-col h-full overflow-hidden">
-              <SheetHeader className="p-6 border-b bg-background/50 backdrop-blur-sm sticky top-0 z-10">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <SheetTitle>{editingEmployee ? "Editar Colaborador" : "Novo Colaborador"}</SheetTitle>
-                    <SheetDescription>
-                      {editingEmployee 
-                        ? `Altere as informações de ${editingEmployee.nome_completo}.` 
-                        : "Cadastre um novo membro na equipe interna."}
-                    </SheetDescription>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Sheet open={isDrawerOpen} onOpenChange={(open) => {
+              setIsDrawerOpen(open);
+              if (!open) setEditingEmployee(null);
+            }}>
+              <SheetContent className="w-full sm:max-w-md md:max-w-lg p-0 flex flex-col h-full overflow-hidden">
+                <SheetHeader className="p-6 border-b bg-background/50 backdrop-blur-sm sticky top-0 z-10">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <SheetTitle>{editingEmployee ? "Editar Colaborador" : "Novo Colaborador"}</SheetTitle>
+                      <SheetDescription>
+                        {editingEmployee 
+                          ? `Altere as informações de ${editingEmployee.nome_completo}.` 
+                          : "Cadastre um novo membro na equipe interna."}
+                      </SheetDescription>
+                    </div>
+                    <Button 
+                      onClick={() => {
+                        const form = document.querySelector('form');
+                        if (form) form.requestSubmit();
+                      }}
+                      disabled={createEmployeeMutation.isPending || updateEmployeeMutation.isPending}
+                      size="sm"
+                      className="gap-2"
+                    >
+                      {createEmployeeMutation.isPending || updateEmployeeMutation.isPending ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+                      ) : (
+                        <Save className="w-4 h-4" />
+                      )}
+                      Salvar
+                    </Button>
                   </div>
-                  <Button 
-                    onClick={() => {
-                      const form = document.querySelector('form');
-                      if (form) form.requestSubmit();
-                    }}
-                    disabled={createEmployeeMutation.isPending || updateEmployeeMutation.isPending}
-                    size="sm"
-                    className="gap-2"
-                  >
-                    {createEmployeeMutation.isPending || updateEmployeeMutation.isPending ? (
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
-                    ) : (
-                      <Save className="w-4 h-4" />
-                    )}
-                    Salvar
-                  </Button>
+                </SheetHeader>
+                <div className="flex-1 overflow-hidden">
+                  <EmployeeForm 
+                    initialData={editingEmployee}
+                    onSubmit={handleSave} 
+                    onCancel={() => setIsDrawerOpen(false)} 
+                    isSubmitting={createEmployeeMutation.isPending || updateEmployeeMutation.isPending} 
+                  />
                 </div>
-              </SheetHeader>
-              <EmployeeForm 
-                initialData={editingEmployee}
-                onSubmit={handleSave} 
-                onCancel={() => setIsDrawerOpen(false)} 
-                isSubmitting={createEmployeeMutation.isPending || updateEmployeeMutation.isPending} 
-              />
+              </SheetContent>
+            </Sheet>
 
-            </SheetContent>
-          </Sheet>
+            <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto" onClick={() => {
+              setEditingEmployee(null);
+              setIsDrawerOpen(true);
+            }}>
+              <UserPlus className="w-4 h-4 mr-2" />
+              Novo colaborador
+            </Button>
+          </div>
         )}
       </div>
 
@@ -367,10 +372,17 @@ export function ColaboradoresPage() {
       ) : view === "cards" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredEmployees.map((emp) => (
-            <Link key={emp.id} to="/colaboradores/$id" params={{ id: emp.id }}>
-
+            <div 
+              key={emp.id} 
+              className="cursor-pointer"
+              onClick={(e) => {
+                const target = e.target as HTMLElement;
+                if (target.closest('button') || target.closest('[role="menuitem"]')) return;
+                navigate({ to: "/colaboradores/$id", params: { id: emp.id } });
+              }}
+            >
               <Card className={cn(
-                "hover:shadow-lg hover:border-primary/20 transition-all group cursor-pointer border-border/60 bg-card overflow-hidden h-full flex flex-col",
+                "hover:shadow-lg hover:border-primary/20 transition-all group border-border/60 bg-card overflow-hidden h-full flex flex-col",
                 emp.status === "desligado" && "opacity-60 grayscale-[0.5]"
               )}>
                 <CardHeader className="flex-row items-center gap-4 space-y-0 pb-4">
@@ -388,27 +400,32 @@ export function ColaboradoresPage() {
                       <div className="flex items-center gap-1">
                         <EmployeeStatusBadge status={emp.status as EmployeeStatus} />
                         {isUserAdmin && (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
-                              <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <MoreHorizontal className="h-3 w-3" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={(e) => handleEditClick(emp, e)}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Editar
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem 
-                                className="text-destructive"
-                                onClick={(e) => handleDeleteClick(emp, e)}
-                              >
-                                <Trash className="mr-2 h-4 w-4" />
-                                Excluir
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div className="flex items-center gap-1">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleEditClick(emp, e);
+                              }}
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleDeleteClick(emp, e);
+                              }}
+                            >
+                              <Trash className="h-3 w-3" />
+                            </Button>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -445,7 +462,7 @@ export function ColaboradoresPage() {
                   <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
               </Card>
-            </Link>
+            </div>
           ))}
         </div>
       ) : (
@@ -500,27 +517,32 @@ export function ColaboradoresPage() {
                   </TableCell>
                   {isUserAdmin && (
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={(e) => handleEditClick(emp, e)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            className="text-destructive"
-                            onClick={(e) => handleDeleteClick(emp, e)}
-                          >
-                            <Trash className="mr-2 h-4 w-4" />
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleEditClick(emp, e);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDeleteClick(emp, e);
+                          }}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   )}
                 </TableRow>
