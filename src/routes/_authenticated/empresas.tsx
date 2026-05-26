@@ -150,12 +150,40 @@ function EmpresasPage() {
         .filter((x): x is NonNullable<typeof x> => x !== null);
 
       if (!payload.length) throw new Error("Nenhuma linha com 'razao_social' encontrada");
-      const { error } = await supabase.from("companies").insert(payload);
+
+      // Dedupe by CNPJ: ignora duplicados dentro do arquivo e contra a base
+      const normCnpj = (v: string | null) => (v ? v.replace(/\D/g, "") : "");
+      const existing = new Set(
+        ((await supabase.from("companies").select("cnpj")).data ?? [])
+          .map((c: { cnpj: string | null }) => normCnpj(c.cnpj))
+          .filter(Boolean),
+      );
+      const seen = new Set<string>();
+      let skipped = 0;
+      const deduped = payload.filter((p) => {
+        const key = normCnpj(p.cnpj);
+        if (!key) return true;
+        if (existing.has(key) || seen.has(key)) {
+          skipped++;
+          return false;
+        }
+        seen.add(key);
+        return true;
+      });
+
+      if (!deduped.length) {
+        throw new Error(`Nenhuma empresa nova — ${skipped} CNPJ(s) duplicado(s) ignorado(s)`);
+      }
+      const { error } = await supabase.from("companies").insert(deduped);
       if (error) throw error;
-      return payload.length;
+      return { inserted: deduped.length, skipped };
     },
-    onSuccess: (n) => {
-      toast.success(`${n} empresa(s) importada(s)`);
+    onSuccess: ({ inserted, skipped }) => {
+      toast.success(
+        skipped > 0
+          ? `${inserted} importada(s) — ${skipped} CNPJ(s) duplicado(s) ignorado(s)`
+          : `${inserted} empresa(s) importada(s)`,
+      );
       qc.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (e: Error) => toast.error(e.message),
