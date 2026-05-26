@@ -238,115 +238,122 @@ function ColaboradorDetail() {
       </div>
 
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Lado Esquerdo - Perfil Resumo */}
-        <div className="lg:w-1/3 space-y-6">
-          <Card className="border-border/40 overflow-hidden shadow-sm">
-            <div className="h-24 bg-gradient-to-r from-primary/10 to-primary/5" />
-            <CardContent className="pt-0 -mt-12 text-center">
-              <Avatar className="h-24 w-24 mx-auto border-4 border-background shadow-md">
-                <AvatarImage src={employee.foto_url || ""} />
-                <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                  {employee.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <h1 className="mt-4 text-xl font-bold">{employee.nome_completo}</h1>
-              <p className="text-muted-foreground text-sm font-medium">{employee.cargo}</p>
-              <div className="mt-3 flex justify-center">
-                <EmployeeStatusBadge status={employee.status as EmployeeStatus} variant="outline" className="h-6 px-3" />
-              </div>
+      <div className="flex flex-col gap-8">
+        {/* Topo - Perfil Resumo e Estrutura */}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Lado Esquerdo - Perfil Resumo */}
+          <div className="lg:w-1/3 space-y-6">
+            <Card className="border-border/40 overflow-hidden shadow-sm">
+              <div className="h-24 bg-gradient-to-r from-primary/10 to-primary/5" />
+              <CardContent className="pt-0 -mt-12 text-center">
+                <Avatar className="h-24 w-24 mx-auto border-4 border-background shadow-md">
+                  <AvatarImage src={employee.foto_url || ""} />
+                  <AvatarFallback className="text-2xl bg-primary/10 text-primary">
+                    {employee.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <h1 className="mt-4 text-xl font-bold">{employee.nome_completo}</h1>
+                <p className="text-muted-foreground text-sm font-medium">{employee.cargo}</p>
+                <div className="mt-3 flex justify-center">
+                  <EmployeeStatusBadge status={employee.status as EmployeeStatus} variant="outline" className="h-6 px-3" />
+                </div>
 
-              <div className="mt-8 space-y-4 text-left">
-                <div className="flex items-center gap-3 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
-                    <Building2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Setor</p>
-                    <p className="font-medium">{employee.setor}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">E-mail</p>
-                    <p className="font-medium truncate">{employee.email_corporativo}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
-                    <Phone className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Telefone/Ramal</p>
-                    <p className="font-medium">{employee.telefone || "-"} (Ramal: {employee.ramal || "-"})</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
-                    <MapPin className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Localização</p>
-                    <p className="font-medium">{employee.localizacao || "Sede Principal"}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Gestor Direto */}
-          <Card className="border-border/40 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-primary" />
-                Estrutura de Reporte
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-               <div className="space-y-3">
-                {employee.gestor && (
-                  <div className="flex items-center gap-3 p-2 rounded-lg border border-transparent hover:border-border/60 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => employee.gestor && navigate({ to: "/colaboradores/$id", params: { id: employee.gestor.id } })}>
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={employee.gestor.foto_url || ""} />
-                      <AvatarFallback className="text-xs">
-                        {employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <p className="text-xs text-muted-foreground font-medium">Gestor Direto</p>
-                      <p className="text-sm font-semibold truncate">{employee.gestor.nome_completo}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">{employee.gestor.cargo}</p>
+                <div className="mt-8 space-y-4 text-left">
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
+                      <Building2 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Setor</p>
+                      <p className="font-medium">{employee.setor}</p>
                     </div>
                   </div>
-                )}
-                {employee.coordenador && (
-                  <div className="flex items-center gap-3 p-2 rounded-lg border border-transparent hover:border-border/60 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => employee.coordenador && navigate({ to: "/colaboradores/$id", params: { id: employee.coordenador.id } })}>
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={employee.coordenador.foto_url || ""} />
-                      <AvatarFallback className="text-xs">
-                        {employee.coordenador.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <p className="text-xs text-muted-foreground font-medium">Coordenador</p>
-                      <p className="text-sm font-semibold truncate">{employee.coordenador.nome_completo}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">{employee.coordenador.cargo}</p>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">E-mail</p>
+                      <p className="font-medium truncate">{employee.email_corporativo}</p>
                     </div>
                   </div>
-                )}
-                {!employee.gestor && !employee.coordenador && (
-                  <p className="text-xs text-muted-foreground">Nenhuma estrutura de reporte atribuída.</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Telefone/Ramal</p>
+                      <p className="font-medium">{employee.telefone || "-"} (Ramal: {employee.ramal || "-"})</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Localização</p>
+                      <p className="font-medium">{employee.localizacao || "Sede Principal"}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Lado Direito - Estrutura de Reporte */}
+          <div className="lg:w-2/3 space-y-6">
+            <Card className="border-border/40 shadow-sm h-full">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-primary" />
+                  Estrutura de Reporte
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {employee.gestor && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => employee.gestor && navigate({ to: "/colaboradores/$id", params: { id: employee.gestor.id } })}>
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={employee.gestor.foto_url || ""} />
+                        <AvatarFallback className="text-xs">
+                          {employee.gestor.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground font-medium">Gestor Direto</p>
+                        <p className="text-sm font-semibold truncate">{employee.gestor.nome_completo}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{employee.gestor.cargo}</p>
+                      </div>
+                    </div>
+                  )}
+                  {employee.coordenador && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-all cursor-pointer" onClick={() => employee.coordenador && navigate({ to: "/colaboradores/$id", params: { id: employee.coordenador.id } })}>
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={employee.coordenador.foto_url || ""} />
+                        <AvatarFallback className="text-xs">
+                          {employee.coordenador.nome_completo.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground font-medium">Coordenador</p>
+                        <p className="text-sm font-semibold truncate">{employee.coordenador.nome_completo}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{employee.coordenador.cargo}</p>
+                      </div>
+                    </div>
+                  )}
+                  {!employee.gestor && !employee.coordenador && (
+                    <div className="col-span-full py-8 text-center bg-muted/20 rounded-xl border border-dashed">
+                      <p className="text-xs text-muted-foreground italic">Nenhuma estrutura de reporte atribuída.</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        {/* Lado Direito - Conteúdo Principal */}
-        <div className="lg:w-2/3 space-y-6">
+        {/* Conteúdo Principal em Abas - Agora abaixo de tudo */}
+        <div className="w-full space-y-6">
           <Tabs defaultValue="overview" className="w-full">
             <div className="overflow-x-auto pb-1">
               <TabsList className="w-max sm:w-full justify-start bg-muted/50 p-1 h-12 gap-1 rounded-xl">
