@@ -94,8 +94,8 @@ export function ColaboradoresPage() {
       if (error) throw error;
       return (data as any[]).map(emp => ({
         ...emp,
-        gestor: Array.isArray(emp.gestor) ? emp.gestor[0] : emp.gestor,
-        coordenador: Array.isArray(emp.coordenador) ? emp.coordenador[0] : emp.coordenador
+        gestor: Array.isArray(emp.gestor) ? emp.gestor[0] : (emp.gestor || null),
+        coordenador: Array.isArray(emp.coordenador) ? emp.coordenador[0] : (emp.coordenador || null)
       }));
     },
   });
@@ -398,23 +398,25 @@ export function ColaboradoresPage() {
                                 variant="ghost" 
                                 size="icon" 
                                 className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                }}
                               >
                                 <MoreHorizontal className="h-3 w-3" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={(e) => handleEditClick(emp, e)}>
+                              <DropdownMenuItem onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditClick(emp, e);
+                              }}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Editar
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem 
                                 className="text-destructive"
-                                onClick={(e) => handleDeleteClick(emp, e)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteClick(emp, e);
+                                }}
                               >
                                 <Trash className="mr-2 h-4 w-4" />
                                 Excluir
