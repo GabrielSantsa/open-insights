@@ -16,7 +16,9 @@ import {
   GraduationCap,
   LayoutDashboard,
   Edit2,
-  Save
+  Save,
+  Copy,
+  CheckCircle2
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -140,12 +142,22 @@ function ColaboradorDetail() {
           <span className="text-foreground font-medium">{employee.nome_completo}</span>
         </nav>
         
-        {isUserAdmin && (
-          <Button onClick={() => setIsEditDrawerOpen(true)} variant="outline" className="gap-2">
-            <Edit2 className="w-4 h-4" />
-            Editar Perfil
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary gap-2 h-9" onClick={() => {
+            navigator.clipboard.writeText(employee.email_corporativo);
+            toast.success("E-mail copiado!");
+          }}>
+            <Copy className="w-4 h-4" />
+            Copiar E-mail
           </Button>
-        )}
+          
+          {isUserAdmin && (
+            <Button onClick={() => setIsEditDrawerOpen(true)} variant="outline" className="gap-2 h-9 border-primary/20 text-primary hover:bg-primary/5">
+              <Edit2 className="w-4 h-4" />
+              Editar Perfil
+            </Button>
+          )}
+        </div>
       </div>
 
 
