@@ -89,11 +89,14 @@ export function ColaboradoresPage() {
           gestor:employee_profiles!employee_profiles_gestor_id_fkey(nome_completo),
           coordenador:employee_profiles!employee_profiles_coordenador_id_fkey(nome_completo)
         `)
-        .order("nome_completo")
-        .maybeSingle(); // This is the mistake, it should NOT be maybeSingle for a list
+        .order("nome_completo");
       
       if (error) throw error;
-      return data;
+      return (data as any[]).map(emp => ({
+        ...emp,
+        gestor: Array.isArray(emp.gestor) ? emp.gestor[0] : emp.gestor,
+        coordenador: Array.isArray(emp.coordenador) ? emp.coordenador[0] : emp.coordenador
+      }));
     },
   });
 
