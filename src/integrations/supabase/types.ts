@@ -414,7 +414,10 @@ export type Database = {
           author_id: string | null
           category: string | null
           content: string
+          content_richtext: string | null
+          cover_image_url: string | null
           created_at: string
+          featured: boolean
           id: string
           published_at: string | null
           status: Database["public"]["Enums"]["news_status"]
@@ -427,7 +430,10 @@ export type Database = {
           author_id?: string | null
           category?: string | null
           content: string
+          content_richtext?: string | null
+          cover_image_url?: string | null
           created_at?: string
+          featured?: boolean
           id?: string
           published_at?: string | null
           status?: Database["public"]["Enums"]["news_status"]
@@ -440,7 +446,10 @@ export type Database = {
           author_id?: string | null
           category?: string | null
           content?: string
+          content_richtext?: string | null
+          cover_image_url?: string | null
           created_at?: string
+          featured?: boolean
           id?: string
           published_at?: string | null
           status?: Database["public"]["Enums"]["news_status"]
