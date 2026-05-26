@@ -34,34 +34,80 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadUserData = async (uid: string) => {
-    const [{ data: prof }, { data: rolesData }] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
-      supabase.from("user_roles").select("role").eq("user_id", uid),
-    ]);
-    setProfile(prof as Profile | null);
-    setRoles((rolesData ?? []).map((r) => r.role as AppRole));
+    try {
+      const [{ data: prof, error: profErr }, { data: rolesData, error: rolesErr }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+      ]);
+      
+      if (profErr) {
+        console.error("Profile load error:", profErr);
+      }
+      if (rolesErr) {
+        console.error("Roles load error:", rolesErr);
+      }
+
+      setProfile(prof as Profile | null);
+      setRoles((rolesData ?? []).map((r) => r.role as AppRole));
+    } catch (err) {
+      console.error("Unexpected error in loadUserData:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+    let mounted = true;
+
+    // Initial session check
+    supabase.auth.getSession().then(({ data: { session: s }, error: sessionErr }) => {
+      if (!mounted) return;
+      
+      if (sessionErr) {
+        console.error("Session fetch error:", sessionErr);
+        setLoading(false);
+        return;
+      }
+
       setSession(s);
       setUser(s?.user ?? null);
+      
       if (s?.user) {
-        setTimeout(() => loadUserData(s.user.id), 0);
+        loadUserData(s.user.id);
       } else {
-        setProfile(null);
-        setRoles([]);
+        setLoading(false);
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, s) => {
+      if (!mounted) return;
+      
+      const sessionUser = s?.user ?? null;
+      
+      // Update basic session info immediately
       setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) loadUserData(s.user.id).finally(() => setLoading(false));
-      else setLoading(false);
+      setUser(sessionUser);
+      
+      if (sessionUser) {
+        // Only trigger loading state for major events if we don't have a profile yet
+        if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+          setLoading(true);
+          await loadUserData(sessionUser.id);
+        } else {
+          // Silent refresh for TOKEN_REFRESHED, etc.
+          loadUserData(sessionUser.id);
+        }
+      } else {
+        setProfile(null);
+        setRoles([]);
+        setLoading(false);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
