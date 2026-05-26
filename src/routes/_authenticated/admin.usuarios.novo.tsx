@@ -95,7 +95,7 @@ function NewUserPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Senha inicial</Label>
-                <Input id="password" type="text" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} placeholder="Mínimo 8 caracteres" />
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} placeholder="Mínimo 8 caracteres" />
               </div>
               <div className="space-y-2 md:col-span-2">
                 <Label>Perfil de acesso</Label>

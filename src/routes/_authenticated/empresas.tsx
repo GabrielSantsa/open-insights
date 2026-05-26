@@ -35,6 +35,7 @@ function EmpresasPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [detail, setDetail] = useState<any | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [form, setForm] = useState({
     razao_social: "",
     nome_fantasia: "",
@@ -53,6 +54,13 @@ function EmpresasPage() {
     queryKey: ["sectors-all"],
     queryFn: async () => (await supabase.from("sectors").select("id, name").order("name")).data ?? [],
   });
+
+  const filteredList = (companies.data ?? []).filter((c: any) => 
+    c.razao_social.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.nome_fantasia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.cnpj?.includes(searchTerm)
+  );
+
 
   const create = useMutation({
     mutationFn: async () => {
@@ -222,10 +230,17 @@ function EmpresasPage() {
 
   return (
     <div className="space-y-6 max-w-7xl">
-      <div className="flex items-end justify-between gap-4">
+      <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Empresas</h1>
           <p className="text-sm text-muted-foreground">Cadastro consolidado dos clientes.</p>
+        </div>
+        <div className="w-full md:w-72">
+          <Input 
+            placeholder="Buscar por nome ou CNPJ..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
         {canManage && (
           <div className="flex gap-2">
@@ -320,7 +335,7 @@ function EmpresasPage() {
       </div>
 
       {(() => {
-        const list = companies.data ?? [];
+        const list = filteredList;
         const total = list.length;
         const by = (s: string) => list.filter((c: any) => c.status === s).length;
         const stats = [
@@ -355,7 +370,7 @@ function EmpresasPage() {
               <TableHead>Status</TableHead>
             </TableRow></TableHeader>
             <TableBody>
-              {(companies.data ?? []).map((c: any) => (
+              {filteredList.map((c: any) => (
                 <TableRow
                   key={c.id}
                   className="cursor-pointer"
