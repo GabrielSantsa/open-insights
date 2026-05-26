@@ -19,21 +19,25 @@ import { Progress } from "@/components/ui/progress";
 
 interface EmployeeSkillsProps {
   employeeId: string;
+  employeeData?: any;
 }
 
-export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
-  const { data: employee } = useQuery({
-    queryKey: ["employee-profile-skills", employeeId],
+export function EmployeeSkills({ employeeId, employeeData }: EmployeeSkillsProps) {
+  const { data: employeeProfile } = useQuery({
+    queryKey: ["employee", employeeId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employee_profiles")
-        .select("foco, perfil, atuacao, competencias_responsabilidades, conhecimento_tecnico")
+        .select("*")
         .eq("id", employeeId)
         .maybeSingle();
       if (error) throw error;
       return data;
     },
+    enabled: !employeeData,
   });
+
+  const employee = employeeData || employeeProfile;
 
   const { data: skills, isLoading, error, refetch } = useQuery({
     queryKey: ["employee-skills", employeeId],
