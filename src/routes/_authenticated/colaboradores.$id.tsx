@@ -240,9 +240,9 @@ function ColaboradorDetail() {
 
       <div className="flex flex-col gap-8">
         {/* Topo - Perfil Resumo */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Coluna do Perfil (1/3) */}
-          <div className="lg:col-span-1">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Lado Esquerdo - Perfil Resumo */}
+          <div className="lg:w-1/3 space-y-6">
             <Card className="border-border/40 overflow-hidden shadow-sm h-full">
               <div className="h-24 bg-gradient-to-r from-primary/10 to-primary/5" />
               <CardContent className="pt-0 -mt-12 text-center">
@@ -300,8 +300,8 @@ function ColaboradorDetail() {
             </Card>
           </div>
 
-          {/* Coluna da Estrutura de Reporte (2/3) */}
-          <div className="lg:col-span-2">
+          {/* Estrutura de Reporte - Agora ao lado do perfil, mantendo a responsividade */}
+          <div className="lg:w-2/3 space-y-6">
             <Card className="border-border/40 shadow-sm h-full">
               <CardHeader className="pb-3 border-b bg-muted/20">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -352,7 +352,7 @@ function ColaboradorDetail() {
                     </div>
                   )}
                   {!employee.gestor && !employee.coordenador && (
-                    <p className="text-xs text-muted-foreground italic col-span-full">Nenhuma estrutura de reporte atribuída.</p>
+                    <p className="text-xs text-muted-foreground italic col-span-full py-4">Nenhuma estrutura de reporte atribuída.</p>
                   )}
                 </div>
               </CardContent>
