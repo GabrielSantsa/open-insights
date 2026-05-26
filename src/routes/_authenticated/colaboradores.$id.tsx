@@ -442,17 +442,6 @@ function ColaboradorDetail() {
                 </CardContent>
               </Card>
             </TabsContent>
-
-            <TabsContent value="assinatura" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
-              <Card className="border-border/40 shadow-sm">
-                <CardHeader className="pb-6">
-                  <CardTitle className="text-sm font-semibold">Assinatura Corporativa</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <EmployeeSignature employee={employee} />
-                </CardContent>
-              </Card>
-            </TabsContent>
           </Tabs>
         </div>
       </div>
