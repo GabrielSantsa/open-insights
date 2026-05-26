@@ -371,7 +371,8 @@ export function ColaboradoresPage() {
               key={emp.id} 
               className="cursor-pointer"
               onClick={(e) => {
-                if ((e.target as HTMLElement).closest('button')) return;
+                const target = e.target as HTMLElement;
+                if (target.closest('button') || target.closest('[role="menuitem"]')) return;
                 navigate({ to: "/colaboradores/$id", params: { id: emp.id } });
               }}
             >
@@ -406,6 +407,7 @@ export function ColaboradoresPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem onClick={(e) => {
+                                e.preventDefault();
                                 e.stopPropagation();
                                 handleEditClick(emp, e);
                               }}>
@@ -416,6 +418,7 @@ export function ColaboradoresPage() {
                               <DropdownMenuItem 
                                 className="text-destructive"
                                 onClick={(e) => {
+                                  e.preventDefault();
                                   e.stopPropagation();
                                   handleDeleteClick(emp, e);
                                 }}
@@ -528,6 +531,7 @@ export function ColaboradoresPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={(e) => {
+                            e.preventDefault();
                             e.stopPropagation();
                             handleEditClick(emp, e);
                           }}>
