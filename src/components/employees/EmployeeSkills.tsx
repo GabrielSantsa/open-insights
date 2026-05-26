@@ -19,9 +19,26 @@ import { Progress } from "@/components/ui/progress";
 
 interface EmployeeSkillsProps {
   employeeId: string;
+  employeeData?: any;
 }
 
-export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
+export function EmployeeSkills({ employeeId, employeeData }: EmployeeSkillsProps) {
+  const { data: employeeProfile } = useQuery({
+    queryKey: ["employee", employeeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("employee_profiles")
+        .select("*")
+        .eq("id", employeeId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !employeeData,
+  });
+
+  const employee = employeeData || employeeProfile;
+
   const { data: skills, isLoading, error, refetch } = useQuery({
     queryKey: ["employee-skills", employeeId],
     queryFn: async () => {
@@ -60,6 +77,31 @@ export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      {(employee?.competencias_responsabilidades || employee?.conhecimento_tecnico) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {employee.competencias_responsabilidades && (
+            <Card className="border-border/40 bg-muted/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Definição de Competências</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm whitespace-pre-wrap">{employee.competencias_responsabilidades}</p>
+              </CardContent>
+            </Card>
+          )}
+          {employee.conhecimento_tecnico && (
+            <Card className="border-border/40 bg-muted/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Definição de Conhecimento Técnico</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm whitespace-pre-wrap">{employee.conhecimento_tecnico}</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Responsabilidades */}
         <div className="space-y-4">
@@ -141,7 +183,7 @@ export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
                 <Wrench className="w-5 h-5 text-primary" />
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Foco</p>
-              <p className="text-sm font-semibold">Excelência Operacional</p>
+              <p className="text-sm font-semibold">{employee?.foco || "Não definido"}</p>
             </div>
           </CardContent>
         </Card>
@@ -153,7 +195,7 @@ export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
                 <Search className="w-5 h-5 text-primary" />
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Perfil</p>
-              <p className="text-sm font-semibold">Análise & Detalhes</p>
+              <p className="text-sm font-semibold">{employee?.perfil || "Não definido"}</p>
             </div>
           </CardContent>
         </Card>
@@ -165,7 +207,7 @@ export function EmployeeSkills({ employeeId }: EmployeeSkillsProps) {
                 <Target className="w-5 h-5 text-primary" />
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Atuação</p>
-              <p className="text-sm font-semibold">Suporte Estratégico</p>
+              <p className="text-sm font-semibold">{employee?.atuacao || "Não definido"}</p>
             </div>
           </CardContent>
         </Card>

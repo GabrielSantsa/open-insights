@@ -444,18 +444,23 @@ export type Database = {
       employee_profiles: {
         Row: {
           assinatura_email: string | null
+          atuacao: string | null
           cargo: string
           cargo_padronizado: string | null
+          competencias_responsabilidades: string | null
+          conhecimento_tecnico: string | null
           coordenador_id: string | null
           created_at: string
           data_admissao: string
           email_corporativo: string
+          foco: string | null
           foto_url: string | null
           gestor_id: string | null
           id: string
           informacoes_institucionais: string | null
           localizacao: string | null
           nome_completo: string
+          perfil: string | null
           ramal: string | null
           setor: string
           status: Database["public"]["Enums"]["employee_status"]
@@ -465,18 +470,23 @@ export type Database = {
         }
         Insert: {
           assinatura_email?: string | null
+          atuacao?: string | null
           cargo: string
           cargo_padronizado?: string | null
+          competencias_responsabilidades?: string | null
+          conhecimento_tecnico?: string | null
           coordenador_id?: string | null
           created_at?: string
           data_admissao?: string
           email_corporativo: string
+          foco?: string | null
           foto_url?: string | null
           gestor_id?: string | null
           id?: string
           informacoes_institucionais?: string | null
           localizacao?: string | null
           nome_completo: string
+          perfil?: string | null
           ramal?: string | null
           setor: string
           status?: Database["public"]["Enums"]["employee_status"]
@@ -486,18 +496,23 @@ export type Database = {
         }
         Update: {
           assinatura_email?: string | null
+          atuacao?: string | null
           cargo?: string
           cargo_padronizado?: string | null
+          competencias_responsabilidades?: string | null
+          conhecimento_tecnico?: string | null
           coordenador_id?: string | null
           created_at?: string
           data_admissao?: string
           email_corporativo?: string
+          foco?: string | null
           foto_url?: string | null
           gestor_id?: string | null
           id?: string
           informacoes_institucionais?: string | null
           localizacao?: string | null
           nome_completo?: string
+          perfil?: string | null
           ramal?: string | null
           setor?: string
           status?: Database["public"]["Enums"]["employee_status"]
