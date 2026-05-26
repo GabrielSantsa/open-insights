@@ -127,29 +127,44 @@ function ProceduresPage() {
                 <Button><Plus className="w-4 h-4" />Publicar</Button>
               </DialogTrigger>
               <DialogContent className="max-w-xl">
-                <DialogHeader><DialogTitle>Publicar procedimento</DialogTitle></DialogHeader>
+                <DialogHeader><DialogTitle>Novo procedimento</DialogTitle></DialogHeader>
                 <div className="space-y-3">
                   <div className="space-y-1.5">
                     <Label>Título</Label>
                     <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                   </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>Categoria</Label>
+                      <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Versão inicial</Label>
+                      <Input value={form.version} onChange={(e) => setForm({ ...form, version: e.target.value })} />
+                    </div>
+                  </div>
                   <div className="space-y-1.5">
                     <Label>Descrição</Label>
-                    <Textarea rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                    <Textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label>Versão</Label>
-                    <Input value={form.version} onChange={(e) => setForm({ ...form, version: e.target.value })} />
-                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Será criado como <strong>rascunho</strong>. Edite o conteúdo e mude o status para <strong>Publicado</strong> quando estiver pronto.
+                  </p>
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
                   <Button onClick={() => publish.mutate()} disabled={publish.isPending}>
-                    {publish.isPending ? "Publicando..." : "Publicar"}
+                    {publish.isPending ? "Criando..." : "Criar rascunho"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
           )}
         </div>
       </div>
