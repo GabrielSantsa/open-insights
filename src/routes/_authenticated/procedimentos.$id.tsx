@@ -400,22 +400,24 @@ function ProcedureDetail() {
             {proc.data.published_at && (
               <span>Publicado em: {new Date(proc.data.published_at).toLocaleDateString("pt-BR")}</span>
             )}
-            <span className="flex items-center gap-2">
-              <span>Status:</span>
-              <Select
-                value={workflow}
-                onValueChange={(v) => changeWorkflow.mutate(v)}
-                disabled={changeWorkflow.isPending}
-              >
-                <SelectTrigger className="h-7 w-36 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="rascunho">Rascunho</SelectItem>
-                  <SelectItem value="em_revisao">Em revisão</SelectItem>
-                  <SelectItem value="publicado">Publicado</SelectItem>
-                  <SelectItem value="arquivado">Arquivado</SelectItem>
-                </SelectContent>
-              </Select>
-            </span>
+            {canEdit && (
+              <span className="flex items-center gap-2">
+                <span>Status:</span>
+                <Select
+                  value={workflow}
+                  onValueChange={(v) => changeWorkflow.mutate(v)}
+                  disabled={changeWorkflow.isPending}
+                >
+                  <SelectTrigger className="h-7 w-36 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="rascunho">Rascunho</SelectItem>
+                    <SelectItem value="em_revisao">Em revisão</SelectItem>
+                    <SelectItem value="publicado">Publicado</SelectItem>
+                    <SelectItem value="arquivado">Arquivado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </span>
+            )}
           </div>
         </header>
 
@@ -555,21 +557,23 @@ function ProcedureDetail() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center justify-between">
                   <span>Anexos</span>
-                  <>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      className="hidden"
-                      onChange={(e) => {
-                        const f = e.target.files?.[0];
-                        if (f) uploadFile.mutate(f);
-                        if (fileInputRef.current) fileInputRef.current.value = "";
-                      }}
-                    />
-                    <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploadFile.isPending}>
-                      <Upload className="w-4 h-4 mr-1" />{uploadFile.isPending ? "Enviando..." : "Enviar arquivo"}
-                    </Button>
-                  </>
+                  {canEdit && (
+                    <>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) uploadFile.mutate(f);
+                          if (fileInputRef.current) fileInputRef.current.value = "";
+                        }}
+                      />
+                      <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploadFile.isPending}>
+                        <Upload className="w-4 h-4 mr-1" />{uploadFile.isPending ? "Enviando..." : "Enviar arquivo"}
+                      </Button>
+                    </>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -591,11 +595,13 @@ function ProcedureDetail() {
                         <Button size="icon" variant="ghost" onClick={() => downloadFile(f)} title="Baixar">
                           <Download className="w-4 h-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" onClick={() => {
-                          if (confirm(`Remover "${f.name}"?`)) deleteFile.mutate({ id: f.id, storage_path: f.storage_path });
-                        }} title="Remover">
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
+                        {canEdit && (
+                          <Button size="icon" variant="ghost" onClick={() => {
+                            if (confirm(`Remover "${f.name}"?`)) deleteFile.mutate({ id: f.id, storage_path: f.storage_path });
+                          }} title="Remover">
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        )}
                       </li>
                     ))}
                   </ul>
