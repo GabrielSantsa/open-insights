@@ -10,7 +10,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { EMPLOYEE_STATUS_LABELS, isAdmin } from "@/lib/permissions";
 import { toast } from "sonner";
-import { Link } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import {
   Table,
