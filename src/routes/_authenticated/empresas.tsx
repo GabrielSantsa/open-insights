@@ -17,7 +17,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
-import { Plus, Upload, Download } from "lucide-react";
+import { Plus, Upload, Download, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { useRef } from "react";
@@ -184,6 +184,19 @@ function EmpresasPage() {
           ? `${inserted} importada(s) — ${skipped} CNPJ(s) duplicado(s) ignorado(s)`
           : `${inserted} empresa(s) importada(s)`,
       );
+      qc.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteCompany = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("companies").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Empresa excluída");
+      setDetail(null);
       qc.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -407,10 +420,27 @@ function EmpresasPage() {
               {detail.observacoes && (
                 <div className="col-span-2">
                   <dt className="text-xs text-muted-foreground">Observações</dt>
-                  <dd className="whitespace-pre-wrap">{detail.observacoes}</dd>
+                  <dd className="font-medium whitespace-pre-wrap">{detail.observacoes}</dd>
                 </div>
               )}
             </dl>
+          )}
+          {canManage && detail && (
+            <DialogFooter className="mt-6 border-t pt-4">
+              <Button
+                variant="destructive"
+                className="gap-2"
+                onClick={() => {
+                  if (confirm("Deseja realmente excluir esta empresa?")) {
+                    deleteCompany.mutate(detail.id);
+                  }
+                }}
+                disabled={deleteCompany.isPending}
+              >
+                <Trash2 className="w-4 h-4" />
+                Excluir Empresa
+              </Button>
+            </DialogFooter>
           )}
         </DialogContent>
       </Dialog>
