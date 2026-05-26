@@ -369,17 +369,13 @@ function ProcedureDetail() {
             <Button variant="outline" size="icon" onClick={() => setFontSize((s) => Math.min(24, s + 1))} title="Aumentar fonte">
               <AArrowUp className="w-4 h-4" />
             </Button>
-            {canEdit && (
-              <>
-                <Button variant="outline" size="sm" className="ml-2" onClick={() => setVersionDialog(true)}>
-                  <GitBranch className="w-4 h-4 mr-1" />Nova versão
-                </Button>
-                {!editing && (
-                  <Button variant="outline" size="sm" onClick={() => { setDraft(content); setEditing(true); }}>
-                    <Pencil className="w-4 h-4 mr-1" />Editar
-                  </Button>
-                )}
-              </>
+            <Button variant="outline" size="sm" className="ml-2" onClick={() => setVersionDialog(true)}>
+              <GitBranch className="w-4 h-4 mr-1" />Nova versão
+            </Button>
+            {!editing && (
+              <Button variant="outline" size="sm" onClick={() => { setDraft(content); setEditing(true); }}>
+                <Pencil className="w-4 h-4 mr-1" />Editar
+              </Button>
             )}
           </div>
         </div>
@@ -404,24 +400,22 @@ function ProcedureDetail() {
             {proc.data.published_at && (
               <span>Publicado em: {new Date(proc.data.published_at).toLocaleDateString("pt-BR")}</span>
             )}
-            {canEdit && (
-              <span className="flex items-center gap-2">
-                <span>Status:</span>
-                <Select
-                  value={workflow}
-                  onValueChange={(v) => changeWorkflow.mutate(v)}
-                  disabled={changeWorkflow.isPending}
-                >
-                  <SelectTrigger className="h-7 w-36 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="rascunho">Rascunho</SelectItem>
-                    <SelectItem value="em_revisao">Em revisão</SelectItem>
-                    <SelectItem value="publicado">Publicado</SelectItem>
-                    <SelectItem value="arquivado">Arquivado</SelectItem>
-                  </SelectContent>
-                </Select>
-              </span>
-            )}
+            <span className="flex items-center gap-2">
+              <span>Status:</span>
+              <Select
+                value={workflow}
+                onValueChange={(v) => changeWorkflow.mutate(v)}
+                disabled={changeWorkflow.isPending}
+              >
+                <SelectTrigger className="h-7 w-36 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="rascunho">Rascunho</SelectItem>
+                  <SelectItem value="em_revisao">Em revisão</SelectItem>
+                  <SelectItem value="publicado">Publicado</SelectItem>
+                  <SelectItem value="arquivado">Arquivado</SelectItem>
+                </SelectContent>
+              </Select>
+            </span>
           </div>
         </header>
 
@@ -430,7 +424,7 @@ function ProcedureDetail() {
             <TabsTrigger value="artigo"><BookOpen className="w-4 h-4 mr-1" />Artigo</TabsTrigger>
             <TabsTrigger value="checklist"><ListChecks className="w-4 h-4 mr-1" />Checklist {total > 0 && `(${done}/${total})`}</TabsTrigger>
             <TabsTrigger value="anexos"><Paperclip className="w-4 h-4 mr-1" />Anexos {(files.data?.length ?? 0) > 0 && `(${files.data?.length})`}</TabsTrigger>
-            <TabsTrigger value="historico"><History className="w-4 h-4 mr-1" />Histórico {(versions.data?.length ?? 0) > 0 && `(${versions.data?.length})`}</TabsTrigger>
+            {canEdit && <TabsTrigger value="historico"><History className="w-4 h-4 mr-1" />Histórico {(versions.data?.length ?? 0) > 0 && `(${versions.data?.length})`}</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="artigo" className="mt-6">
@@ -483,11 +477,9 @@ function ProcedureDetail() {
                     <CardContent className="py-12 text-center text-muted-foreground">
                       <BookOpen className="w-10 h-10 mx-auto mb-3 opacity-50" />
                       <p className="text-sm">Este procedimento ainda não tem um artigo de leitura.</p>
-                      {canEdit && (
-                        <Button className="mt-4" onClick={() => { setDraft(""); setEditing(true); }}>
-                          <Pencil className="w-4 h-4 mr-1" />Escrever artigo
-                        </Button>
-                      )}
+                      <Button className="mt-4" onClick={() => { setDraft(""); setEditing(true); }}>
+                        <Pencil className="w-4 h-4 mr-1" />Escrever artigo
+                      </Button>
                     </CardContent>
                   </Card>
                 )}
@@ -563,23 +555,21 @@ function ProcedureDetail() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center justify-between">
                   <span>Anexos</span>
-                  {canEdit && (
-                    <>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) uploadFile.mutate(f);
-                          if (fileInputRef.current) fileInputRef.current.value = "";
-                        }}
-                      />
-                      <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploadFile.isPending}>
-                        <Upload className="w-4 h-4 mr-1" />{uploadFile.isPending ? "Enviando..." : "Enviar arquivo"}
-                      </Button>
-                    </>
-                  )}
+                  <>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) uploadFile.mutate(f);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                    />
+                    <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploadFile.isPending}>
+                      <Upload className="w-4 h-4 mr-1" />{uploadFile.isPending ? "Enviando..." : "Enviar arquivo"}
+                    </Button>
+                  </>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -601,13 +591,11 @@ function ProcedureDetail() {
                         <Button size="icon" variant="ghost" onClick={() => downloadFile(f)} title="Baixar">
                           <Download className="w-4 h-4" />
                         </Button>
-                        {canEdit && (
-                          <Button size="icon" variant="ghost" onClick={() => {
-                            if (confirm(`Remover "${f.name}"?`)) deleteFile.mutate({ id: f.id, storage_path: f.storage_path });
-                          }} title="Remover">
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
-                        )}
+                        <Button size="icon" variant="ghost" onClick={() => {
+                          if (confirm(`Remover "${f.name}"?`)) deleteFile.mutate({ id: f.id, storage_path: f.storage_path });
+                        }} title="Remover">
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
                       </li>
                     ))}
                   </ul>
