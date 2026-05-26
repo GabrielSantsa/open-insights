@@ -106,12 +106,61 @@ function ProcedureDetail() {
     queryFn: async () => {
       const { data } = await supabase
         .from("procedure_versions")
-        .select("id, version, change_note, is_major, created_at, created_by")
+        .select("id, version, change_note, is_major, content, created_at, created_by")
         .eq("procedure_id", id)
         .order("created_at", { ascending: false });
       return data ?? [];
     },
   });
+
+  const files = useQuery({
+    queryKey: ["proc-files", id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("procedure_files")
+        .select("*")
+        .eq("procedure_id", id)
+        .order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  const uploadFile = useMutation({
+    mutationFn: async (file: File) => {
+      if (!user) throw new Error("Não autenticado");
+      const path = `${id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+      const { error: upErr } = await supabase.storage.from("procedures").upload(path, file, {
+        contentType: file.type, upsert: false,
+      });
+      if (upErr) throw upErr;
+      const { error } = await supabase.from("procedure_files").insert({
+        procedure_id: id, name: file.name, storage_path: path,
+        file_size: file.size, mime_type: file.type, uploaded_by: user.id,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Anexo enviado"); qc.invalidateQueries({ queryKey: ["proc-files", id] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteFile = useMutation({
+    mutationFn: async (f: { id: string; storage_path: string }) => {
+      await supabase.storage.from("procedures").remove([f.storage_path]);
+      const { error } = await supabase.from("procedure_files").delete().eq("id", f.id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Anexo removido"); qc.invalidateQueries({ queryKey: ["proc-files", id] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const downloadFile = async (f: { storage_path: string; name: string }) => {
+    const { data, error } = await supabase.storage.from("procedures")
+      .createSignedUrl(f.storage_path, 60, { download: f.name });
+    if (error || !data) return toast.error(error?.message ?? "Erro");
+    window.open(data.signedUrl, "_blank");
+  };
+
+
 
   const steps = useQuery({
     queryKey: ["proc-steps", id],
