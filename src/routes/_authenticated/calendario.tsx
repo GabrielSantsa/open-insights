@@ -327,6 +327,24 @@ function CalendarioPage() {
                         </Button>
                       </div>
                     )}
+                    {canPublish && (
+                      <div className="pt-4 flex justify-end border-t border-dashed">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="h-8 gap-2"
+                          onClick={() => {
+                            if (confirm("Tem certeza que deseja excluir este evento?")) {
+                              deleteEvent.mutate(e.id);
+                            }
+                          }}
+                          disabled={deleteEvent.isPending}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Excluir Evento
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </DialogContent>
               </Dialog>
