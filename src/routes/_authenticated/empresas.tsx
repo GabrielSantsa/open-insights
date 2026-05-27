@@ -17,7 +17,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
-import { Plus, Upload, Download, Trash2 } from "lucide-react";
+import { Plus, Upload, Download, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { useRef } from "react";
@@ -35,7 +35,7 @@ function EmpresasPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [alphabetFilter, setAlphabetFilter] = useState<string | null>(null);
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>({ key: "razao_social", direction: "asc" });
   const [detail, setDetail] = useState<any | null>(null);
   const [form, setForm] = useState({
     company_number: "",
@@ -57,20 +57,45 @@ function EmpresasPage() {
     queryFn: async () => (await supabase.from("sectors").select("id, name").order("name")).data ?? [],
   });
 
-  const filteredList = (companies.data ?? []).filter((c: any) => {
-    const matchesSearch = 
+  const filteredList = (companies.data ?? [])
+    .filter((c: any) => 
       c.razao_social.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.nome_fantasia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.cnpj?.includes(searchTerm) ||
-      c.company_number?.includes(searchTerm);
-    
-    const matchesAlphabet = !alphabetFilter || 
-      c.razao_social.toUpperCase().startsWith(alphabetFilter);
-    
-    return matchesSearch && matchesAlphabet;
-  });
+      c.company_number?.includes(searchTerm)
+    )
+    .sort((a, b) => {
+      if (!sortConfig) return 0;
+      const { key, direction } = sortConfig;
+      
+      let valA = a[key];
+      let valB = b[key];
 
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+      // Handle company_number as number if possible for better sorting
+      if (key === "company_number") {
+        const numA = parseInt(valA, 10);
+        const numB = parseInt(valB, 10);
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return direction === "asc" ? numA - numB : numB - numA;
+        }
+      }
+
+      valA = String(valA || "").toLowerCase();
+      valB = String(valB || "").toLowerCase();
+
+      if (valA < valB) return direction === "asc" ? -1 : 1;
+      if (valA > valB) return direction === "asc" ? 1 : -1;
+      return 0;
+    });
+
+  const toggleSort = (key: string) => {
+    setSortConfig((prev) => {
+      if (prev?.key === key) {
+        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
+      }
+      return { key, direction: "asc" };
+    });
+  };
 
   const create = useMutation({
     mutationFn: async () => {
@@ -378,34 +403,36 @@ function EmpresasPage() {
         );
       })()}
 
-      <div className="flex flex-wrap gap-1 p-2 bg-muted/50 rounded-lg border">
-        <Button
-          variant={alphabetFilter === null ? "default" : "ghost"}
-          size="sm"
-          className="h-8 px-2 text-xs"
-          onClick={() => setAlphabetFilter(null)}
-        >
-          Tudo
-        </Button>
-        {alphabet.map((char) => (
-          <Button
-            key={char}
-            variant={alphabetFilter === char ? "default" : "ghost"}
-            size="sm"
-            className="h-8 w-8 p-0 text-xs"
-            onClick={() => setAlphabetFilter(char === alphabetFilter ? null : char)}
-          >
-            {char}
-          </Button>
-        ))}
-      </div>
-
       <Card>
         <CardContent className="p-0">
           <Table>
             <TableHeader><TableRow>
-              <TableHead className="w-20">N°</TableHead>
-              <TableHead>Razão social</TableHead>
+              <TableHead 
+                className="w-20 cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => toggleSort("company_number")}
+              >
+                <div className="flex items-center gap-1">
+                  N°
+                  {sortConfig?.key === "company_number" ? (
+                    sortConfig.direction === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />
+                  ) : (
+                    <ArrowUpDown className="w-3 h-3 text-muted-foreground/50" />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => toggleSort("razao_social")}
+              >
+                <div className="flex items-center gap-1">
+                  Razão social
+                  {sortConfig?.key === "razao_social" ? (
+                    sortConfig.direction === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />
+                  ) : (
+                    <ArrowUpDown className="w-3 h-3 text-muted-foreground/50" />
+                  )}
+                </div>
+              </TableHead>
               <TableHead>CNPJ</TableHead>
               <TableHead>Cidade/UF</TableHead>
               <TableHead>Setor</TableHead>
