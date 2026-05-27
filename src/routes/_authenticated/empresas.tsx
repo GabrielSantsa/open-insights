@@ -68,8 +68,8 @@ function EmpresasPage() {
       if (!sortConfig) return 0;
       const { key, direction } = sortConfig;
       
-      let valA = a[key];
-      let valB = b[key];
+      let valA = (a as any)[key];
+      let valB = (b as any)[key];
 
       // Handle company_number as number if possible for better sorting
       if (key === "company_number") {
