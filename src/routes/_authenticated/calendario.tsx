@@ -133,14 +133,24 @@ function CalendarioPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Calendário corporativo</h1>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight">Calendário corporativo</h1>
+            <Badge variant="outline" className="capitalize">
+              {format(currentDate, "MMMM yyyy", { locale: ptBR })}
+            </Badge>
+          </div>
           <p className="text-sm text-muted-foreground">Prazos fiscais, reuniões e treinamentos.</p>
         </div>
         <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 mr-2 bg-muted/50 p-1 rounded-lg">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prevMonth} title="Mês anterior"><ChevronLeft className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => setCurrentDate(new Date())}>Hoje</Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={nextMonth} title="Próximo mês"><ChevronRight className="h-4 w-4" /></Button>
+          </div>
           <Select value={selectedSector} onValueChange={setSelectedSector}>
-            <SelectTrigger className="w-[180px]">
-              <Filter className="w-4 h-4 mr-2" />
+            <SelectTrigger className="w-[160px] h-9">
+              <Filter className="w-3.5 h-3.5 mr-2" />
               <SelectValue placeholder="Setor" />
             </SelectTrigger>
             <SelectContent>
@@ -153,7 +163,7 @@ function CalendarioPage() {
           {canPublish && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button><Plus className="w-4 h-4 mr-1" />Novo evento</Button>
+                <Button size="sm" className="h-9"><Plus className="w-4 h-4 mr-1" />Novo</Button>
               </DialogTrigger>
               <DialogContent className="max-w-xl">
                 <DialogHeader><DialogTitle>Publicar evento na agenda</DialogTitle></DialogHeader>
