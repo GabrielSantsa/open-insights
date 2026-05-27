@@ -76,7 +76,7 @@ function CalendarioPage() {
   });
 
   const events = useQuery({
-    queryKey: ["calendar-events", selectedSector],
+    queryKey: ["calendar-events", selectedSector, currentDate.getMonth(), currentDate.getFullYear()],
     queryFn: async () => {
       const start = startOfMonth(currentDate).toISOString();
       const end = endOfMonth(currentDate).toISOString();
