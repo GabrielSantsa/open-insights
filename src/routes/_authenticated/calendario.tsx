@@ -213,106 +213,96 @@ function CalendarioPage() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-4">
-          <CardTitle className="text-lg font-medium capitalize">
-            {format(currentDate, "MMMM yyyy", { locale: ptBR })}
-          </CardTitle>
-          <div className="flex items-center gap-1">
-            <Button variant="outline" size="icon" onClick={prevMonth}><ChevronLeft className="h-4 w-4" /></Button>
-            <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>Hoje</Button>
-            <Button variant="outline" size="icon" onClick={nextMonth}><ChevronRight className="h-4 w-4" /></Button>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="grid grid-cols-7 border-b border-t bg-muted/30">
-            {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"].map((day) => (
-              <div key={day} className="py-2 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {day}
-              </div>
+      <div className="space-y-4">
+        {events.isLoading ? (
+          <div className="text-center py-12 text-muted-foreground italic">Carregando eventos...</div>
+        ) : events.data?.length === 0 ? (
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+              <CalIcon className="w-12 h-12 mb-4 opacity-20" />
+              <p>Nenhum evento encontrado para os filtros selecionados.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {events.data?.map((e) => (
+              <Dialog key={e.id}>
+                <DialogTrigger asChild>
+                  <Card className={cn(
+                    "cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all border-l-4",
+                    e.event_type === "prazo_fiscal" ? "border-l-red-500" :
+                    e.event_type === "reuniao" ? "border-l-blue-500" :
+                    e.event_type === "treinamento" ? "border-l-green-500" :
+                    "border-l-amber-500"
+                  )}>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <Badge variant="secondary" className={cn("text-[10px] uppercase", TYPE_COLORS[e.event_type])}>
+                          {TYPE_LABEL[e.event_type]}
+                        </Badge>
+                        {e.sectors?.name && (
+                          <Badge variant="outline" className="text-[10px] uppercase">
+                            {e.sectors.name}
+                          </Badge>
+                        )}
+                      </div>
+                      <CardTitle className="text-base line-clamp-1">{e.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-semibold text-foreground">Início:</span>
+                          {format(parseISO(e.start_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                        </div>
+                        {e.end_at && (
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-semibold text-foreground">Fim:</span>
+                            {format(parseISO(e.end_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          </div>
+                        )}
+                      </div>
+                      {e.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-2 italic">
+                          "{e.description}"
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="secondary">{TYPE_LABEL[e.event_type]}</Badge>
+                      {e.sectors?.name && <Badge variant="outline">{e.sectors.name}</Badge>}
+                    </div>
+                    <DialogTitle>{e.title}</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-2">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase">Início</Label>
+                        <div className="font-medium">{format(parseISO(e.start_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</div>
+                      </div>
+                      {e.end_at && (
+                        <div>
+                          <Label className="text-xs text-muted-foreground uppercase">Fim</Label>
+                          <div className="font-medium">{format(parseISO(e.end_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</div>
+                        </div>
+                      )}
+                    </div>
+                    {e.description && (
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase">Descrição</Label>
+                        <p className="text-sm mt-1 whitespace-pre-wrap">{e.description}</p>
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
             ))}
           </div>
-          <div className="grid grid-cols-7 auto-rows-[120px]">
-            {calendarDays.map((day, i) => {
-              const dayEvents = (events.data ?? []).filter((e) => isSameDay(parseISO(e.start_at), day));
-              const isSelectedMonth = isSameMonth(day, monthStart);
-              
-              return (
-                <div
-                  key={i}
-                  className={cn(
-                    "relative border-r border-b p-2 overflow-hidden transition-colors hover:bg-muted/10 group",
-                    !isSelectedMonth && "bg-muted/5 text-muted-foreground/50"
-                  )}
-                  onClick={() => canPublish && isSelectedMonth && openWithDate(day)}
-                >
-                  <span className={cn(
-                    "text-sm font-medium inline-flex items-center justify-center w-7 h-7 rounded-full",
-                    isSameDay(day, new Date()) && "bg-primary text-primary-foreground"
-                  )}>
-                    {format(day, "d")}
-                  </span>
-                  
-                  <div className="mt-1 space-y-1">
-                    {dayEvents.map((e) => (
-                      <Dialog key={e.id}>
-                        <DialogTrigger asChild>
-                          <div 
-                            className={cn(
-                              "text-[10px] px-1.5 py-0.5 rounded border truncate cursor-pointer hover:opacity-80 transition-opacity font-medium",
-                              TYPE_COLORS[e.event_type] || "bg-secondary border-border"
-                            )}
-                            onClick={(evt) => evt.stopPropagation()}
-                          >
-                            {e.title}
-                          </div>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <div className="flex items-center gap-2 mb-1">
-                              <Badge variant="secondary">{TYPE_LABEL[e.event_type]}</Badge>
-                              {e.sectors?.name && <Badge variant="outline">{e.sectors.name}</Badge>}
-                            </div>
-                            <DialogTitle>{e.title}</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4 pt-2">
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <Label className="text-xs text-muted-foreground uppercase">Início</Label>
-                                <div className="font-medium">{format(parseISO(e.start_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</div>
-                              </div>
-                              {e.end_at && (
-                                <div>
-                                  <Label className="text-xs text-muted-foreground uppercase">Fim</Label>
-                                  <div className="font-medium">{format(parseISO(e.end_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</div>
-                                </div>
-                              )}
-                            </div>
-                            {e.description && (
-                              <div>
-                                <Label className="text-xs text-muted-foreground uppercase">Descrição</Label>
-                                <p className="text-sm mt-1 whitespace-pre-wrap">{e.description}</p>
-                              </div>
-                            )}
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    ))}
-                  </div>
-                  
-                  {canPublish && isSelectedMonth && (
-                    <div className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                        <Plus className="w-2.5 h-2.5" /> Adicionar
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
     </div>
   );
 }
