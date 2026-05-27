@@ -455,20 +455,35 @@ export function ColaboradoresPage() {
                 <div className="mt-auto px-6 py-3 border-t bg-muted/20 flex items-center justify-between">
                   {(() => {
                     const cargoLower = (emp.cargo || "").toLowerCase();
-                    const isLideranca = cargoLower.includes("gerente") || cargoLower.includes("coordenador") || cargoLower.includes("diretor");
-                    const label = isLideranca ? "Gestor" : "Coordenador";
-                    const pessoa = isLideranca ? emp.gestor : (emp.coordenador || emp.gestor);
+                    const isGerente = cargoLower.includes("gerente");
+                    const isDiretor = cargoLower.includes("diretor");
+                    const isCoordenador = cargoLower.includes("coordenador");
+                    const isLideranca = isGerente || isCoordenador || isDiretor;
+
+                    let label = "Gestor";
+                    let valor: string;
+                    if (isGerente) {
+                      label = "Administração";
+                      valor = emp.gestor?.nome_completo || "Diretoria";
+                    } else if (isLideranca) {
+                      valor = emp.gestor?.nome_completo || "Não definido";
+                    } else {
+                      label = "Coordenador";
+                      const pessoa = emp.coordenador || emp.gestor;
+                      valor = pessoa?.nome_completo || "Não definido";
+                    }
                     return (
                       <div className="flex items-center gap-1.5 text-xs">
                         <span className="text-muted-foreground">{label}:</span>
-                        <span className="font-medium text-foreground truncate max-w-[120px]">
-                          {pessoa ? pessoa.nome_completo : "Não definido"}
+                        <span className="font-medium text-foreground truncate max-w-[140px]">
+                          {valor}
                         </span>
                       </div>
                     );
                   })()}
                   <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
+
 
               </Card>
             </div>
