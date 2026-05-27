@@ -78,10 +78,19 @@ function CalendarioPage() {
   const events = useQuery({
     queryKey: ["calendar-events", selectedSector],
     queryFn: async () => {
-      let query = supabase.from("calendar_events").select("*, sectors(name)");
+      const start = startOfMonth(currentDate).toISOString();
+      const end = endOfMonth(currentDate).toISOString();
+      
+      let query = supabase
+        .from("calendar_events")
+        .select("*, sectors(name)")
+        .gte("start_at", start)
+        .lte("start_at", end);
+        
       if (selectedSector !== "all") {
         query = query.eq("sector_id", selectedSector);
       }
+      
       const { data } = await query.order("start_at");
       return data ?? [];
     },
