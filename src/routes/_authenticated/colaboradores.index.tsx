@@ -463,7 +463,7 @@ export function ColaboradoresPage() {
                     let label = "Gestor";
                     let valor: string;
                     if (isGerente) {
-                      label = "Administração";
+                      label = "Gestor";
                       valor = emp.gestor?.nome_completo || "Diretoria";
                     } else if (isLideranca) {
                       valor = emp.gestor?.nome_completo || "Não definido";
