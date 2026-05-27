@@ -11,8 +11,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, CheckCircle2, User, LayoutGrid, List } from "lucide-react";
+import { Plus, CheckCircle2, User, LayoutGrid, List, Trash2 } from "lucide-react";
 import { TASK_PRIORITY_LABELS, TASK_STATUS_LABELS, isApprover, ROLE_LABELS } from "@/lib/permissions";
 import { toast } from "sonner";
 import type { TaskPriority, TaskStatus } from "@/lib/permissions";
@@ -73,6 +74,18 @@ function DemandasPage() {
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["tasks"] }); toast.success("Status atualizado"); },
     onError: (e: any) => toast.error(e.message),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("tasks").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["tasks"] });
+      toast.success("Demanda apagada com sucesso");
+    },
+    onError: (e: any) => toast.error("Erro ao apagar: " + e.message),
   });
 
   const [form, setForm] = useState({
@@ -230,11 +243,37 @@ function DemandasPage() {
                     <TableCell><Badge variant="outline">{TASK_PRIORITY_LABELS[t.priority as TaskPriority]}</Badge></TableCell>
                     <TableCell className="text-sm">{t.due_date ? new Date(t.due_date).toLocaleDateString("pt-BR") : "—"}</TableCell>
                     <TableCell><Badge className={STATUS_TONE[t.status as TaskStatus]}>{TASK_STATUS_LABELS[t.status as TaskStatus]}</Badge></TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right flex justify-end gap-2">
                       {t.status !== "concluida" && (
                         <Button size="sm" variant="ghost" onClick={() => updateStatus.mutate({ id: t.id, status: "concluida" })}>
                           <CheckCircle2 className="w-4 h-4 mr-1" />Concluir
                         </Button>
+                      )}
+                      {canCreate && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Apagar demanda</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tem certeza que deseja apagar esta demanda? Esta ação não pode ser desfeita.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => deleteMutation.mutate(t.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Apagar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       )}
                     </TableCell>
                   </TableRow>
@@ -273,7 +312,33 @@ function DemandasPage() {
                   </div>
                 </div>
               </CardContent>
-              <div className="p-4 border-t flex justify-end">
+              <div className="p-4 border-t flex justify-end gap-2">
+                {canCreate && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="outline" className="text-destructive border-destructive hover:bg-destructive/10">
+                        <Trash2 className="w-4 h-4 mr-1" />Apagar
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Apagar demanda</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja apagar esta demanda? Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => deleteMutation.mutate(t.id)}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Apagar
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
                 {t.status !== "concluida" && (
                   <Button size="sm" variant="outline" onClick={() => updateStatus.mutate({ id: t.id, status: "concluida" })}>
                     <CheckCircle2 className="w-4 h-4 mr-1" />Concluir
