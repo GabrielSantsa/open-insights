@@ -44,7 +44,7 @@ export function isApprover(roles: AppRole[]): boolean {
 }
 
 export function isAdmin(roles: AppRole[]): boolean {
-  return roles.includes("admin");
+  return roles.includes("admin") || roles.includes("gerente");
 }
 
 export function hasGlobalSectorAccess(roles: AppRole[]): boolean {
