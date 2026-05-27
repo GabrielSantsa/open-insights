@@ -453,14 +453,23 @@ export function ColaboradoresPage() {
                   </div>
                 </CardContent>
                 <div className="mt-auto px-6 py-3 border-t bg-muted/20 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs">
-                    <span className="text-muted-foreground">Gestor:</span>
-                    <span className="font-medium text-foreground truncate max-w-[120px]">
-                      {emp.gestor ? emp.gestor.nome_completo : "Não definido"}
-                    </span>
-                  </div>
+                  {(() => {
+                    const cargoLower = (emp.cargo || "").toLowerCase();
+                    const isLideranca = cargoLower.includes("gerente") || cargoLower.includes("coordenador") || cargoLower.includes("diretor");
+                    const label = isLideranca ? "Gestor" : "Coordenador";
+                    const pessoa = isLideranca ? emp.gestor : (emp.coordenador || emp.gestor);
+                    return (
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <span className="text-muted-foreground">{label}:</span>
+                        <span className="font-medium text-foreground truncate max-w-[120px]">
+                          {pessoa ? pessoa.nome_completo : "Não definido"}
+                        </span>
+                      </div>
+                    );
+                  })()}
                   <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
+
               </Card>
             </div>
           ))}
