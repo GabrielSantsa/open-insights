@@ -35,6 +35,7 @@ function EmpresasPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [alphabetFilter, setAlphabetFilter] = useState<string | null>(null);
   const [detail, setDetail] = useState<any | null>(null);
   const [form, setForm] = useState({
     company_number: "",
@@ -56,12 +57,20 @@ function EmpresasPage() {
     queryFn: async () => (await supabase.from("sectors").select("id, name").order("name")).data ?? [],
   });
 
-  const filteredList = (companies.data ?? []).filter((c: any) => 
-    c.razao_social.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.nome_fantasia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.cnpj?.includes(searchTerm) ||
-    c.company_number?.includes(searchTerm)
-  );
+  const filteredList = (companies.data ?? []).filter((c: any) => {
+    const matchesSearch = 
+      c.razao_social.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.nome_fantasia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.cnpj?.includes(searchTerm) ||
+      c.company_number?.includes(searchTerm);
+    
+    const matchesAlphabet = !alphabetFilter || 
+      c.razao_social.toUpperCase().startsWith(alphabetFilter);
+    
+    return matchesSearch && matchesAlphabet;
+  });
+
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
   const create = useMutation({
     mutationFn: async () => {
@@ -368,6 +377,28 @@ function EmpresasPage() {
           </div>
         );
       })()}
+
+      <div className="flex flex-wrap gap-1 p-2 bg-muted/50 rounded-lg border">
+        <Button
+          variant={alphabetFilter === null ? "default" : "ghost"}
+          size="sm"
+          className="h-8 px-2 text-xs"
+          onClick={() => setAlphabetFilter(null)}
+        >
+          Tudo
+        </Button>
+        {alphabet.map((char) => (
+          <Button
+            key={char}
+            variant={alphabetFilter === char ? "default" : "ghost"}
+            size="sm"
+            className="h-8 w-8 p-0 text-xs"
+            onClick={() => setAlphabetFilter(char === alphabetFilter ? null : char)}
+          >
+            {char}
+          </Button>
+        ))}
+      </div>
 
       <Card>
         <CardContent className="p-0">
