@@ -23,15 +23,8 @@ function AppsPage() {
   const isCoordenador = roles.includes("coordenador");
   const isAdmin = roles.includes("admin");
 
-  useEffect(() => {
-    if (!isAdmin && userSector) {
-      const normalizedSector = normalize(userSector);
-      const found = SECTORS.find(s => normalize(s) === normalizedSector);
-      if (found) {
-        setActiveTab(found);
-      }
-    }
-  }, [userSector, isAdmin]);
+  const normalize = (s: string) => 
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
   const { data: userSector } = useQuery({
     queryKey: ["user-sector", profile?.primary_sector_id],
@@ -46,6 +39,16 @@ function AppsPage() {
     },
     enabled: !!profile?.primary_sector_id,
   });
+
+  useEffect(() => {
+    if (!isAdmin && userSector) {
+      const normalizedSector = normalize(userSector);
+      const found = SECTORS.find(s => normalize(s) === normalizedSector);
+      if (found) {
+        setActiveTab(found);
+      }
+    }
+  }, [userSector, isAdmin]);
 
   const apps = useQuery({
     queryKey: ["apps-all"],
@@ -76,9 +79,6 @@ function AppsPage() {
     await supabase.from("app_access_log").insert({ app_id: a.id, user_id: user!.id });
     window.open(a.url, "_blank", "noopener,noreferrer");
   };
-
-  const normalize = (s: string) => 
-    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
   const visibleSectors = SECTORS.filter(s => {
     if (isAdmin) return true;
@@ -163,4 +163,3 @@ function AppsPage() {
     </div>
   );
 }
-
