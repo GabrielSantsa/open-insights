@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExternalLink, Star, Plus, Settings } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const SECTORS = ["fiscal", "contabil", "comercial", "departamento pessoal"] as const;
+const SECTORS = ["fiscal", "contabil", "comercial", "departamento pessoal", "financeiro", "diretoria"] as const;
 
 export const Route = createFileRoute("/_authenticated/apps")({
   component: AppsPage,
@@ -17,11 +17,38 @@ export const Route = createFileRoute("/_authenticated/apps")({
 });
 
 function AppsPage() {
-  const { user, roles } = useAuth();
+  const { user, roles, profile } = useAuth();
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState<string>("geral");
   const isCoordenador = roles.includes("coordenador");
   const isAdmin = roles.includes("admin");
+
+  const normalize = (s: string) => 
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  const { data: userSector } = useQuery({
+    queryKey: ["user-sector", profile?.primary_sector_id],
+    queryFn: async () => {
+      if (!profile?.primary_sector_id) return null;
+      const { data } = await supabase
+        .from("sectors")
+        .select("name")
+        .eq("id", profile.primary_sector_id)
+        .single();
+      return data?.name || null;
+    },
+    enabled: !!profile?.primary_sector_id,
+  });
+
+  useEffect(() => {
+    if (!isAdmin && userSector) {
+      const normalizedSector = normalize(userSector);
+      const found = SECTORS.find(s => normalize(s) === normalizedSector);
+      if (found) {
+        setActiveTab(found);
+      }
+    }
+  }, [userSector, isAdmin]);
 
   const apps = useQuery({
     queryKey: ["apps-all"],
@@ -52,6 +79,12 @@ function AppsPage() {
     await supabase.from("app_access_log").insert({ app_id: a.id, user_id: user!.id });
     window.open(a.url, "_blank", "noopener,noreferrer");
   };
+
+  const visibleSectors = SECTORS.filter(s => {
+    if (isAdmin) return true;
+    if (!userSector) return false;
+    return normalize(s) === normalize(userSector);
+  });
 
   const filteredApps = (sector?: string) => {
     const all = apps.data ?? [];
@@ -104,8 +137,8 @@ function AppsPage() {
 
       <Tabs defaultValue="geral" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="w-full justify-start overflow-x-auto h-auto p-1 bg-muted/50">
-          <TabsTrigger value="geral" className="capitalize">Geral</TabsTrigger>
-          {SECTORS.map(s => (
+          {(isAdmin || activeTab === "geral") && <TabsTrigger value="geral" className="capitalize">Geral</TabsTrigger>}
+          {visibleSectors.map(s => (
             <TabsTrigger key={s} value={s} className="capitalize">{s}</TabsTrigger>
           ))}
         </TabsList>
@@ -130,4 +163,3 @@ function AppsPage() {
     </div>
   );
 }
-
