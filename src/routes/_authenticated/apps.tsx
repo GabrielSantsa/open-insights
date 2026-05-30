@@ -9,7 +9,7 @@ import { ExternalLink, Star, Plus, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 
-const SECTORS = ["fiscal", "contabil", "comercial", "departamento pessoal"] as const;
+const SECTORS = ["fiscal", "contabil", "comercial", "departamento pessoal", "financeiro", "diretoria"] as const;
 
 export const Route = createFileRoute("/_authenticated/apps")({
   component: AppsPage,
