@@ -17,11 +17,25 @@ export const Route = createFileRoute("/_authenticated/apps")({
 });
 
 function AppsPage() {
-  const { user, roles } = useAuth();
+  const { user, roles, profile } = useAuth();
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState<string>("geral");
   const isCoordenador = roles.includes("coordenador");
   const isAdmin = roles.includes("admin");
+
+  const { data: userSector } = useQuery({
+    queryKey: ["user-sector", profile?.primary_sector_id],
+    queryFn: async () => {
+      if (!profile?.primary_sector_id) return null;
+      const { data } = await supabase
+        .from("sectors")
+        .select("name")
+        .eq("id", profile.primary_sector_id)
+        .single();
+      return data?.name || null;
+    },
+    enabled: !!profile?.primary_sector_id,
+  });
 
   const apps = useQuery({
     queryKey: ["apps-all"],
@@ -40,18 +54,14 @@ function AppsPage() {
     enabled: !!user,
   });
 
-  const toggle = useMutation({
-    mutationFn: async ({ id, isFav }: { id: string; isFav: boolean }) => {
-      if (isFav) await supabase.from("app_favorites").delete().eq("user_id", user!.id).eq("app_id", id);
-      else await supabase.from("app_favorites").insert({ user_id: user!.id, app_id: id });
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-fav-apps"] }),
-  });
+  const normalize = (s: string) => 
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-  const open = async (a: any) => {
-    await supabase.from("app_access_log").insert({ app_id: a.id, user_id: user!.id });
-    window.open(a.url, "_blank", "noopener,noreferrer");
-  };
+  const visibleSectors = SECTORS.filter(s => {
+    if (isAdmin) return true;
+    if (!userSector) return false;
+    return normalize(s) === normalize(userSector);
+  });
 
   const filteredApps = (sector?: string) => {
     const all = apps.data ?? [];
