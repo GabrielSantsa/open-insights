@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExternalLink, Star, Plus, Settings } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const SECTORS = ["fiscal", "contabil", "comercial", "departamento pessoal"] as const;
 
@@ -22,6 +22,16 @@ function AppsPage() {
   const [activeTab, setActiveTab] = useState<string>("geral");
   const isCoordenador = roles.includes("coordenador");
   const isAdmin = roles.includes("admin");
+
+  useEffect(() => {
+    if (!isAdmin && userSector) {
+      const normalizedSector = normalize(userSector);
+      const found = SECTORS.find(s => normalize(s) === normalizedSector);
+      if (found) {
+        setActiveTab(found);
+      }
+    }
+  }, [userSector, isAdmin]);
 
   const { data: userSector } = useQuery({
     queryKey: ["user-sector", profile?.primary_sector_id],
@@ -127,8 +137,8 @@ function AppsPage() {
 
       <Tabs defaultValue="geral" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="w-full justify-start overflow-x-auto h-auto p-1 bg-muted/50">
-          <TabsTrigger value="geral" className="capitalize">Geral</TabsTrigger>
-          {SECTORS.map(s => (
+          {(isAdmin || activeTab === "geral") && <TabsTrigger value="geral" className="capitalize">Geral</TabsTrigger>}
+          {visibleSectors.map(s => (
             <TabsTrigger key={s} value={s} className="capitalize">{s}</TabsTrigger>
           ))}
         </TabsList>
