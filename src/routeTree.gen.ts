@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedDemandasRouteImport } from './routes/_authenticated/demandas'
+import { Route as AuthenticatedDatabaseStatusRouteImport } from './routes/_authenticated/database-status'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedColaboradoresRouteImport } from './routes/_authenticated/colaboradores'
 import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authenticated/calendario'
@@ -66,6 +67,12 @@ const AuthenticatedDemandasRoute = AuthenticatedDemandasRouteImport.update({
   path: '/demandas',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDatabaseStatusRoute =
+  AuthenticatedDatabaseStatusRouteImport.update({
+    id: '/database-status',
+    path: '/database-status',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -160,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/calendario': typeof AuthenticatedCalendarioRoute
   '/colaboradores': typeof AuthenticatedColaboradoresRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/database-status': typeof AuthenticatedDatabaseStatusRoute
   '/demandas': typeof AuthenticatedDemandasRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
@@ -181,6 +189,7 @@ export interface FileRoutesByTo {
   '/apps': typeof AuthenticatedAppsRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/database-status': typeof AuthenticatedDatabaseStatusRoute
   '/demandas': typeof AuthenticatedDemandasRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
@@ -206,6 +215,7 @@ export interface FileRoutesById {
   '/_authenticated/calendario': typeof AuthenticatedCalendarioRoute
   '/_authenticated/colaboradores': typeof AuthenticatedColaboradoresRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/database-status': typeof AuthenticatedDatabaseStatusRoute
   '/_authenticated/demandas': typeof AuthenticatedDemandasRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/calendario'
     | '/colaboradores'
     | '/dashboard'
+    | '/database-status'
     | '/demandas'
     | '/documentos'
     | '/empresas'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/calendario'
     | '/dashboard'
+    | '/database-status'
     | '/demandas'
     | '/documentos'
     | '/empresas'
@@ -276,6 +288,7 @@ export interface FileRouteTypes {
     | '/_authenticated/calendario'
     | '/_authenticated/colaboradores'
     | '/_authenticated/dashboard'
+    | '/_authenticated/database-status'
     | '/_authenticated/demandas'
     | '/_authenticated/documentos'
     | '/_authenticated/empresas'
@@ -347,6 +360,13 @@ declare module '@tanstack/react-router' {
       path: '/demandas'
       fullPath: '/demandas'
       preLoaderRoute: typeof AuthenticatedDemandasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/database-status': {
+      id: '/_authenticated/database-status'
+      path: '/database-status'
+      fullPath: '/database-status'
+      preLoaderRoute: typeof AuthenticatedDatabaseStatusRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
@@ -492,6 +512,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCalendarioRoute: typeof AuthenticatedCalendarioRoute
   AuthenticatedColaboradoresRoute: typeof AuthenticatedColaboradoresRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDatabaseStatusRoute: typeof AuthenticatedDatabaseStatusRoute
   AuthenticatedDemandasRoute: typeof AuthenticatedDemandasRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
@@ -509,6 +530,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCalendarioRoute: AuthenticatedCalendarioRoute,
   AuthenticatedColaboradoresRoute: AuthenticatedColaboradoresRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDatabaseStatusRoute: AuthenticatedDatabaseStatusRoute,
   AuthenticatedDemandasRoute: AuthenticatedDemandasRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
@@ -533,3 +555,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
