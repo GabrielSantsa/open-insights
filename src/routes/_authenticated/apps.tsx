@@ -54,6 +54,19 @@ function AppsPage() {
     enabled: !!user,
   });
 
+  const toggle = useMutation({
+    mutationFn: async ({ id, isFav }: { id: string; isFav: boolean }) => {
+      if (isFav) await supabase.from("app_favorites").delete().eq("user_id", user!.id).eq("app_id", id);
+      else await supabase.from("app_favorites").insert({ user_id: user!.id, app_id: id });
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-fav-apps"] }),
+  });
+
+  const open = async (a: any) => {
+    await supabase.from("app_access_log").insert({ app_id: a.id, user_id: user!.id });
+    window.open(a.url, "_blank", "noopener,noreferrer");
+  };
+
   const normalize = (s: string) => 
     s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
