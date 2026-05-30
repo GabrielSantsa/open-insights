@@ -11,6 +11,7 @@ import {
   Shield,
   Building2,
   Users,
+  Database,
 } from "lucide-react";
 import {
   Sidebar,
@@ -93,6 +94,14 @@ export function AppSidebar() {
                     <Link to="/admin">
                       <Shield className="w-4 h-4" />
                       <span>Painel admin</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={isActive("/database-status")} tooltip="Status do Banco">
+                    <Link to="/database-status">
+                      <Database className="w-4 h-4" />
+                      <span>Status do Banco</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
