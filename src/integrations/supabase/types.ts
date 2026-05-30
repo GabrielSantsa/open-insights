@@ -73,34 +73,40 @@ export type Database = {
         Row: {
           active: boolean
           allow_iframe: boolean
+          coordenador_id: string | null
           created_at: string
           description: string | null
           icon: string | null
           id: string
           name: string
           sector_id: string | null
+          sector_name: string | null
           url: string
         }
         Insert: {
           active?: boolean
           allow_iframe?: boolean
+          coordenador_id?: string | null
           created_at?: string
           description?: string | null
           icon?: string | null
           id?: string
           name: string
           sector_id?: string | null
+          sector_name?: string | null
           url: string
         }
         Update: {
           active?: boolean
           allow_iframe?: boolean
+          coordenador_id?: string | null
           created_at?: string
           description?: string | null
           icon?: string | null
           id?: string
           name?: string
           sector_id?: string | null
+          sector_name?: string | null
           url?: string
         }
         Relationships: [
