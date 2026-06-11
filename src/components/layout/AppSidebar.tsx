@@ -30,7 +30,6 @@ import { isAdmin } from "@/lib/permissions";
 
 const mainItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Demandas", url: "/demandas", icon: CheckSquare },
   { title: "Procedimentos", url: "/procedimentos", icon: BookOpen },
   { title: "Apps & Ferramentas", url: "/apps", icon: AppWindow },
   { title: "Documentos", url: "/documentos", icon: FileText },
@@ -89,6 +88,14 @@ export function AppSidebar() {
             <SidebarGroupLabel>Administração</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={isActive("/demandas")} tooltip="Demandas">
+                    <Link to="/demandas">
+                      <CheckSquare className="w-4 h-4" />
+                      <span>Demandas</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("/admin")} tooltip="Administração">
                     <Link to="/admin">
