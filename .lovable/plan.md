@@ -1,111 +1,47 @@
-# União Contadores — Plano de Implementação
+# Plano
 
-Intranet operacional para ~30 usuários, com RBAC por perfil + setor, módulos integrados e backend nativo via Lovable Cloud (Supabase).
+## 1. Restringir a página `/demandas` a administradores e gestores
 
-## Stack
-- TanStack Start (React 19 + TS + Vite) — já é o template do projeto
-- Tailwind v4 + Shadcn/UI + Lucide
-- TanStack Query (cache/estado de servidor)
-- Lovable Cloud: Auth, Postgres + RLS, Storage, Realtime
-- Formulários: react-hook-form + zod
+A rota `/demandas` hoje é acessível a qualquer usuário autenticado. Vamos torná-la exclusiva para `admin` e `gerente` (mesma regra já usada por `isAdmin()` em `src/lib/permissions.ts`).
 
-> Observação técnica: o template usa **TanStack Router** (file-based em `src/routes/`), não React Router. O roteamento será feito nessa convenção, mantendo a mesma experiência.
+- Em `src/routes/_authenticated/demandas.tsx`:
+  - Ler `roles` do `useAuth()` e usar `isAdmin(roles)`.
+  - Se não for admin/gestor, exibir um bloco "Acesso restrito" com botão para voltar ao Dashboard (em vez de mostrar a página).
+- Em `src/components/layout/AppSidebar.tsx`:
+  - O item "Demandas" passa a aparecer somente quando `isAdmin(roles) === true` (mover para um grupo condicional como já é feito para Administração).
 
-## Fase 0 — Fundação
-1. Ativar Lovable Cloud (Supabase gerenciado).
-2. Design system: paleta sóbria corporativa (azul-petróleo + cinza + accent âmbar), tipografia Inter/IBM Plex, tokens em `src/styles.css`, sem excesso de animação.
-3. Layout base: `Sidebar` recolhível + `Topbar` (busca, notificações, perfil) + área principal com `<Outlet />`.
+Observação: usamos guard no componente (e não em `beforeLoad`) para manter consistência com o padrão atual do projeto e evitar problemas com o gate do `_authenticated`.
 
-## Fase 1 — Auth + RBAC + Setores
-- Supabase Auth (email/senha + recuperação de senha + `/reset-password`).
-- Enum `app_role`: `admin`, `diretoria`, `gerente`, `coordenador`, `colaborador`.
-- Tabelas: `profiles`, `sectors`, `user_roles`, `user_sectors`.
-- Função `has_role(uuid, app_role)` SECURITY DEFINER.
-- Função `can_view_sector(uuid, uuid)` (diretoria/admin = global).
-- Layout `_authenticated` com `beforeLoad` para gate.
-- Hook `useAuth` + contexto de permissões.
+## 2. Configurar a aba "Demandas" dentro do colaborador
 
-## Fase 2 — Banco completo + RLS + Storage
-Tabelas:
-`profiles`, `roles` (enum), `user_roles`, `sectors`, `user_sectors`,
-`tasks`, `task_comments`,
-`procedures`, `procedure_steps`, `procedure_user_progress`, `procedure_favorites`,
-`documents`, `document_access_log`,
-`apps`, `app_favorites`, `app_access_log`,
-`companies`,
-`calendar_events`,
-`news_posts`,
-`notifications`,
-`audit_log`.
+A aba já existe (`EmployeeTasksTab`) e busca tarefas por `assignee_id = employee.user_id`. Vamos enriquecê-la para refletir a página principal de demandas, no escopo do colaborador.
 
-Buckets privados: `documents`, `procedures`, `news`.
-RLS em todas as tabelas, baseada em `has_role` + `can_view_sector`.
-Trigger `handle_new_user` cria `profiles` + role padrão `colaborador`.
-Função `log_audit(action, resource, metadata)` para registro centralizado.
+Melhorias em `src/components/employees/EmployeeTasksTab.tsx`:
 
-## Fase 3 — Dashboard
-Cards: Minhas Pendências, Comunicados Recentes, Procedimentos Favoritos, Apps Mais Utilizados, Próximos Eventos, Meu Perfil.
+- **Aviso quando o colaborador não tem `user_id` vinculado**: hoje 4 de 7 colaboradores não têm conta de usuário associada — a aba simplesmente fica vazia. Mostrar uma mensagem clara: "Este colaborador ainda não possui conta de usuário vinculada. Vincule um usuário para registrar demandas."
+- **KPIs existentes** (Em andamento, Pendentes, Concluídas, Atrasadas) — manter.
+- **Tabela completa de demandas** (substitui a lista resumida atual) com colunas: Título, Prioridade, Prazo, Status, Criador, Ações.
+  - Badge de status com as cores já usadas em `/demandas`.
+  - Badge de prioridade com `TASK_PRIORITY_LABELS`.
+  - Botão "Concluir" (visível quando status ≠ `concluida`) — disponível para admin/gestor/coordenador/diretoria (`isApprover`).
+  - Botão "Apagar" com AlertDialog — somente admin/gestor (`isAdmin`).
+- **Botão "Nova demanda para este colaborador"** no topo da aba (somente para `isApprover`):
+  - Abre um Dialog com os campos: Título, Descrição, Setor, Prioridade, Prazo.
+  - O responsável já vem fixado como o `user_id` do colaborador (não editável).
+  - Cria a tarefa via `supabase.from('tasks').insert({...})` com `creator_id = auth user`, `assignee_id = employee.user_id`.
+  - Ao salvar, invalida `["employee-tasks", userId]`.
+- **Filtro de status** dentro da aba (Todos / Nova / Em andamento / Aguardando / Concluída / Cancelada).
+- **Link "Ver Todas"** continua apontando para `/demandas` — mas só renderiza se o usuário tiver acesso à página (admin/gestor).
 
-## Fase 4 — Módulos funcionais
-1. **Demandas** — CRUD, filtros por status/prioridade/setor, regras por perfil, comentários.
-2. **Procedimentos** — base de conhecimento + etapas + checklist **individual** por usuário (`procedure_user_progress`), favoritos, anexos PDF via Storage.
-3. **Documentos** — upload/listagem/download por categoria e setor, flag “sensível”, auditoria de visualização/download.
-4. **Apps & Ferramentas** — catálogo CRUD (admin), abrir externo ou iframe, favoritar, log de acesso.
-5. **Empresas** — cadastro simples (Razão Social, Fantasia, Responsável, Setor, Status, Observações).
-6. **Calendário** — eventos no banco, visões mensal/semanal/agenda, notificações 24h/1h/no momento via job (Realtime + tabela `notifications`).
-7. **Notícias** — workflow Rascunho → Aguardando Aprovação → Publicado, categorias, aprovação por Diretoria/Gerente/Coordenador autorizado.
+## 3. Detalhes técnicos
 
-## Fase 5 — Administração + Auditoria + Notificações
-- Painel admin: usuários (criar, editar, desativar, vincular setores, definir perfil), setores, apps.
-- `audit_log` populado pelas server functions + triggers nos pontos sensíveis.
-- Notificações em tempo real (Supabase Realtime) com contador na topbar.
+- Sem novas tabelas, sem migrações.
+- Sem mudanças em RLS — as policies atuais de `tasks` permitem que approvers criem/editem; usuários comuns veem suas próprias.
+- Reuso de helpers `isAdmin`, `isApprover`, `TASK_STATUS_LABELS`, `TASK_PRIORITY_LABELS` de `src/lib/permissions.ts`.
+- Sem alteração no roteamento (a rota continua existindo; o gate é em componente + sidebar).
 
-## Fase 6 — Seed inicial
-- 6 setores, 8 apps, 5 procedimentos, 10 notícias de exemplo (via migration `INSERT`).
+## Arquivos alterados
 
-## Fase 7 — Entregáveis finais
-- `README.md` com: visão geral, stack, variáveis de ambiente, deploy (Cloudflare Workers / self-host), seed, contas de teste.
-- Revisão final de RLS, permissões e fluxos.
-
-## Estrutura de pastas
-```text
-src/
-  routes/
-    __root.tsx
-    index.tsx                       (redireciona p/ /dashboard ou /login)
-    login.tsx
-    reset-password.tsx
-    _authenticated.tsx              (gate)
-    _authenticated/
-      dashboard.tsx
-      demandas.tsx, demandas.$id.tsx
-      procedimentos.tsx, procedimentos.$id.tsx
-      documentos.tsx
-      apps.tsx
-      empresas.tsx
-      calendario.tsx
-      noticias.tsx, noticias.$id.tsx
-      admin/usuarios.tsx
-      admin/setores.tsx
-      admin/apps.tsx
-      admin/auditoria.tsx
-  components/
-    layout/ (AppSidebar, Topbar, NotificationsMenu, ProfileMenu, GlobalSearch)
-    dashboard/ (PendingCard, NewsCard, FavoriteProceduresCard, AppsCard, EventsCard, ProfileCard)
-    demandas/ procedimentos/ documentos/ apps/ empresas/ calendario/ noticias/ admin/
-    ui/ (shadcn)
-  lib/
-    permissions.ts
-    *.functions.ts (server functions)
-  integrations/supabase/ (gerado)
-  hooks/ (useAuth, usePermissions, useNotifications)
-```
-
-## Notas importantes
-- **Escopo enorme**: vou entregar em fases nesta ordem (0 → 1 → 2 → 3 → 4 → 5 → 6 → 7), commitando a cada fase. Você poderá testar incrementalmente.
-- Esta primeira iteração entregará **Fases 0–3 + Demandas e Procedimentos (núcleo da Fase 4)**. As demais virão em sequência para evitar um único push gigante e difícil de revisar.
-- Sem dark mode (não foi pedido). Idioma da UI: PT-BR.
-- Sem integração com Google Calendar (conforme pedido).
-- Iframe de apps respeitará `X-Frame-Options` do alvo — quando bloqueado, abre em nova aba.
-
-Confirma o plano (e a estratégia de entrega em fases)?
+- `src/routes/_authenticated/demandas.tsx` — guard de acesso.
+- `src/components/layout/AppSidebar.tsx` — esconder item "Demandas" para não-admins.
+- `src/components/employees/EmployeeTasksTab.tsx` — aba enriquecida (tabela, criação, conclusão, exclusão, filtro, aviso de user_id).
