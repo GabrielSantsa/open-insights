@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, CheckCircle2, User, LayoutGrid, List, Trash2 } from "lucide-react";
-import { TASK_PRIORITY_LABELS, TASK_STATUS_LABELS, isApprover, ROLE_LABELS } from "@/lib/permissions";
+import { TASK_PRIORITY_LABELS, TASK_STATUS_LABELS, isApprover, isAdmin, ROLE_LABELS } from "@/lib/permissions";
 import { toast } from "sonner";
 import type { TaskPriority, TaskStatus } from "@/lib/permissions";
 
@@ -35,6 +35,21 @@ function DemandasPage() {
   const { user, roles } = useAuth();
   const qc = useQueryClient();
   const canCreate = isApprover(roles);
+  const allowed = isAdmin(roles);
+
+  if (!allowed) {
+    return (
+      <div className="max-w-xl mx-auto mt-20 text-center space-y-4">
+        <h1 className="text-2xl font-bold">Acesso restrito</h1>
+        <p className="text-muted-foreground">
+          A página de Demandas é exclusiva para administradores e gestores.
+        </p>
+        <Button asChild>
+          <a href="/dashboard">Voltar ao Dashboard</a>
+        </Button>
+      </div>
+    );
+  }
 
   const [filter, setFilter] = useState<TaskStatus | "todas">("todas");
   const [employeeFilter, setEmployeeFilter] = useState<string | "todos">("todos");
